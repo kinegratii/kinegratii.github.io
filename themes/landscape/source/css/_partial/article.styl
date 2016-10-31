@@ -10,16 +10,24 @@
 
 .article-date
   @extend $block-caption
+  margin: 15px 15px 0px 20px
   float: left
+  a&:hover
+    color: color-link
+  &:before
+    font-family: font-icon
+    color: #ccc
+    content: "\f073"
 
 .article-category
+  margin: 15px 15px 0px 8px
   float: left
   line-height: 1em
   color: #ccc
   text-shadow: 0 1px #fff
-  margin-left: 8px
   &:before
-    content: "\2022"
+    font-family: font-icon
+    content: "\f0c6"
 
 .article-category-link
   @extend $block-caption
@@ -301,6 +309,14 @@ $article-share-link
   &:hover
     background: color-google
     text-shadow: 0 1px darken(color-google, 20%)
+
+.article-share-wechat
+  @extend $article-share-link
+  &:before
+    content: "\f1d7"
+  &:hover
+    background: color-wechat
+    text-shadow: 0 1px darken(color-wechat, 20%)
 
 .article-gallery
   background: #000

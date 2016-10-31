@@ -4,8 +4,24 @@
   <% } %>
   <div class="outer">
     <div id="footer-info" class="inner">
-      &copy; <%= date(new Date(), 'YYYY') %> <%= config.author || config.title %><br>
-      <%= __('powered_by') %> <a href="http://hexo.io/" target="_blank">Hexo</a>
+	  <table width="100%" border="0">
+	    <tr>
+		  <td style="text-align:left">
+		    Copyright &copy; <%= date(new Date(), 'YYYY') %> <%= config.author || config.title %><br>
+		    Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
+		  </td>
+		  <td style="text-align:right">
+		    <div style="font-family: FontAwesome;font-size: 20px;">
+			  <a href="https://github.com/kinegratii" title="GitHub" target="_blank">&#61595;</a>&nbsp;
+			</div>
+			  <a href="/sitemap.xml">网站地图</a>&nbsp;&nbsp;
+			  <a href="/atom.xml">订阅本站</a>&nbsp; &nbsp;
+			  <a href="mailto:kinegratii@yeah.net" target="_blank">联系博主</a>
+		  </td>
+		</tr>
+	  </table>
+      
+      
     </div>
   </div>
 </footer>

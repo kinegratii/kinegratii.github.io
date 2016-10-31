@@ -4,10 +4,11 @@
 
 # Site
 title: Kinegratii的博客
-subtitle: 你说有一日总会名扬天下实现你抱负
-description:
+subtitle:
+description: 你说有一日总会名扬天下实现你抱负
 author: Kinegratii
-language: zh-CN
+avatar: /images/avatar.jpg
+language: zh-Hans
 timezone: Asia/Shanghai
 
 # URL
@@ -63,7 +64,7 @@ pagination_dir: page
 # Extensions
 ## Plugins: https://hexo.io/plugins/
 ## Themes: https://hexo.io/themes/
-theme: landscape
+theme: next
 
 # Deployment
 ## Docs: https://hexo.io/docs/deployment.html

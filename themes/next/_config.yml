@@ -6,7 +6,7 @@
 favicon: /favicon.ico
 
 # Set default keywords (Use a comma to separate)
-keywords: "Hexo, NexT"
+keywords: "前端,python"
 
 # Set rss to false to disable feed link.
 # Leave rss as empty to use site's feed link.
@@ -32,7 +32,7 @@ menu:
   #categories: /categories
   #about: /about
   archives: /archives
-  #tags: /tags
+  tags: /tags
   #schedule: /schedule
   #commonweal: /404.html
 
@@ -153,7 +153,7 @@ toc:
   enable: true
 
   # Automatically add list number to toc.
-  number: true
+  number: false
 
 
 # Creative Commons 4.0 International License.
@@ -173,9 +173,9 @@ sidebar:
   #  - always  expand for all pages automatically
   #  - hide    expand only when click on the sidebar toggle icon.
   #  - remove  Totally remove sidebar including sidebar toggler.
-  display: post
+  #display: post
   #display: always
-  #display: hide
+  display: hide
   #display: remove
 
 

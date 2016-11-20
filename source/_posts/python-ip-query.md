@@ -13,7 +13,7 @@ tags:
 
 ## 代码
 
-```
+```python
 from tkinter import *
 import re
 import urllib

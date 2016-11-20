@@ -1,5 +1,5 @@
 ---
-title: django实践：数据库查询
+title: Django实践：数据库查询
 date: 2016-11-18 20:43:57
 categories:
  - 编程

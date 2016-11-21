@@ -7,6 +7,7 @@ date: 2016-11-19 23:33:01
 
 - 男/90后/福建·福州/web开发
 - Python/Javascript
+- kinegratii *AT* yeah.net
 
 ---
 
@@ -30,7 +31,9 @@ date: 2016-11-19 23:33:01
 
 ### Java
 
-2015年用过半年时间，还停留在5.0时代。对于Java，不太习惯强类型，上编译原理的时候，用Java写过实践项目[C语言词法分析器](https://www.oschina.net/p/lexer)。
+对于Java，不太习惯强类型，上编译原理的时候，用Java写过实践项目[C语言词法分析器](https://www.oschina.net/p/lexer)
+
+2015年用过半年时间，还停留在5.0时代。
 
 ---
 

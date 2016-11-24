@@ -1,6 +1,7 @@
 ---
 title: 关于
 date: 2016-11-19 23:33:01
+comments: false
 ---
 
 ##  个人

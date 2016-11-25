@@ -6,9 +6,9 @@ comments: false
 
 ##  个人
 
-- 男/90后/福建·福州/web开发
+- 男/90后/福建·福州/Web开发
 - Python/Javascript
-- kinegratii *AT* yeah.net
+- kinegratii@yeah.net
 
 ---
 
@@ -24,17 +24,17 @@ comments: false
 
 ### Javascript
 
-不是专业的前端开发，用过jQuery、echarts和高德地图Javascript API。
+在写后端代码时顺带学习了HTML/Javascript/Css等前端语言，主要用的是jQuery、underscopse.js和Bootsrap等基础库，在业务方面用过jqGrid、echarts和高德地图Javascript API等第三方库，形成了“数据管理 + 统计分析”的基本系统功能结构。
 
-前端要学的东西真的很多，2016年用[ionic1](http://ionicframework.com/)开发了给自家家族成员使用的家谱APP（信息浏览+消息推送+查询工具），学习了JS面向对象、APP混合开发。2017年准备迁移到ionic2，目前按照`typescript -> Angularjs2 -> ioinc2` 漫长的技术链慢慢进行着。
+今年在技术转型的过程中有更多的时间接触前端，发现现在前端百花齐放，要学的东西真的很多，2016年用[ionic1](http://ionicframework.com/)开发了给自家成员使用的家谱APP（信息浏览+消息推送+查询工具），学习了JS面向对象、APP混合开发。2017年准备迁移到ionic2，目前按照`typescript -> Angularjs2 -> ioinc2` 漫长的技术链慢慢进行着。
 
-之前的博客是用[Pelican](https://getpelican.com)搭建的，用的有点不太顺手，后来换成了现在的Hexo。
+之前的博客是用[Pelican](https://getpelican.com)搭建的，一方面用的有点不太顺手，另一方面也许是迎合个人技术转型大潮流，索性就换成了现在的Hexo。
 
 ### Java
 
-对于Java，不太习惯强类型，上编译原理的时候，用Java写过实践项目[C语言词法分析器](https://www.oschina.net/p/lexer)
+上编译原理的时候，用Java写过实践项目[C语言词法分析器](https://www.oschina.net/p/lexer)，后来工作之后积累了一些经验后，进行大规模的项目重构，涉及命名规则、设计模式、内聚与耦合等方面的内容，对学校学的一些理论知识有了更深刻的体会。
 
-2015年用过半年时间，还停留在5.0时代。
+兼职用2Java开发过Android项目，这对于已经写惯了Python和Javascript等解释性语言的我，Java写着写着总觉得哪里点不太习惯了，经常串写，今年准备着向混合开发方向发展，就慢慢的不再接触Java了，依旧停留在5.0的印象中。
 
 ---
 

@@ -9,6 +9,12 @@ tags:
 
 本文总结了一些Django数据库查询的实践经验。
 
+- 基本的增删改查
+- 分类统计：`aggregate`和`annotate`的使用
+- 实现按年/月/日统计
+- Manager和QuerySet的混合使用
+- 编写迁移文件
+
 <!-- more -->
 
 
@@ -65,9 +71,14 @@ class Device(models.Model):
         return self.serial
 
 class Alarm(models.Model):
-    device = models.ForeignKey(Device, verbose_name='消防栓')
+    ALARM_CATALOG_CHOICES = (
+          ('low_battery', '低电量'),
+          ('fail_connection', '通信故障'),
+          ('location_moved', '位置移动')
+      )
+    device = models.ForeignKey(Device, verbose_name='设备')
     create_time = models.DateTimeField(verbose_name='创建时间', default=timezone.now)
-    catalog = models.CharField(max_length=30, null=True)
+    catalog = models.CharField(max_length=30, null=True, choices=ALARM_CATALOG_CHOICES)
     content = models.CharField(verbose_name='内容', max_length=30, null=True, blank=True)
     longitude = models.FloatField(verbose_name='经度', null=True,
                                   validators=[validators.MaxValueValidator(180), validators.MinValueValidator(-180)])
@@ -90,14 +101,14 @@ except models.Device.DoesNotExist:
 
 <Device:0FFFFFFF561C4030>
 
-# Q2 查询地址包含“小区”的设备。
+# 查询地址包含“小区”的设备。
 >>> device_list = models.Device.objects.filter(address__icontains='小区')
 <QuerySet [<Device: 0FFFFFFF5BC91F87>, <Device: 0FFFFFFF561C4030>, ...]>
 
 # 查询设备'0FFFFFFF5BC91F87'的所有报警记录
 models.Alarm.objects.filter(device__serial='0FFFFFFF5BC91F87')
 
-# 假设，设备列表每页20项，查询第3页的数据。
+# 假设设备列表每页20项，查询第3页的数据。
 device_list = models.Device.objects.all()[20:30]
 ```
 #### 2.2.2 更新
@@ -124,19 +135,18 @@ models.Device.objects.filter(address__isnull=False).update(address=F('address').
 # 删除单条记录
 try:
     device = models.Device.objects.get(serial='0FFFFFFF561C4030')
-    device.is_active = False
     device.delete()
 except models.Device.DoesNotExist:
     pass
 
 # 批量删除
 models.Alarm.objects.filter(serial='0FFFFFFF561C4030').delete()
-# 由于delete只是QuerySet的方法，并没有向Manager公开
+# 由于delete只是QuerySet的方法，并没有向Manager公开，需要先调用all方法
 models.Alarm.objects.all().delete() # OK
 models.Alarm.objects.delete() # Fail
 ```
 
-#### 2.2.4 统计
+#### 2.2.4 基础统计
 
 ```
 # 计算设备0FFFFFFF561C4030所有的报警数目。
@@ -161,24 +171,50 @@ models.Alarm.objects.values('serial').annotate(num_alarms=models.Count('serial')
 {'serial':'0FFFFFFF66DDF14D', 'num_alarms':12},
 ]
 
-# 查询每个报警类型的报警数目
-models.Alarm.objects.aggregate(
-            fail_connection=Coalesce(Sum(
-                Case(When(catalog='fail_connection', then=1), output_field=models.IntegerField()),
-            ), 0),
-            low_battery=Coalesce(Sum(
-                Case(When(catalog='low_battery', then=1), output_field=models.IntegerField()),
-            ), 0)
-        )
+```
 
-{‘fail_connection’：12， ‘low_battery’：34}
+#### 2.2.5 分类统计
+
+分类统计有以下两种方法。
+
+- `aggregate` + 条件表达式Case，返回一个字典形式的结果，未出现的分类值默认为None，需要使用`Coalesce`类设置默认值为0
+- `annotate` + 分组GROUP BY，返回一个列表形式的结果，未出现的分类值不会出现在最后的结果中
+
+以查询最近30天中每个报警类型的报警数目为例。
+
+```
+latest_week_qs = models.Alarm.objects.filter(create_time__gt=timezone.now()-timedelta(days=30).
+# 查询每个报警类型的报警数目
+latest_week_qs.aggregate(
+    fail_connection=Coalesce(Sum(
+        Case(When(catalog='fail_connection', then=1), output_field=models.IntegerField()),
+    ), 0),
+    low_battery=Coalesce(Sum(
+        Case(When(catalog='low_battery', then=1), output_field=models.IntegerField()),
+    ), 0),
+    location_moved=Coalesce(Sum(
+        Case(When(catalog='location_moved', then=1), output_field=models.IntegerField()),
+    ), 0)
+)
+# 结果
+{‘fail_connection’：12， 'low_battery'：34, 'location_moved': 0}
 
 # 查询每个报警类型的报警数目。
->>> models.Alarm.objects.values('catalog', 'content').annotate(count=Count('catalog'))
-{'low_battary':None, 'content':'低电量'},{'fail_connection':3，'content':'通讯故障'}
->>> models.Alarm.objects.values('catalog', 'content').annotate(count=Coalesce(Count('catalog'), 0))
-{'low_battary':0, 'content':'低电量'},{'fail_connection':3，'content':'通讯故障'}
+latest_week_qs.values('catalog').annotate(count=Count('catalog'))
+# 结果
+[{'catalog':'low_battery', 'count':34},{'catalog':'fail_connection'， 'count': 12}]
+```
 
+#### 2.2.6 日期统计
+
+实现按年、月、日统计通常有两种方法：
+
+- 数据库函数 `django.db.connection.ops.date_trunc_sql`
+- 对第一种的封装类DateExtra，仅Django 1.10+可用
+
+以上两种结果中日期类型不一样，第一种返回时datetime对象，第二种只返回其中的分类字段，为整数类型。
+
+```
 # 查询mac地址为`0FFFFFFF561C4030`的设备最近一周每天报警次数。
 models.Alarm.objects.filter(serial='0FFFFFFF561C4030', create_time__gt=timezone.now()-timedelta(days=7)).extra(
     select={'dt': connection.ops.date_trunc_sql('day', 'create_time')}
@@ -192,12 +228,19 @@ models.Alarm.objects.filter(serial='0FFFFFFF561C4030', create_time__gt=timezone.
 # 在Django 1.10+ 还可以使用`DateExtra`相关类
 models.Alarm.objects.filter(serial='0FFFFFFF561C4030', create_time__gt=timezone.now()-timedelta(days=7))
     annotate(day=ExtractDay('create_time'))
+# 结果
+{
+  'count':4, 'day': 8,
+  'count':2, 'day': 11,
+  'count':1, 'day': 12
+}
 ```
 
 ### 2.3 小结
 
 - `django.db.models.Q`: 与、或、非条件组合查询
 - `django.db.models.F`: `F()`表示数据库中相应字段的值，用于计数器更新等。
+- `django.db.models.Functions.Coalesce`:接收一组参数，返回第一个不为None的数据，
 
 ## 3 管理器和查询集
 

@@ -70,5 +70,5 @@ theme: next
 ## Docs: https://hexo.io/docs/deployment.html
 deploy:
   type: git
-  repo: git@github.com:kinegratii/kinegratii.github.io.git
+  repo: ssh://git@github.com/kinegratii/kinegratii.github.io
   branch: master

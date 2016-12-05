@@ -25,6 +25,8 @@ ionic2是基于Angular2开发，Angular2是使用Typescript重新改写的。Typ
 
 和Javascript相比，在函数、接口、类、泛型都有很大的变化，总的来说，会使得程序更加明确，加强了面向对象的一些设计规范。
 
+interface是接口，class是类。类可以实现接口。
+
 ## 3 第三方js库与d.ts声明文件
 
 对于现有第三方js库，根据不同情况采取不同的策略。
@@ -45,6 +47,7 @@ interface RelationshipOptions {
 	reverse?:boolean;
 }
 declare function relationship(relationshipOptions:RelationshipOptions):string;
+export = relationship;
 ```
 
 使用方式

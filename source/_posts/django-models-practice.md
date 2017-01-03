@@ -67,6 +67,7 @@ class Device(models.Model):
     is_alarm = models.BooleanField(verbose_name='报警标识', default=False)
     latest_alarm_time = models.DateTimeField(verbose_name='最新报警时间', null=True, blank=True)
     latest_alarm_remark = models.CharField(verbose_name='最新报警内容', max_length=200, null=True, blank=True)
+
     def __str__(self):
         return self.serial
 
@@ -80,11 +81,6 @@ class Alarm(models.Model):
     create_time = models.DateTimeField(verbose_name='创建时间', default=timezone.now)
     catalog = models.CharField(max_length=30, null=True, choices=ALARM_CATALOG_CHOICES)
     content = models.CharField(verbose_name='内容', max_length=30, null=True, blank=True)
-    longitude = models.FloatField(verbose_name='经度', null=True,
-                                  validators=[validators.MaxValueValidator(180), validators.MinValueValidator(-180)])
-    latitude = models.FloatField(verbose_name='纬度', null=True,
-                                 validators=[validators.MaxValueValidator(90), validators.MinValueValidator(-90)])
-    address = models.CharField(verbose_name='地址', max_length=100, null=True)
     read = models.BooleanField(verbose_name='已读', default=False)
 ```
 
@@ -146,7 +142,7 @@ models.Alarm.objects.all().delete() # OK
 models.Alarm.objects.delete() # Fail
 ```
 
-#### 2.2.4 基础统计
+#### 2.2.4 基础统计：数据、最值和平均值
 
 ```
 # 计算设备0FFFFFFF561C4030所有的报警数目。
@@ -160,15 +156,16 @@ models.Alarm.objects.filter(device__serial='0FFFFFFF561C4030').count()
 >>> device_list [0].num_alarms
 34
 
-# 查询最近一个月报警次数最多的前5个设备。
-models.Alarm.objects.values('serial').annotate(num_alarms=models.Count('serial')).order_by('num_alarms')[:5]
+# 查询2016年报警次数最多的前5个设备
+
+models.Alarm.objects.filter(create_time__year=2016).values('serial').annotate(num_alarms=models.Count('serial')).order_by('-num_alarms')[:5]
 
 [
-{'serial':'0FFFFFFF9FFC15F9', 'num_alarms':38},
-{'serial':'0FFFFFFF71281152', 'num_alarms':32},
-{'serial':'0FFFFFFF5992B723', 'num_alarms':27},
-{'serial':'0FFFFFFF05E20356', 'num_alarms':21},
-{'serial':'0FFFFFFF66DDF14D', 'num_alarms':12},
+    {'serial':'0FFFFFFF9FFC15F9', 'num_alarms':38},
+    {'serial':'0FFFFFFF71281152', 'num_alarms':32},
+    {'serial':'0FFFFFFF5992B723', 'num_alarms':27},
+    {'serial':'0FFFFFFF05E20356', 'num_alarms':21},
+    {'serial':'0FFFFFFF66DDF14D', 'num_alarms':12},
 ]
 
 ```
@@ -177,14 +174,15 @@ models.Alarm.objects.values('serial').annotate(num_alarms=models.Count('serial')
 
 分类统计有以下两种方法。
 
-- `aggregate` + 条件表达式Case，返回一个字典形式的结果，未出现的分类值默认为None，需要使用`Coalesce`类设置默认值为0
+- `aggregate` + 条件表达式Case，返回一个字典形式的结果，未出现的分类值默认为None，需要使用`Coalesce`函数设置默认值
 - `annotate` + 分组GROUP BY，返回一个列表形式的结果，未出现的分类值不会出现在最后的结果中
 
-以查询最近30天中每个报警类型的报警数目为例。
+下面是两种方式查询最近30天中每个报警类型的报警数目为例。
 
 ```
 latest_week_qs = models.Alarm.objects.filter(create_time__gt=timezone.now()-timedelta(days=30).
-# 查询每个报警类型的报警数目
+
+# aggregate方式
 latest_week_qs.aggregate(
     fail_connection=Coalesce(Sum(
         Case(When(catalog='fail_connection', then=1), output_field=models.IntegerField()),
@@ -199,7 +197,7 @@ latest_week_qs.aggregate(
 # 结果
 {‘fail_connection’：12， 'low_battery'：34, 'location_moved': 0}
 
-# 查询每个报警类型的报警数目。
+# annotate方式
 latest_week_qs.values('catalog').annotate(count=Count('catalog'))
 # 结果
 [{'catalog':'low_battery', 'count':34},{'catalog':'fail_connection'， 'count': 12}]
@@ -236,22 +234,23 @@ models.Alarm.objects.filter(serial='0FFFFFFF561C4030', create_time__gt=timezone.
 }
 ```
 
-### 2.3 小结
+### 2.3 数据库函数
 
 - `django.db.models.Q`: 与、或、非条件组合查询
 - `django.db.models.F`: `F()`表示数据库中相应字段的值，用于计数器更新等。
 - `django.db.models.Functions.Coalesce`:接收一组参数，返回第一个不为None的数据，
 
+更多函数可参考[Database Functions](https://docs.djangoproject.com/en/1.10/ref/models/database-functions/)。
+
 ## 3 管理器和查询集
 
 ### 3.1 管理器与模型的关系
 
-管理器是Django数据库查询的接口。查询语句`models.XxModels.objects.`
+管理器是Django数据库查询的接口。查询语法 `models.XxModels.objects.filter(*kwargs)` 。
 
 - 一个模型可以拥有一个或多个管理器。
 - 默认情况下，每个模型都有名为objects的管理器，默认返回数据表中所有记录。
 - 管理器来源于默认管理器、外键管理器和自定义管理器。
-
 
 ### 3.2 自定义管理器
 
@@ -356,11 +355,14 @@ objects = models.Manager.from_queryset(AlarmQuerySet)
 
 ### 3.3 managers模块实践
 
-随着自定义管理器越来越多，代码放置在`models.py`模块显然不利于代码模块划分，需要单独创建一个模块，通常该模块名称为`managers`。
+随着业务逻辑越来越复杂，需要编写更多的自定义管理器，通常的做法是单独创建一个名称为`managers`的模块，封装所有数据操作。
 
 ```
 from django.db import models
 from django.contrib.auth.models import BaseUserManager
+
+__all__ = ['AxxManager', 'BxxManager', 'UserManager'] # 外部模块只能引用XxxManager类
+
 
 class BaseQuerySet(models.QuerySet):
     def common_method_for_all_models(self):
@@ -414,43 +416,44 @@ device = models.objects.get_object(serial='0FFFFFFF66DDF13F')
 
 ## 4 迁移
 
-### 4.1开发流程
+### 4.1 开发流程
 
-迁移是将模型代码的变化应用到数据库。这个是在1.7新引入的特性，在此之前的版本可以使用第三方库[South](http://south.aeracode.org/)实现类似的功能。
+迁移是将模型代码的变化应用到数据库，可以认为是一个数据库模式的版本管理系统。
+
+> 在Django1.7之前的版本第三方库[South](http://south.aeracode.org/)提供了类似的功能。
 
 迁移通常可以按照下列步骤循环进行。
 
-- 1 编写`models`模块代码
-- 2 模型迁移：执行 `python manage.py makemigrations`，在`APP.migrations`包生成迁移文件（模块）。
+- 1 编写 `models` 模块代码
+- 2 模型迁移：执行 `python manage.py makemigrations`，在`APP.migrations`包生成迁移模块文件。
 - 3 数据迁移：如果需要数据迁移，按照一定的格式编写迁移文件。
-- 3 应用迁移文件：执行 `python manage.py migrate`，将2、3步迁移文件所实现的数据库变化应用到数据库。
+- 3 应用迁移：执行 `python manage.py migrate`，将2、3步迁移文件所实现的数据库变化应用到数据库。
 
 Django Migration分为模式迁移（Schema migration）和数据迁移（Data Migration）。
 
 - 模式迁移：包括表结构修改，对应于 SQL的 `CREATE TABLE` `ALTER TABLE`和 `DROP TABLE`，可以由Django自动生成。
 - 数据迁移：包括数据记录修改，对应于SQL的 `INSERT TO` `DELETE`和 `UPDATE`等语句,需要开发者自己编写。
 
-无论是模式迁移还是数据迁移，迁移文件都具有几个特点：
+无论是模式迁移还是数据迁移，迁移模块都具有几个特点：
 
-- 每个迁移文件是一个Python模块，位于应用目录migrations包下，
-- 迁移类名称固定为Migration，继承自`django.db.models.migrations.Migration`
-- `dependencies`表示需要依赖的迁移文件列表
-- `operations`表示一系列依次进行的迁移操作
+- 每个迁移文件是一个Python模块，位于应用目录migrations包下，代表了一次迁移
+- 每个迁移包含一个名为Migration的迁移类，该类继承自 `django.db.migrations.Migration`
+- `dependencies` 属性表示需要依赖的迁移模块名称
+- `operations` 属性表示一系列依次进行的迁移操作，这些都定义在 `django.db.migrations.operations`模块中。
 
 ```
 from django.db import migrations
 
 class Migration(migrations.Migration):
     dependencies = []
-   operations = []
+    operations = []
 ```
 
-### 4.2 编写数据迁移文件
+### 4.2 数据迁移
 
-一个典型应用场景是冗余字段的添加。以上述设备管理系统为例子，在前期数据库设计中Alarm表没有`longitude` `latitude`和`address`三个字段，可以通过外键查询得到。
-查询操作远远多于插入操作。可以通过冗余字段以解决查询慢的问题。
+下面的例子实现了将设备的`longitude` `latitude`和`address`三个字段复制到报警记录表中，以便查询位置时无需外接操作。
 
-所有的操作被操作`migrations.RunPython`类中，要注意的是无法直接引用模型类，需要`django.apps.get_model`函数查找。
+所有的操作被操作 `migrations.RunPython` 类中，要注意的是需要 `django.apps.get_model` 函数引用模型类。
 
 ```
 from __future__ import unicode_literals

@@ -66,3 +66,12 @@ Javascript / MIT / 插件
 - [中国历史地图](http://www.bilibili.com/video/av3652382/)
 - [Mini Metro](http://dinopoloclub.com/minimetro/)
 - [Mekorama](http://www.mekorama.com/)
+
+## 版权声明
+
+除特殊注明外，所有文章均采用[Creative Commons BY-NC-ND 4.0（自由转载-保持署名-非商用-禁止演绎）](http://creativecommons.org/licenses/by-nc-nd/4.0/deed.zh)协议发布。
+
+这意味着你可以在非商业性使用的前提下自由转载，但必须:
+
+1. 保持文章署名
+2. 不对文章进行修改

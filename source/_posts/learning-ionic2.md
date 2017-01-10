@@ -35,9 +35,11 @@ interface是接口，class是类。类可以实现接口。
 - 自己编写d.ts声明文件
 - 实现对应TypeScript的版本
 
-一些常用库诸如`underscope.js`可在github下载到对应的d.ts文件。
+一些常用库诸如`underscope.js`可在[DefinitelyTyped/DefinitelyTyped](https://github.com/DefinitelyTyped/DefinitelyTyped)下载到对应的d.ts文件。
 
-[中国家庭称谓计算器](https://github.com/mumuy/relationship)，该API项目逻辑复杂，但是接口只有一个，可以自己编写。以下是本人编写的相应d.ts文件。
+[中国家庭称谓计算器](https://github.com/mumuy/relationship)，该项目的接口只有一个顶级函数 `relationship`，相应的d.ts文件可以自己编写。以下是一种写法。
+
+文件 relationship.d.ts
 
 ```javascript
 interface RelationshipOptions {
@@ -50,7 +52,7 @@ declare function relationship(relationshipOptions:RelationshipOptions):string;
 export = relationship;
 ```
 
-使用方式
+调用示例 demo.ts
 
 ```javascript
 /// <reference path="relationship.d.ts" />
@@ -120,8 +122,10 @@ ionic generate page more
 
 习惯先创建所有的页面，完成跳转逻辑，最后再写各个页面的逻辑。
 
-ionic2的导航类似于Android，像一个简单的栈，可以进行push和remove操作。不使用url来决定导航，当然也可以这么做。
+ionic2的导航类似于Android，像一个简单的栈，可以进行push和remove操作。不建议使用url来决定导航，当然从底层也支持这么做。
 
-`no component factory found for AboutPage`
+```
+no component factory found for AboutPage
+```
 
-在刚使用导航（MorePage -> AboutPage）时出现了这个错误，需要将AboutPage加到`app.module.ts`的`declarations`和`entryComponents`，两个都要添加。
+在刚使用导航（MorePage -> AboutPage）时出现了这个错误，解决的方案是将AboutPage加到`app.module.ts`的`declarations`和`entryComponents`，两个都要添加。

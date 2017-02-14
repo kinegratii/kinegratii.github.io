@@ -8,8 +8,8 @@ comments: false
 
 - 男/90后/福建·福州/Web开发
 - Python/Javascript
-- kinegratii@gmail.com
-- kinegratii@yeah.net
+- 'a2luZWdyYXRpaUBnbWFpbC5jb20=' (base64)
+- 'a2luZWdyYXRpaUB5ZWFoLm5ldA==' (base64)
 
 ---
 
@@ -27,9 +27,7 @@ comments: false
 
 在写后端代码时顺带学习了HTML/Javascript/Css等前端语言，主要用的是jQuery、underscopse.js和Bootsrap等基础库，在业务方面用过jqGrid、echarts和高德地图Javascript API等第三方库，形成了“数据管理 + 统计分析”的基本系统功能结构。
 
-今年在技术转型的过程中有更多的时间接触前端，发现现在前端百花齐放，要学的东西真的很多。2016年的业余时间用[ionic1](http://ionicframework.com/)开发了本家家谱APP，这是一个信息浏览+消息推送+查询工具的应用。在此过程中学习了JS面向对象、APP混合开发。
-
-2017年准备迁移到ionic2，目前按照`typescript -> Angularjs2 -> ioinc2` 漫长的技术链慢慢进行着。
+今年在技术转型的过程中有更多的时间接触前端，发现现在前端百花齐放，要学的东西真的很多。2016年的业余时间用[ionic1](http://ionicframework.com/)开发了本家家谱APP，这是一个信息浏览+消息推送+查询工具的应用。在此过程中学习了JS面向对象、APP混合开发，预计于2017年迁移到ionic2。
 
 顺便值得一提的是，之前的博客是用[Pelican](https://getpelican.com)搭建的，一方面在windows表现并不是那么顺手，另一方面也许是迎合个人技术转型大潮流，索性就换成了现在的Hexo。
 
@@ -43,29 +41,32 @@ comments: false
 
 ## 项目
 
-### C语言词法分析器
+### 水资源费征收工作平台
 
-Java / GPL / 算法
+Django / 2016 / 网站平台
 
-[主页](https://www.oschina.net/p/lexer)  基于Java Swing的C语言词法分析器，是《编译原理》课程的实践项目，经过后来的重构改写。
+包括了企业管理、价格管理、抄表缴费、查询统计等账目基本功能，由Python 3.x和Django 1.10开发，支持DaoClound云部署。
+
+### 家谱APP
+
+ionic1 / 2016 / 工具、内容
+
+基于ionic的跨平台APP，包括家谱显示、生日提醒、家庭计算器、百家姓等常用功能。
 
 ### 高德位置选择插件
 
-Javascript / MIT / 插件
+Javascript / 2016 /  MIT / 插件
 
 [主页](https://www.oschina.net/p/amappositionpicker)  基于高德地图的位置选择jQuery插件。项目参考[Eonasdan / bootstrap-datetimepicker](https://github.com/Eonasdan/bootstrap-datetimepicker)。
 
+
+### C语言词法分析器
+
+Java / 2014 / GPL / 算法
+
+[主页](https://www.oschina.net/p/lexer)  基于Java Swing的C语言词法分析器，是《编译原理》课程的实践项目，经过后来的重构改写。
+
 ---
-
-## 推荐
-
-- [《构建之法 - 现代软件工程》](https://book.douban.com/subject/25965995/)
-- [《想象另一种可能》](https://book.douban.com/subject/26614057/)
-- [Victory - Two Steps From Hell](http://music.163.com/m/song?id=31654455)
-- [Star Sky - Two Steps From Hell](http://music.163.com/m/song?id=31654479)
-- [中国历史地图](http://www.bilibili.com/video/av3652382/)
-- [Mini Metro](http://dinopoloclub.com/minimetro/)
-- [Mekorama](http://www.mekorama.com/)
 
 ## 版权声明
 

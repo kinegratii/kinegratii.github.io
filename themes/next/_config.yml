@@ -32,6 +32,7 @@ menu:
   #categories: /categories
   archives: /archives
   tags: /tags
+  recommend: /recommend
   about: /about
   #schedule: /schedule
   #commonweal: /404.html
@@ -52,6 +53,7 @@ menu_icons:
   tags: tags
   archives: archive
   commonweal: heartbeat
+  recommend: thumbs-up
 
 
 
@@ -125,7 +127,7 @@ font:
 # Value is the target link (E.g. GitHub: https://github.com/iissnan)
 social:
   GitHub: https://github.com/kinegratii
-  # 微博: http://weibo.com/kinegratii
+  微博: http://weibo.com/kinegratii
 
 
 # Social Links Icons

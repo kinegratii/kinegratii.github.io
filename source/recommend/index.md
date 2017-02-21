@@ -6,8 +6,8 @@ comments: false
 
 ## 图书
 
-- [《离散数学及其应用（原书第7版）》][https://book.douban.com/subject/26316200/]
-- [算法导论（原书第3版） (豆瓣)](https://book.douban.com/subject/20432061/)
+- [《离散数学及其应用（原书第7版）》](https://book.douban.com/subject/26316200/)
+- [《算法导论（原书第3版） (豆瓣)》](https://book.douban.com/subject/20432061/)
 - [《构建之法 - 现代软件工程》](https://book.douban.com/subject/25965995/)
 - [《想象另一种可能》](https://book.douban.com/subject/26614057/)
 

@@ -391,7 +391,7 @@ class UserManager(BaseUserManager.from_queryset(UserQuerySet)):
 - 需要使用`django.apps.apps.get_model`函数获取模型类对象，不能直接使用 `from models import Xxxx`
 - `managers`模块一般只能被`models`模块引用，其他模块应当不能引用
 
-### 3.4 小提示
+### 3.4 其他
 
 **覆盖get函数异常**
 
@@ -477,3 +477,12 @@ class Migration(migrations.Migration):
          migrations.RunPython(create_address_for_alarm),
     ]
 ```
+
+## 5 参考资料
+
+- [QuerySet API reference | Django documentation | Django](https://docs.djangoproject.com/en/1.10/ref/models/querysets/)
+- [Django aggregation, group by day](http://chase-seibert.github.io/blog/2012/02/24/django-aggregation-group-by-day.html)
+- [Filtering on annotations in Django](http://timmyomahony.com/blog/filtering-annotations-django/)
+- [Building a higher-level query API: the right way to use Django's ORM - DabApps, Brighton, UK](http://www.dabapps.com/blog/higher-level-query-api-django-orm/)
+- [Django Migrations - A Primer - Real Python](https://realpython.com/blog/python/django-migrations-a-primer/)
+- [Django Custom Model Manager Chaining - Hunter Ford](http://hunterford.me/django-custom-model-manager-chaining/)

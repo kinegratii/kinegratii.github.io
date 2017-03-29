@@ -220,6 +220,8 @@ auto_excerpt:
   enable: false
   length: 150
 
+reward_comment: 坚持原创技术分享，您的支持将鼓励我继续创作！
+wechatpay: /images/wechat_reward.png
 
 # Wechat Subscriber
 #wechat_subscriber:

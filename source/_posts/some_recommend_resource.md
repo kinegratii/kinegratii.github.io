@@ -1,8 +1,13 @@
 ---
-title: 推荐
+title: 资源推荐
 date: 2016-11-25 15:47:21
-comments: false
+categories: 生活
+tags:
+- 游戏
+- 音乐
 ---
+
+<!-- more -->
 
 ## 图书
 

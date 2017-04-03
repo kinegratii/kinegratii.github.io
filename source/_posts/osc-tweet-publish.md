@@ -5,6 +5,7 @@ categories:
  - 编程
 tags:
  - Python
+ - 开源中国
 ---
 
 自动发送动弹到开源中国。

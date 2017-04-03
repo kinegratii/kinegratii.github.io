@@ -292,7 +292,7 @@ assert isinstance(packet, HydrantProtocol) == True
         - 是：计算app_id，查询 (packet_tpye, source_catalog, app_id)
           - 是：使用 (packet_tpye, source_catalog, app_id)
           - 否：无法识别
-       - 否：查询 (packet_tpye, source_catalog, None)
+        - 否：查询 (packet_tpye, source_catalog, None)
           - 是：使用(packet_tpye, source_catalog, None)
           - 否：无法识别
 

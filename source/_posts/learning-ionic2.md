@@ -5,7 +5,7 @@ categories:
  - 编程
 tags:
 - Typescript
-- ionic2
+- ionic
 ---
 
 记录一些个人使用ionic2过程中的感受和碰到的问题。

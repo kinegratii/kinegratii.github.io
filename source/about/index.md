@@ -62,14 +62,3 @@ Java Swing / 2014 / GPL / 算法
 [点此访问软件主页](https://www.oschina.net/p/lexer)
 
  基于Java Swing的C语言词法分析器，是《编译原理》课程的实践项目，初版完成于2011年（大三），2014年末，重构改写并开源，涉及命名规则、设计模式、内聚与耦合等方面的内容。
-
----
-
-## 版权声明
-
-除特殊注明外，所有文章均采用[Creative Commons BY-NC-ND 4.0（自由转载-保持署名-非商用-禁止演绎）](http://creativecommons.org/licenses/by-nc-nd/4.0/deed.zh)协议发布。
-
-这意味着你可以在非商业性使用的前提下自由转载，但必须:
-
-1. 保持文章署名
-2. 不对文章进行修改

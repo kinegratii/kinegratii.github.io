@@ -1,5 +1,5 @@
 ---
-title: Python3之旅
+title: Python3之旅（一） —— 目录
 date: 2017-02-04 09:55:27
 categories: 编程
 tags:
@@ -10,8 +10,6 @@ comments: false
 《Python3之旅》介绍了Python3的相关知识点及其应用。
 
 <!-- more -->
-
-[TOC]
 
 ## 1 概述
 

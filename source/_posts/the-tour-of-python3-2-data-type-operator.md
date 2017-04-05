@@ -6,16 +6,36 @@ tags:
 - Python
 ---
 
-关键字：长整数、八进制、除法、比较。
+关键字：长整数、八进制、迭代器、除法、比较。
 
 <!-- more -->
 
 
 ## 1 整数
 
-- Python3.X不再有long的数据类型，合并到int中，因此像 `34023932232L`和 `34023932232l` 将引发语法错误。
-- `sys.maxint`常量被移除，因为整数没有任何限制。然而常量 `sys.maxsize`在列表索引等情况下可以被认为正无穷。
-- 八进制数使用更加明确的0o前缀，代码`t = 070`将产生语法错误，`int('070')`结果为70。
+- Python3.X不再有long的数据类型，合并到int中，因此像 `34023932232L` 和 `34023932232l` 将引发语法错误。
+- `sys.maxint`常量被移除，因为整数没有任何限制。
+- 八进制数使用更加明确的0o前缀，代码 `t = 070` 将产生语法错误，`int('070')` 结果为70。
+- 数字字面量支持下划线划分 (【Python3.6+】)
+
+在数字字面量使用下划线：
+
+```python
+# grouping decimal numbers by thousands
+amount = 10_000_000.0
+
+# grouping hexadecimal addresses by words
+addr = 0xCAFE_F00D
+
+# grouping bits into nibbles in a binary literal
+flags = 0b_0011_1111_0100_1110
+
+# same, for string conversions
+flags = int('0b_1111_0000', 2)
+```
+
+> PEP 链接
+- [PEP 515 -- Underscores in Numeric Literals | Python.org](https://www.python.org/dev/peps/pep-0515/)
 
 ## 2 列表、字典和迭代器
 
@@ -29,10 +49,17 @@ tags:
 
 ### 3 除法
 
+Python3中针对除法作了比较大的改变，`/`由地板除法改为了精确除法。
+
+| 操作符 | Python2 | Python3 |
+| ------ | ------ | ------ |
+| /  | 地板除法 | 精确除法 |
+| // | 地板除法 | 地板除法 |
+
+代码示例如下表：
+
 | 操作符 | Python2 | Python3 | 备注 |
 | ------ | ------ | ------ | |
-| /  | 地板除法 | 精确除法 | |
-| // | 地板除法 | 地板除法 | |
 | /  | 5 / 2 = 2 | 5 / 2 = 2.5 | |
 | | 5.0 / 2 = 2.5 | 5.0 / 2 = 2.5 | |
 | | 4 / 2 = 2 | 4 / 2 = 2.0 | |
@@ -42,11 +69,49 @@ tags:
 | | 4 // 2 = 2 | 4 // 2 = 2 | |
 | | 4.0 // 2 = 2.0 | 4.0 // 2 = 2.0 | |
 
-**应用实践**
 
-- Python3中/执行的是精确除法，无论操作数的类型，都会返回一个浮点数。
+> PEP 链接
+- [PEP 238 -- Changing the Division Operator | Python.org](https://www.python.org/dev/peps/pep-0238/)
 
-### 4 比较
+### 4 矩阵乘法
+
+Python3.5增加了用于矩阵乘法的操作符 `@` 。但目前所有内置类型还不支持这个操作符，可以通过定义 `__matmul__`、`__rmatmul__` 和 `__lmatmul__` 三个魔术方法实现。
+
+引入操作符后，将使得代码变得更加可读性。
+
+@操作符
+
+```python
+S = (H @ beta - r).T @ inv(H @ V @ H.T) @ (H @ beta - r)
+```
+
+函数实现
+
+```python
+S = dot((dot(H, beta) - r).T,
+        dot(inv(dot(dot(H, V), H.T)), dot(H, beta) - r))
+```
+
+NumPy 1.10已经增加了`@`操作符的支持。
+
+```
+>>> import numpy
+
+>>> x = numpy.ones(3)
+>>> x
+array([ 1., 1., 1.])
+
+>>> m = numpy.eye(3)
+>>> m
+array([[ 1., 0., 0.],
+       [ 0., 1., 0.],
+       [ 0., 0., 1.]])
+
+>>> x @ m
+array([ 1., 1., 1.])
+```
+
+### 5 比较
 
 3.0 简化了比较规则：
 

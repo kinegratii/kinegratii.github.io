@@ -244,6 +244,9 @@ mathjax:
 # Swiftype Search API Key
 #swiftype_key:
 
+local_search:
+  enable: true
+
 # Baidu Analytics ID
 #baidu_analytics:
 

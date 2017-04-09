@@ -29,41 +29,27 @@ def my_sum(*args):
 my_sum(1, 2)  # 3
 my_sum(1, 2, 3, 4) # 10
 ```
-## 2 关键字限定参数传递
+## 2 强制关键字参数定义和调用
 
-在3.X中关键字限定参数传递（Keyword-Only Arguments）中，**参数只能通过关键字方式传入，不能通过位置参数方式**。
-```python
-def sortwords(*wordlist, case_sensitive=False):
-    pass
-```
-Python2.X的语法情况，如函数 `compare` 携带两个位置参数和一个关键字参数。
-```python
-def compare(a, b, key=None):
-    pass
+> PEP链接
+[PEP 3102 -- Keyword-Only Arguments | Python.org](https://www.python.org/dev/peps/pep-3102/)
 
-# 几种有效的调用形式
-compare(2, 3)
-compare(2, 3, True)
-compare(2, 3, key=True)
-compare(a=2, b=3, key=True)
-compare(1, 2, *[True])
-compare(1, 2, ** {'key': True})
-```
-在key参数前增加一个`*`，表示key参数必须以关键字形式传入。
-```
-def compare(a, b, *, key=None):
-    pass
+在3.X中新增了关键字限定参数传递（Keyword-Only Arguments）中，**参数只能通过关键字方式传入，不能通过位置参数方式**。
 
-# 几种有效调用形式
-compare(2, 3)
-compare(2, 3, key=True)
-compare(a=2, b=3, key=True)
-compare(1, 2, ** {'key': True})
+定义的形式为使用 `*` 单独占用一个参数，表示之后的参数必须以关键字方式传入。
 
-# 以下两种调用形式均引发 TypeError: compare() takes 2 positional arguments but 3 were given
-compare(2, 3, True)
-compare(1, 2, *[True])
-```
+下表通过对比显示了一个简单的例子。
 
-Understanding '*', '*args', '**' and '**kwargs' - Agiliq Blog | Django web app development
-http://agiliq.com/blog/2012/06/understanding-args-and-kwargs/
+| 定义-调用 | `def compare(a, b, key=None):pass` |  `def compare(a, b, *, key=None):pass` |
+| ------ | ------ | ------ |
+| `compare(2, 3)` | 是 | 是 |
+| `compare(2, 3, key=True)` | 是 | 是 |
+| `compare(a=2, b=3, key=True)` | 是 | 是 |
+| `compare(1, 2, ** {'key': True})` | 是 | 是 |
+| `compare(2, 3, True)` | 是 | 引发TypeError |
+| `compare(1, 2, *[True])` | 是 | 引发TypeError |
+
+## 3 参考链接
+
+- [Understanding '*', '*args', '**' and '**kwargs' - Agiliq Blog | Django web app development](http://agiliq.com/blog/2012/06/understanding-args-and-kwargs/)
+- [Python 的 Keyword-Only Arguments (强制关键字参数) - Python 学习之旅 - SegmentFault](https://segmentfault.com/a/1190000005173136)

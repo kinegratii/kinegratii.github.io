@@ -19,7 +19,7 @@ comments: false
 - [Kinegratii](https://kinegratii.github.io/)
     - [Python](https://www.python.org)
         - [tkinter GUI开发](https://wiki.python.org/moin/TkInter)
-        - [socket编程]()
+        - socket编程
             - [二进制数据处理(struct)](https://docs.python.org/3/library/struct.html)
         - 爬虫
             - HTTP 请求
@@ -51,7 +51,7 @@ comments: false
             - [Angularjs 1](https://angularjs.org/)
         - 混合开发
             - [ionic 1](http://ionicframework.com/)
-    - [linux]
+    - [linux](https://www.linux.com/)
         - 树莓派
 
 [在线简历](/resume)

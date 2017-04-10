@@ -34,7 +34,7 @@ my_sum(1, 2, 3, 4) # 10
 > PEP链接
 [PEP 3102 -- Keyword-Only Arguments | Python.org](https://www.python.org/dev/peps/pep-3102/)
 
-在3.X中新增了关键字限定参数传递（Keyword-Only Arguments）中，**参数只能通过关键字方式传入，不能通过位置参数方式**。
+在3.X中新增了强制关键字参数传递（Keyword-Only Arguments）中，**参数只能通过关键字方式传入，不能通过位置参数方式**。
 
 定义的形式为使用 `*` 单独占用一个参数，表示之后的参数必须以关键字方式传入。
 

@@ -16,22 +16,43 @@ comments: false
 
 ## 技能
 
-### Python
-
-目前工作方向是 *Python web 开发*。[Django](https://www.djangoproject.com/)走的是一种大而全的一揽子解决方案的路线，完整的文档、活跃的社区和优秀丰富的第三方库，是其开发学习的最大优势。从1.4开始使用到目前的1.10，Django每8个月发布一个大版本。
-
-和Django路线不同，Python世界的另一个重要框架Flask追求的是是小而精，需要自己扩展ORM、Admin、API等等。同样轻量级的框架还有的是[Bottle](http://www.bottlepy.org/docs/dev/)，推荐看看它的源代码，只涉及到一些核心的部件，只有4300行代码，作为爬虫数据展示是一个很好的工具。
-
-在平时用Python处理一些简单的事情，比如Excel文件处理、文字提取、获取网页上的信息等等，比如用 Bottle + Peewee + docx 写过文档生成工具。
-
-### Javascript
-
-作为伪全栈工程师，HTML/Javascript/CSS等前端语言也是必须要学习的，包括jQuery、underscopse.js和Bootsrap等基础库的使用，在业务方面熟练掌握了jqGrid、echarts和高德地图Javascript API等第三方库。
-
-2016年利用业余时间使用[ionic1](http://ionicframework.com/)开发了家谱APP，学习了JS面向对象、APP混合开发，预计于2017年迁移到ionic2。
-
-顺便值得一提的是，之前的博客是用[Pelican](https://getpelican.com)搭建的，由于各种原因荒废，直到2016年10月份才重新启用，博客构建工具换成了现在的Hexo。
-
+- [Kinegratii](https://kinegratii.github.io/)
+    - [Python](https://www.python.org)
+        - [tkinter GUI开发](https://wiki.python.org/moin/TkInter)
+        - socket编程
+            - [二进制数据处理(struct)](https://docs.python.org/3/library/struct.html)
+        - 爬虫
+            - HTTP 请求
+                - [requests](http://docs.python-requests.org/en/master/)
+                - [asyncio  异步HTTP请求]()    
+        - web开发
+            - 框架
+                - [Django](https://www.djangoproject.com)
+                - [Bottle](http://bottlepy.org/)
+            - 部署
+                - Ubuntu + Docker + DaoCloud + wsgi
+                - Windows + Apache + wsgi
+        - Python3
+            - 异步IO
+            - [《Python3之旅》](/2017/02/04/the-tour-of-python3-1-catalog/)
+        - 文件处理
+            - Excel文件(xlwt/xlrd)
+            - 图片处理(Pillow)
+            - dbf数据文件
+            - Word文件(docx)
+        - 测试
+            - 单元测试
+            - 覆盖测试
+    - [Javascript](https://www.javascript.com/)
+        - [jQuery](https://jquery.com/)
+            - [高德位置选择插件](https://www.oschina.net/p/amappositionpicker)
+        - [Typescript](http://www.typescriptlang.org/)
+        - MVC框架
+            - [Angularjs 1](https://angularjs.org/)
+        - 混合开发
+            - [ionic 1](http://ionicframework.com/)
+    - [linux](https://www.linux.com/)
+        - 树莓派
 ---
 
 ## 项目

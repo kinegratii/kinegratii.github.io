@@ -212,6 +212,10 @@ highlight_theme: normal
 # Automatically scroll page to section which is under <!-- more --> mark.
 scroll_to_more: true
 
+post_meta:
+  created_at: true
+  updated_at: false
+  categories: true
 
 # Automatically Excerpt. Not recommand.
 # Please use <!-- more --> in the post to control excerpt accurately.

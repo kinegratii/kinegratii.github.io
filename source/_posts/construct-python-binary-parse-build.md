@@ -5,6 +5,7 @@ categories: 编程
 tags:
 - Python
 - ORM
+- 软件
 ---
 
 Construct是一个强大的二进制数据解析和构建Python库，适用于建立大型复杂应用程序的通信协议，类似于二进制数据的ORM库。

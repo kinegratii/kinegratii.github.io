@@ -127,7 +127,7 @@ font:
 social:
   GitHub: https://github.com/kinegratii
   微博: http://weibo.com/kinegratii
-
+  osc: https://my.oschina.net/kinegratii
 
 # Social Links Icons
 # Icon Mapping:
@@ -141,6 +141,7 @@ social_icons:
   GitHub: github
   Twitter: twitter
   微博: weibo
+  osc: link
 
 
 # Sidebar Avatar
@@ -217,6 +218,8 @@ post_meta:
   updated_at: false
   categories: true
 
+post_copyright:
+  enable: true
 # Automatically Excerpt. Not recommand.
 # Please use <!-- more --> in the post to control excerpt accurately.
 auto_excerpt:

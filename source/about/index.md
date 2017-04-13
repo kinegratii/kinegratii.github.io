@@ -1,25 +1,27 @@
 ---
-title: 关于
 date: 2016-11-19 23:33:01
 comments: false
 ---
 
-##  个人
+##  关于本人
 
 - 男/90后/福建·福州/Web开发
 - Python/Javascript
 - Email
-    - kinegratii@gmail.com
-    - kinegratii@yeah.net
+    - kinegratii@gmail.com (git账号)
+    - kinegratii@yeah.net (日常使用)
 
 ---
 
-## 博客
+## 专题页面
 
-源码链接：[https://github.com/kinegratii/kinegratii.github.io](https://github.com/kinegratii/kinegratii.github.io)
+- [在线简历](/resume)
 
-更新日志
+---
 
+## 更新日志
+
+- 2017-04-13 增加文章末尾版权声明
 - 2017-04-09 NextT主题更新至v5.1.1；增加本地搜索功能
 - 2017-04-03 添加简历、分类、404页面
 - 2017-03-22 移除多说评论

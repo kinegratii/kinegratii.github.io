@@ -9,8 +9,6 @@ tags:
 
   使用Python元类改写Django模型字段的choices，使其更加简单可读。
 
-<!-- more -->
-
 ## Django Field.choices
 
 choices是Django定义模型字段的可选参数，适用于所有的字段类型。
@@ -29,6 +27,8 @@ YEAR_IN_SCHOOL_CHOICES = (
 当某个字段设置了这个参数，默认的表单组件将变成一个携带这些选项的选择框，而不是标准的文本输入框。
 
 一般来说，choices变量应该在model内部定义，而且每个值都用一个常量赋值定义。
+
+<!-- more -->
 
 ```
 from django.db import models

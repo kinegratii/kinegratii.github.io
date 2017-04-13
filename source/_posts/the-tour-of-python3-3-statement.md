@@ -8,8 +8,6 @@ tags:
 
 Python3的语句。
 
-<!-- more -->
-
 ## 1 print函数
 
 在Python3.0中使用 `print()`函数代替`print`语句，并且提供一些关键字参数实现`print`语句的特别的语法。
@@ -34,6 +32,8 @@ New: print((x, y))      # Not the same as print(x, y)!
 - sep：分隔符
 - end：末尾字符串
 - file：输出目标，如控制台、文件。
+
+<!-- more -->
 
 比如：
 ```

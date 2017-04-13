@@ -10,8 +10,6 @@ tags:
 
 本文介绍了py2exe、cx_freeze和PyInstaller这三种Python打包工具的使用方法。
 
-<!-- more -->
-
 ## 1 Python打包工具
 
 目前在windows平台上将Python程序打包成exe文件主要有三个工具。
@@ -32,8 +30,7 @@ tags:
 
 写一个setup_py2exe.py文件
 
-```
-
+```python
 from distutils.core import setup
 import py2exe
 options = {'py2exe': {'compressed': 1,
@@ -48,6 +45,7 @@ setup(name='App',
       )
 
 ```
+<!-- more -->
 
 ### 2.3 命令
 

@@ -9,8 +9,6 @@ tags:
 
 本文描述了ionic项目构建Android安装包的主要步骤。
 
-<!--more-->
-
 ## 1 环境配置
 
 ### 1.1 添加Android平台

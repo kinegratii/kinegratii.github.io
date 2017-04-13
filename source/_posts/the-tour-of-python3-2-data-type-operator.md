@@ -6,11 +6,6 @@ tags:
 - Python
 ---
 
-关键字：长整数、八进制、迭代器、除法、比较。
-
-<!-- more -->
-
-
 ## 1 整数
 
 - Python3.X不再有long的数据类型，合并到int中，因此像 `34023932232L` 和 `34023932232l` 将引发语法错误。
@@ -36,6 +31,8 @@ flags = int('0b_1111_0000', 2)
 
 > PEP 链接
 - [PEP 515 -- Underscores in Numeric Literals | Python.org](https://www.python.org/dev/peps/pep-0515/)
+
+<!-- more -->
 
 ## 2 列表、字典和迭代器
 

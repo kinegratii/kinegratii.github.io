@@ -10,7 +10,6 @@ tags:
 
 使用aiohttp + lxml/爬取OSC乱弹的歌曲
 
-<!-- more -->
 
 ## 一 原理分析
 
@@ -43,6 +42,8 @@ https://my.oschina.net/xxiaobian/blog?catalog=547834&sort=time&p={page}
 在博客文档中无法找到（通常是由于匹配规则无法覆盖所有情况），向云音乐网站获取数据，注意两点：
 - 需要将 `http://music.163.com/#/song?id=28285557` 转换成 `http://music.163.com/song?id=28285557` 格式
 - 网页标题去掉末尾的字符串“- 网易云音乐”即是所需要的歌手歌曲信息。
+
+<!-- more -->
 
 ## 二 实现
 

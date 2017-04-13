@@ -7,6 +7,8 @@ tags:
  - Django
 ---
 
+## 1 概述
+
 本文总结了一些Django数据库查询的实践经验。
 
 - 基本的增删改查
@@ -14,11 +16,6 @@ tags:
 - 实现按年/月/日统计
 - Manager和QuerySet的混合使用
 - 编写迁移文件
-
-<!-- more -->
-
-
-## 1概述
 
 根据[Django官方文档](https://docs.djangoproject.com/en/1.10/)，本人整理出与数据库相关的话题列表，
 
@@ -42,6 +39,8 @@ tags:
 - `django.db.connections`: 底层数据库连接对象操作
 - `django.db.migrations`:  迁移相关
 - `django.db.models`: 模型定义、数据库查询
+
+<!-- more -->
 
 ## 2 查询API
 

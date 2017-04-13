@@ -8,9 +8,6 @@ tags:
 - ionic
 ---
 
-记录一些个人使用ionic2过程中的感受和碰到的问题。
-<!-- more -->
-
 ## 1 技能链
 
 > Typescript --> Angular2 --> ionic2
@@ -26,6 +23,8 @@ ionic2是基于Angular2开发，Angular2是使用Typescript重新改写的。Typ
 和Javascript相比，在函数、接口、类、泛型都有很大的变化，总的来说，会使得程序更加明确，加强了面向对象的一些设计规范。
 
 interface是接口，class是类。类可以实现接口。
+
+<!-- more -->
 
 ## 3 第三方js库与d.ts声明文件
 

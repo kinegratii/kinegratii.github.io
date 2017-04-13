@@ -11,13 +11,13 @@ tags:
 
 本文介绍了在DaoCloud平台部署Django项目的方法。
 
-<!-- more -->
-
 ## 1 DaoCloud云平台
 
 关于DaoCloud云平台。https://www.daocloud.io/
 
 > DaoCloud 为用户提供了 Docker 镜像的自动构建和自动发布功能，当用户完成了 Dockerfile 和 daocloud.yml 文件的编写后，将应用代码推送到第三方代码托管平台上，将其与 DaoCloud 绑定后，在每次修改（commit）后，并将其推送到代码托管平台上，DaoCloud 会检测到代码的变动，并根据 Dockerfile 和 daocloud.yml 进行相应的构建和测试；当触发规定的构建事件（如 tag）时，DaoCloud 会将其进行镜像构建，并推送到相对应的所有生产环节中。
+
+<!-- more -->
 
 ## 2 Django项目配置
 

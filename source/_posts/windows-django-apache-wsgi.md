@@ -16,8 +16,6 @@ tags:
 - Django 1.10
 - Apache 2.2
 
-<!-- more -->
-
 ## 目录文件位置
 
 | 名称 | 文件目录 |
@@ -28,6 +26,8 @@ tags:
 | 静态文件目录 | D:/static/nms/ |
 | 上传文件目录 | D:/upload/nms/ |
 | Apache目录 | C:/Apache22/ |
+
+<!-- more -->
 
 ## 步骤
 

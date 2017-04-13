@@ -9,8 +9,6 @@ tags:
 
 Celery是一个异步任务队列/基于分布式消息传递的作业队列。Celery通过消息（message）进行通信，使用代理（broker）在客户端和工作执行者之间进行交互。当开始一个任务时，客户端发送消息到队列并由代理将其发往响应的工作执行者处。。djcelery是其和Django框架一个很方便使用的第三方包。
 
-<!-- more -->
-
 ## 1 环境配置
 
 ### 1.1 安装ERLang
@@ -31,6 +29,8 @@ Celery是一个异步任务队列/基于分布式消息传递的作业队列。C
 ### 1.3 安装Djcelery
 
 和大多数Python第三方包一样，用 pip安装celery和djcelery两个包。djcelery依赖于djcelery，所以只要执行pip install djcelery命令即可。
+
+<!-- more -->
 
 ## 2 配置Djcelery
 

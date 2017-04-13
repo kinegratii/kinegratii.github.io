@@ -10,7 +10,6 @@ tags:
 
 Construct是一个强大的二进制数据解析和构建Python库，适用于建立大型复杂应用程序的通信协议，类似于二进制数据的ORM库。
 
-<!-- more -->
 
 ## 1 标准库struct
 
@@ -19,6 +18,8 @@ struct是用于二进制数据的解析和构建，处理Python对象和二进�
 - `stricut.pack(fmt, v1, v2, *)` 打包，Python对象到二进制数据
 - `struct.unpack(fmt, buffer)` 解包，二进制数据到Python对象
 - `struct.calcsize(fmt)` 计算格式字符串数据大小
+
+<!-- more -->
 
 ## 2 Construct库
 

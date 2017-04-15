@@ -164,6 +164,10 @@ toc:
 creative_commons: by-nc-sa
 #creative_commons:
 
+post_wordcount:
+  wordcount: true
+  #item_text: true
+  min2read: true
 
 sidebar:
   # Sidebar Position, available value: left | right

@@ -10,72 +10,98 @@ tags:
 
 自动发送动弹到开源中国。
 
+1. 登录系统，密码使用sha1算法加密。
+2. 获取用户信息，包括user_code和user_id。
+3. 发送动弹。
+
+代码仅在Python3有效。
+
 <!-- more -->
 
-```
+```python
 # coding=utf8
+
 from __future__ import unicode_literals
-import requests
+
 import hashlib
-import re
 from datetime import datetime
-class User(object):
-    def __init__(self, username, password, user_code=None, user_id=None):
+import re
+
+import requests
+
+
+class OSCRobot:
+    HEADERS = {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1500.72 Safari/537.36'
+    }
+
+    def __init__(self, *, username, password, user_code=None, user_id=None):
         self.username = username
         self.password = password
         self.user_code = user_code
         self.user_id = user_id
-    @property
-    def password_hash(self):
-        return hashlib.sha1(self.password).hexdigest()
-class OSCTweetRobot(object):
-    LOGIN_URL = 'https://www.oschina.net/action/user/hash_login'
-    HOME_URL = 'https://www.oschina.net/'
-    PUBLISH_URL = 'https://www.oschina.net/action/tweet/pub'
-    HEADERS = {'User-Agent':'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/28.0.1500.72 Safari/537.36'}
-    def __init__(self, user):
-        self.user = user
         self.client = requests.session()
         self.client.headers = self.HEADERS
+
     def login(self, **kwargs):
+        if not (self.user_id and self.user_code):
+            self._login(**kwargs)
+
+    def _login(self, **kwargs):
         data = {
-            'email':self.user.username,
-            'pwd':self.user.password_hash
+            'email': self.username,
+            'pwd': hashlib.sha1(self.password.encode('utf8')).hexdigest()
         }
         has_login = False
-        login_rsp = self.client.post(self.LOGIN_URL, data)
+        login_rsp = self.client.post('https://www.oschina.net/action/user/hash_login', data)
         if login_rsp.status_code == 200:
-            home_rsp = self.client.get(self.HOME_URL)
+            home_rsp = self.client.get('https://www.oschina.net/')
             if home_rsp.status_code == 200:
-                content = home_rsp.content
-                m_regx = re.search(r"name='user_code' value='(?P<user_code>.*?)'/>", content)
+                text = home_rsp.text
+                m_regx = re.search(r":bind=\"user_code\"\svalue='(?P<user_code>[a-zA-Z0-9]+)'", text)
                 if m_regx:
-                    self.user.user_code = m_regx.group('user_code')
-                    m_regx = re.search(r"name='user' value='(?P<user_id>.*?)'/>", content)
+                    self.user_code = m_regx.group('user_code')
+                    m_regx = re.search(r":bind=\"user\"\svalue='(?P<user_id>\d+)'", text)
                     if m_regx:
-                        self.user.user_id =  m_regx.group('user_id')
+                        self.user_id = m_regx.group('user_id')
                         has_login = True
+                    else:
+                        print('[Fail] No user id found!')
+                else:
+                    print('[Fail] No user code found!')
+            else:
+                print('[Fail] Request home page fail with status code {}'.format(home_rsp.status_code))
+        else:
+            print('[Fail] Login fail with status_code {}'.format(login_rsp.status_code))
         if has_login:
             print('[Success] Login success! User info')
-            print(self.user.__dict__)
         else:
             print('[Fail] fail to login!')
         return has_login
+
     def publish_tweet(self, msg, **kwargs):
         post_data = {
-            'user_code':self.user.user_code,
-            'user':self.user.user_id,
-            'msg':msg
+            'user_code': self.user_code,
+            'user': self.user_id,
+            'msg': msg
         }
-        rsp = self.client.post(self.PUBLISH_URL,post_data)
+        rsp = self.client.post('https://www.oschina.net/action/tweet/pub', post_data)
         if 200 <= rsp.status_code < 300:
             print('[Success] Push tweet success!')
         else:
             print('[Fail] Fail to push tweet!')
+
+
 def main():
-    u = User('YOUR USERNAME', 'YOUR PASSWORD')
-    robot = OSCTweetRobot(u)
+    robot = OSCRobot(
+        username='YOUR USERNAME',
+        password='YOUR PASSWORD'
+    )
     robot.login()
-    s = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    # robot.publish_tweet(msg=s)
+    robot.publish_tweet('Hello everyone! The current time is {}'.format(datetime.now().strftime('%Y-%m-%d %H:%M:%S')))
+
+
+if __name__ == '__main__':
+    main()
+
 ```

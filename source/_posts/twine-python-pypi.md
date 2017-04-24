@@ -26,7 +26,7 @@ pip install twine
 2 生成wheel包
 
 ```
-python setup.py sdist bdist_wheel
+python setup.py sdist bdist_wheel --universal
 ```
 
 3 注册项目（第一次上传时必须）
@@ -42,3 +42,5 @@ twine upload dist/*
 ```
 
 5 成功！
+
+> 参考文档 [Python Packaging User Guide — Python Packaging User Guide documentation](https://packaging.python.org/)

@@ -27,7 +27,14 @@ tags:
 
 ## 2 运行本地单元测试
 
-依据开发规范，测试代码放置在tests包下，每个测试文件以test_开头。测试框架这里使用的是Python自带的unittest（实际是后面pytest和Travis CI集成的出现了问题，所以改用unittest）。执行以下命令。
+依据开发规范，测试代码放置在tests包下，每个测试文件以test_开头。Python的测试框架有：
+
+- [unittest](https://docs.python.org/3/library/unittest.html)
+- [pytest](http://pytest.org/)
+- [nose](https://nose.readthedocs.io/en/latest/)
+- [tox](https://tox.readthedocs.io/en/latest/)
+
+本博客使用的是最简单自带的unittest。执行以下命令以运行测试用例。
 
 ```
 python -m unittest
@@ -73,43 +80,24 @@ script: python -m unittest
 
 ## 4 编写setup.py文件
 
-setup.py文件描述了项目的一些基本信息，定义在 setuptools或 distutils.core 的 setup 函数参数。主要有
+setup.py文件调用了 `setuptools.setup` 函数，它描述了项目的一些基本信息，主要参数如下表
 
-**name**
+| 名称 | 描述 |
+| ------ | ------ |
+| name | 名称，PyPI的唯一标识，不能与已有的冲突。 |
+| version | 版本字符串，可以使用常量或者从库的 `__VERSION__` 导入。 |
+| author | 作者 |
+| author_email | 邮箱 |
+| url | 项目主页 |
+| py_modules | 源代码模块 |
+| install_requires | 安装依赖，格式与requirements.txt相同 |
+| license | 开源协议类型，如 MIT |
+| lib_classifiers | 分类标签，设置Python版本支持、操作系统支持、面向开发者或使用者、软件分类等信息。可用的选项在[这里](https://pypi.python.org/pypi?:action=list_classifiers) 可以找到|
 
-名称，PyPI的唯一标识，不能与已有的冲突。
-
-**version**
-
-版本字符串，可以使用常量或者从库的 `__VERSION__` 导入。
-
-**author / author_email**
-
-作者名称和邮箱
-
-**url**
-
-项目主页，可以使用github项目页面。
-
-**py_modules**
-
-项目代码模块
-
-**install_requires**
-
-安装依赖，格式与requirements.txt相同
-
-**license**
-
-开源协议类型，如 MIT
-
-**lib_classifiers**
-
-分类标签，设置Python版本支持、操作系统支持、面向开发者或使用者、软件分类等信息。
 
 ## 5 生成wheel安装包
 
-wheel实际上是一个zip压缩包，是Python最新推荐的包格式。在生成之前需要安装相关包。
+[wheel](http://pythonwheels.com/)实际上是一个zip压缩包，是Python最新标准分发格式，用于替代eggs。在生成之前需要安装相关包。
 
 ```
 pip install wheel
@@ -125,13 +113,25 @@ python setup.py bdist_wheel --universal
 
 ## 6 发布到PyPI
 
+PyPI目前有两个可用的网址:
+
+- 旧版 PyPI [https://pypi.python.org/pypi](https://pypi.python.org/pypi)
+- 新版 Warehouse  [https://pypi.org/](https://pypi.org/)。Warehouse目前还处于开发状态(pre-production developement)，可以显示项目页面，但是页面内容简单，很多链接还没有完善。
+
+[twine]() 是一个专门用于发布项目到PyPI的工具，主要优点：
+
+- 安全的HTTPS传输
+- 上传过程中不要求执行setup.py脚本
+- 上传已经存在的文件，支持在发布前进行分发测试
+- 支持任意包格式，包括wheel
+
 执行 `pip install twine` 安装twine。执行以下命令上传文件，在此过程中可能需要输入PyPI的用户名和密码。
 
 ```
 twine upload dist/*
 ```
 
-最新版本的twine无需注册这一步骤，执行命令 `twine register` 将显示 `HTTPError: 410 Client Error: This API is no longer supported, instead simply upload the file. for url: https://upload.pypi.org/legacy/`的错误。
+**注意**：最新版本的twine无需注册这一步骤，执行命令 `twine register` 将显示 `HTTPError: 410 Client Error: This API is no longer supported, instead simply upload the file. for url: https://upload.pypi.org/legacy/`的错误。
 
 ## 7 添加徽章
 

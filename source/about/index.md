@@ -16,6 +16,7 @@ comments: false
 ## 专题页面
 
 - [在线简历](/resume)
+- [Python Wiki](/python-wiki)
 
 ---
 

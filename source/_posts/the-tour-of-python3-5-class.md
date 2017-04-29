@@ -16,28 +16,50 @@ tags:
 - 新式类增加了 `__slots__` 内置属性, 可以把实例属性的种类锁定到 `__slots__` 规定的范围之中
 - 新式类增加了 `__getattribute__` 方法
 
-参考
-- Python新式类和经典类的区别 - u010066807的博客 - 博客频道 - CSDN.NET
-http://blog.csdn.net/u010066807/article/details/46896835
-- https://wiki.python.org/moin/NewClassVsClassicClass
+```python
+
+# Python2
+class A(object):
+    pass
+
+# Python3
+class A:
+    pass
+```
+
+<!-- more -->
 
 ## 2 类继承和混合(Mixin)
 
-新式类采用广度优先搜索，而旧式类是采用深度优先搜索
+新式类采用广度优先搜索，而旧式类是采用深度优先搜索，在新式类中可以通过 `__mro__` 树形查看继承结构。
+
+```
+>>> class New(object): pass
+>>> class N1(New): pass
+>>> class N2(New): pass
+>>> class ND(N1, N2): pass
+>>> ND.__mro__
+(<class '__main__.ND'>, <class '__main__.N1'>, <class '__main__.N2'>, <class '__main__.New'>, <type 'object'>)
+```
 
 ## 3 元类
 
-元类的定义方式有所变更，由
+元类的定义方式有所变更，下面是Python2的定义形式。
 ```
 class C:
     __metaclass__ = M
 ```
-变为
+而Python3废弃了 `__metaclass__` 树形，改为 metaclass 参数。
 ```
 class C(metaclass=M):
     pass
 ```
 
+## 4 参考资料
+
+- Python新式类和经典类的区别 - u010066807的博客 - 博客频道 - CSDN.NET
+http://blog.csdn.net/u010066807/article/details/46896835
+- https://wiki.python.org/moin/NewClassVsClassicClass
 - Python 3 Object Oriented
 https://www.tutorialspoint.com/python3/python_classes_objects.htm
 - Python3 Tutorial: Inheritance

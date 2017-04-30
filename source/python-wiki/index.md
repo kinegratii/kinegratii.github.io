@@ -11,3 +11,5 @@ date: 2017-04-28 20:23:57
 http://www.pythondoc.com/pythontutorial3/index.html
 - python-3-patterns-idioms
 https://bitbucket.org/MatToufoutu/python-3-patterns-idioms
+- Python 3 Module of the Week — PyMOTW 3
+https://pymotw.com/3/

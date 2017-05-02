@@ -3,6 +3,7 @@ title: 高德地图热力图显示
 date: 2017-04-29 18:42:05
 categories: 编程
 tags:
+- 数据可视化
 - Javascript
 - 地图
 ---

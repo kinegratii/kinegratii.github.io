@@ -65,7 +65,7 @@ setup(name='App',
 
 程序报的异常是`ImportError: No module named lxml._elementpath`，但按照网上的说法加了includes参数可以解决。
 
-```
+```python
 options={
     'py2exe': {
         'includes': ['lxml.etree', 'lxml._elementpath', 'gzip'],
@@ -91,10 +91,12 @@ pip install cx_Freeze
 
 setup_cx.py文件如下
 
-```
+```python
 from __future__ import unicode_literals
+
 import sys
 from cx_Freeze import setup, Executable
+
 base = None
 if sys.platform == "win32":
     base = "Win32GUI"
@@ -168,7 +170,7 @@ PyInstaller也是一个标准的Python包，提供了`PyInstaller.main.run`这�
 
 4.2节中等效的python脚本如下
 
-```
+```python
 if __name__ == '__main__':
     from PyInstaller.main import run
     params=[app.py', '-F', '-w', '--clean']
@@ -209,21 +211,21 @@ DB_FILE = os.path.join(BASE_DIR,'data', 'wpa.db')
 调试打印出`BASE_DIR`，发现路径不是XxxApp，而是在用户目录下的某一个位置，类似如下
 
 ```
-c:\Users\kinegratii\AppData'Local\Temp\_MEI11~1\dadta\wpa.db
+c:\Users\kinegratii\AppData'Local\Temp\_MEI11~1\data\wpa.db
 ```
 
 这是因为**在单文件模式中运行程序的时候先将文件解压到sys._MEIPASS指向的目录下，所以引用资源文件就需要添加os.path.join(sys._MEIPASS,filename)**，
 
 第一种方法，具体判断程序当前模式。
 
-```
+```python
   if getattr(sys, 'frozen', False):
         BASE_DIR = sys._MEIPASS
     else:
         BASE_DIR = os.path.dirname(__file__)
 ```
 
-第二种，就是将`__file__`改为sys.args[0]，即
+第二种，就是将 `__file__` 改为 `sys.args[0]`，即
 
 ```
 BASE_DIR = os.path.abspath(os.path.dirname(sys.argv[0]))

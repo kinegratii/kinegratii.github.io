@@ -15,6 +15,7 @@ tags:
 - 新式类对象可以直接通过 `__class__` 属性获取自身类型:type
 - 新式类增加了 `__slots__` 内置属性, 可以把实例属性的种类锁定到 `__slots__` 规定的范围之中
 - 新式类增加了 `__getattribute__` 方法
+- `super` 函数用法差异
 
 ```python
 
@@ -27,9 +28,37 @@ class A:
     pass
 ```
 
+**super函数**
+
+关于super函数定义在 [PEP3135](https://www.python.org/dev/peps/pep-3135/) ，super演变过程描述历经三个过程：
+
+1 在Python2的旧式类中，用法是这样子：
+
+```python
+class MySubClass(MySuperClass):
+     def __init__(self):
+         MySuperClass.__init__(self)
+```
+2 为了使用代码更加抽象，Python2的新式类改成 `super(<class>, <instance>)`，上述 `__init__` 变成
+
+
+```python
+class MySubClassBetter(MySuperClass):
+    def __init__(self):
+        super(MySubClassBetter, self).__init__()
+```
+
+3 在Python3中，支持无参数super调用。
+
+```python
+class MySubClassBetter(MySuperClass):
+    def __init__(self):
+        super().__init__()
+```
+
 <!-- more -->
 
-## 2 类继承和混合(Mixin)
+## 2 类继承
 
 新式类采用广度优先搜索，而旧式类是采用深度优先搜索，在新式类中可以通过 `__mro__` 树形查看继承结构。
 
@@ -42,20 +71,24 @@ class A:
 (<class '__main__.ND'>, <class '__main__.N1'>, <class '__main__.N2'>, <class '__main__.New'>, <type 'object'>)
 ```
 
-## 3 元类
+## 3 混合(Mixin)
+
+混合在Django CBV中运用的非常频繁。
+
+## 4 元类
 
 元类的定义方式有所变更，下面是Python2的定义形式。
 ```
 class C:
     __metaclass__ = M
 ```
-而Python3废弃了 `__metaclass__` 树形，改为 metaclass 参数。
+而Python3废弃了 `__metaclass__` 定义，改为 metaclass 参数。
 ```
 class C(metaclass=M):
     pass
 ```
 
-## 4 参考资料
+## 5 参考资料
 
 - Python新式类和经典类的区别 - u010066807的博客 - 博客频道 - CSDN.NET
 http://blog.csdn.net/u010066807/article/details/46896835

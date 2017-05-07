@@ -226,6 +226,8 @@ post_copyright:
   enable: true
 # Automatically Excerpt. Not recommand.
 # Please use <!-- more --> in the post to control excerpt accurately.
+
+copyright: true
 auto_excerpt:
   enable: false
   length: 150

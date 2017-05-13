@@ -10,9 +10,21 @@ tags:
 - 持续集成
 ---
 
-本文以 [ConfStruct](https://github.com/kinegratii/ConfStruct) 为例子描述了Python项目的持续集成和包发布等开发流程，并了解 Travis CI、wheel和twine等工具的使用。
+本文依据[Python Packaging User Guide](https://packaging.python.org/)Python打包用户手册，以 [ConfStruct](https://github.com/kinegratii/ConfStruct) 为例子描述了Python项目的持续集成和包发布等开发流程，并了解 Travis CI、wheel和twine等工具的使用。
 
-## 1 准备工作
+主要步骤
+
+- 准备项目代码
+- 运行本地单元测试
+- Travis持续集成
+- 编写setup.py文件
+- 生成wheel安装包
+- 发布到PyPI
+- 添加徽章
+
+<!-- more -->
+
+## 1 准备项目代码
 
 首先准备好项目代码和文本，包括：
 
@@ -22,8 +34,6 @@ tags:
 - 开源协议文件
 - requirements.txt依赖文件
 - .gitignore文件
-
-<!-- more -->
 
 ## 2 运行本地单元测试
 

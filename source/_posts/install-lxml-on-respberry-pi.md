@@ -67,6 +67,23 @@ E: Unable to locate package libxslt-devel
 在Debian源找到了 libxslt-devel2 包页面，地址是 https://packages.debian.org/jessie/libxml2-dev ，按照页面提示添加apt源并安装。
 
 ```
+W: GPG error: http://ftp.cn.debian.org jessie Release: The following signatures couldn't be verified because the public key is not available: NO_PUBKEY 8B48AD6246925553 NO_PUBKEY 7638D0442B90D010 NO_PUBKEY CBF8D6FD518E17E1
+```
+
+该消息显示这个源未经过验证，所以需要添加plublic key到系统中，如果显示 imported 1 字样就是导入成功了.
+
+```
+pi@raspberrypi:~ $ sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 8B48AD6246925553
+Executing: gpg --ignore-time-conflict --no-options --no-default-keyring --homedir /tmp/tmp.5TjGyQBYus --no-auto-check-trustdb --trust-model always --keyring /etc/apt/trusted.gpg --primary-keyring /etc/apt/trusted.gpg --keyserver keyserver.ubuntu.com --recv-keys 8B48AD6246925553
+gpg: requesting key 46925553 from hkp server keyserver.ubuntu.com
+gpg: key 46925553: public key "Debian Archive Automatic Signing Key (7.0/wheezy) <ftpmaster@debian.org>" imported
+gpg: Total number processed: 1
+gpg:               imported: 1  (RSA: 1)
+```
+
+使用apt安装libxslt-dev。
+
+```
 pi@raspberrypi:~ $ sudo apt install libxslt-dev
 Reading package lists... Done
 Building dependency tree

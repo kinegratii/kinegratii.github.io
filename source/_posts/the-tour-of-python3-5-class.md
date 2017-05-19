@@ -73,7 +73,7 @@ class MySubClassBetter(MySuperClass):
 
 ## 3 混合(Mixin)
 
-混合在Django CBV中运用的非常频繁。
+混合在Django CBV中运用的非常频繁。和类继承不同的是，单独的Mixin不可实例化和执行其方法，需要配合其他主体类执行。
 
 ## 4 元类
 

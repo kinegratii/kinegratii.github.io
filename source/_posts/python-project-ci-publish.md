@@ -49,13 +49,13 @@ tags:
 本博客使用的是最简单自带的unittest。执行以下命令以运行测试用例。
 
 ```
-python -m unittest
+python -m unittest discover
 ```
 
 结果如下，完全测试通过。
 
 ```
-E:\projects\ConfStruct>python -m unittest
+E:\projects\ConfStruct>python -m unittest discover
 .......
 ----------------------------------------------------------------------
 Ran 7 tests in 0.002s

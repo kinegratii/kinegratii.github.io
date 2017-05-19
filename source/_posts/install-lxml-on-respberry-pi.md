@@ -48,9 +48,19 @@ sudo ln -s -f /usr/local/bin/python3.6 /usr/bin/python3
 
 ## 问题: py3clean: permission denied
 
-由于安装python3.6没有完全配置好，导致使用apt-get安装任何包都会出现这个错误信息。
+由于安装python3.6没有完全配置好，导致使用apt-get安装任何包都会出现这个错误信息。从字面上是权限的问题，使用chmod命令或者root用户也无效。
 
-从字面上是权限的问题，使用chmod命令或者root用户也无效，后来发现是linux shabang符号的问题，py3clean可执行文件是一个python脚本，使用编辑器（nano）发现其为 `#! /usr/bin/python3` 改成 `#! /usr/local/bin/python3`，同时修改的还有py3compile脚本，这两个脚本都在 `/usr/bin` 目录下。
+后来定位并查看该执行文件的内容,发现是一个python脚本。问题出现在第一行的linux shabang符号，需要 将 `#! /usr/bin/python3` 改成 `#! /usr/local/bin/python3`，同时修改的还有同义目录下的py3compile脚本。
+
+```
+pi@raspberrypi:~ $ which py3clean
+/usr/bin/py3clean
+pi@raspberrypi:~ $ sudo nano /usr/bin/py3clean
+  GNU nano 2.2.6           File: /usr/bin/py3clean
+
+#! /usr/bin/python3
+
+```
 
 ## 问题：找不到libxslt-dev
 

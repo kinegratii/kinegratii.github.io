@@ -1,17 +1,7 @@
 ---
-title: 简历
+title: 技能与项目
 date: 2017-04-03 20:33:29
 comments: false
----
-
-##  个人
-
-- 男/90后/福建·福州/Web开发
-- Python/Javascript
-- Email
-    - kinegratii@gmail.com
-    - kinegratii@yeah.net
-
 ---
 
 ## 技能
@@ -24,7 +14,7 @@ comments: false
   - Windows + Apache + mod_wsgi
   - Ubuntu + Docker + DaoCloud + wsgi
   - Docker
-- 基本的爬虫方法
+- 基本的爬虫方法：正则提取
 - Python项目持续集成、打包、发布
 - jQuery及其插件的应用
 - ionic混合开发
@@ -32,7 +22,15 @@ comments: false
 
 ## 项目
 
+### boron
+
+Python / 2017 / 工具
+
+Python和Django的开发工具箱。该项目包含了一些可复用的列代码片段，来源自网络或者自己创建，每个尽可能包含一些列简单的单元测试。
+
 ### ConfStruct
+
+Python / 2017 / 工具、二进制数据
 
 ConfStruct是一个特定场景下的Python对象和二进制数据的构建器和解析器,该项目解决了一种设备配置二进制数据的解析和构建。项目具有单元测试、持续集成等开源项目的特性，已发布在PyPI。
 
@@ -46,7 +44,7 @@ Django / 2016 / 网站平台
 
 ionic1 / 2016 / 工具、内容阅读
 
-基于ionic的跨平台APP，包括家谱显示、生日提醒、家庭计算器、百家姓等常用功能，此外在前期数据整理使用Python脚本提取相关信息以存储于型数据库，节省了大量的时间。
+基于[ionic](http://ionicframework.com/)的跨平台APP，包括家谱显示、生日提醒、家庭计算器、百家姓等常用功能，此外在前期数据整理使用Python脚本提取相关信息以存储于型数据库，节省了大量的时间。
 
 ### 高德位置选择插件
 

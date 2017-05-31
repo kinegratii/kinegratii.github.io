@@ -15,3 +15,5 @@ https://bitbucket.org/MatToufoutu/python-3-patterns-idioms
 https://pymotw.com/3/
 - Python Cookbook 3rd Edition Documentation — python3-cookbook 2.0.0 文档
 http://python3-cookbook.readthedocs.io/zh_CN/latest/index.html
+- The Hitchhiker’s Guide to Python!
+http://docs.python-guide.org/en/latest/

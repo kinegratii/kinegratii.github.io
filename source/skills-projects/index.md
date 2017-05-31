@@ -26,19 +26,23 @@ comments: false
 
 Python / 2017 / 工具
 
-Python和Django的开发工具箱。该项目包含了一些可复用的列代码片段，来源自网络或者自己创建，每个尽可能包含一些列简单的单元测试。
+Python和Django的开发工具箱。该项目包含了一些可复用的列代码片段，均来源自网络或者自己创建，每个包和模块尽可能包含相对应的单元测试，boron支持python2和3，已托管在PyPI上，主页为 [https://pypi.org/project/boron/](https://pypi.org/project/boron/)。
 
 ### ConfStruct
 
 Python / 2017 / 工具、二进制数据
 
-ConfStruct是一个特定场景下的Python对象和二进制数据的构建器和解析器,该项目解决了一种设备配置二进制数据的解析和构建。项目具有单元测试、持续集成等开源项目的特性，已发布在PyPI。
+ConfStruct是一个解决了具有“length-body”结构的二进制数据的解析和构建的Python库,实现了Python对象和二进制数据之间转化。项目参考了 [Construct](http://construct.readthedocs.io/en/latest/) 并支持整合部分特性。
+
+项目具有单元测试、持续集成等开源项目的特性，已发布在PyPI，主页为 [https://pypi.org/project/ConfStruct/](https://pypi.org/project/ConfStruct/)。
 
 ### 水资源费征收工作平台
 
 Django / 2016 / 网站平台
 
-该平台包括了企业管理、价格管理、抄表缴费、数据查询和统计报表等功能，覆盖了水资源费征收全部的业务流程,实现了相关业务的电子信息化，符合现代软件工程“人工管理 -> 文件管理 -> 数据库系统”的数据管理技术的发展趋势。平台使用 `Python3 + Django1.10 + postgresql` 进行开发，考虑Python3在web开发上的现状以及具体应用场景的特点，平台不保证兼容Python2.x。除了常规部署方案外，平台还支持[DaoClound](https://www.daocloud.io/)云部署。
+该平台包括了企业管理、价格管理、抄表缴费、数据查询和统计报表等功能，覆盖了水资源费征收全部的业务流程,实现了相关业务的电子信息化，符合现代软件工程“人工管理 -> 文件管理 -> 数据库系统”的数据管理技术的发展趋势。
+
+平台使用 Python3 + Django1.10 进行开发，并且自v1.2起，项目不再支持Python2.X。在部署方案上，平台不仅支持 Apache 、uwsgo等常规方案，还支持[DaoClound](https://www.daocloud.io/)等云部署。
 
 ### 家谱APP
 

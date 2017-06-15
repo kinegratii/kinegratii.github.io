@@ -6,6 +6,8 @@ categories: Python
 
 ## 连接二进制数据
 
+<!-- more -->
+
 使用 sum 方法
 
 ```

@@ -28,6 +28,8 @@ class A:
     pass
 ```
 
+<!-- more -->
+
 **super函数**
 
 关于super函数定义在 [PEP3135](https://www.python.org/dev/peps/pep-3135/) ，super演变过程描述历经三个过程：
@@ -55,8 +57,6 @@ class MySubClassBetter(MySuperClass):
     def __init__(self):
         super().__init__()
 ```
-
-<!-- more -->
 
 ## 2 类继承
 

@@ -13,8 +13,8 @@ tags:
 - [（三）语句](/2017/03/18/the-tour-of-python3-3-statement/)
 - [（四）函数定义和调用](/2017/04/08/the-tour-of-oython3-4-function/)
 - [（五） 类和类继承](/2017/04/29/the-tour-of-python3-5-class/)
-- （六）类型提示
-- （七）字符串
+- [（六）类型提示](/2017/05/20/the-tour-of-python3-6-type-hint/)
+- （七）文本与二进制
 - （八）模块和导入
 - （九）枚举类型
 - （十）Mock测试框架

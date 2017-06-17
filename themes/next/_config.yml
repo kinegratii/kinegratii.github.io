@@ -32,7 +32,7 @@ menu:
   #categories: /categories
   archives: /archives
   tags: /tags
-  project: /skills-projects
+  topics: /topics
   about: /about
   #schedule: /schedule
   #commonweal: /404.html
@@ -54,7 +54,7 @@ menu_icons:
   archives: archive
   commonweal: heartbeat
   recommend: thumbs-up
-  project: product-hunt
+  topics: book
 
 
 

@@ -1,7 +1,7 @@
 ---
 title: python小记
 date: 2017-06-08 08:59:54
-categories: Python
+categories: 编程
 ---
 
 ## 连接二进制数据

@@ -1,5 +1,5 @@
 ---
-title: Python3之旅（四） —— 函数定义与调用
+title: Python3之旅（四） —— 函数
 date: 2017-04-08 20:49:04
 categories: 编程
 tags:

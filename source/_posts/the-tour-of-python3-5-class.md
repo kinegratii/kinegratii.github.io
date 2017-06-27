@@ -1,5 +1,5 @@
 ---
-title: Python3之旅（五）——类与类继承
+title: Python3之旅（五）—— 面向对象和类
 date: 2017-04-29 20:12:58
 categories: 编程
 tags:

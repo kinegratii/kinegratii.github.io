@@ -17,6 +17,8 @@ https://pymotw.com/3/
 http://python3-cookbook.readthedocs.io/zh_CN/latest/index.html
 - The Hitchhiker’s Guide to Python!
 http://docs.python-guide.org/en/latest/
+- Full Stack Python
+https://www.fullstackpython.com/table-of-contents.html
 
 ## Python库列表
 

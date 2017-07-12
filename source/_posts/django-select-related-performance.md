@@ -9,11 +9,14 @@ tags:
 
 缴费项目主体功能完成的差不多了，写前端JS写的都快吐了，把所有的通用的代码封装在一个文件里差不多有1500行。接下去应该主要是Bug修正和性能优化了。性能优化方面，数据库访问效率是重要的环节，使用ORM遇到的一个很常见的是 "N+1"问题，自然Django也不例外。
 
+> 关于 ORM的N+1的介绍，可以参考stackoverflow上的这篇文章 https://stackoverflow.com/questions/97197/what-is-n1-select-query-issue 。
+
 <!-- more -->
 
+在Django中可以使用 [select_related](https://docs.djangoproject.com/en/1.11/ref/models/querysets/#select-related)和 [prefetch_related](https://docs.djangoproject.com/en/1.11/ref/models/querysets/#prefetch-related) 查询API解决这个问题。
 ## 表定义
 
-```
+```python
 class Organization(models.Model):
     name = models.CharField(max_length=100)
     remark = models.TextField(max_length=500, null=True, blank=True)
@@ -49,7 +52,7 @@ class Bill(models.Model):
 
 测试是否使用 `select_related` 函数对查询耗时的影响。
 
-```
+```python
 def test_normal():
     t1 = time.time()
     el = []

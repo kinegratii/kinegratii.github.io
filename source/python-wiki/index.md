@@ -38,3 +38,4 @@ https://www.fullstackpython.com/table-of-contents.html
 - [Pelican](http://blog.getpelican.com/) - 静态站点生成器，之前博客就是用Pelican构建的，由于在windows上比较麻烦，改成Hexo了。
 - [lxml](http://lxml.de/) - xml和html解析处理库。
 - [python-gsmmodem](https://github.com/faucamp/python-gsmmodem) - Python的GSM库，包括收发短信、电话处理等功能，支持常见型号的芯片。
+- [tablib](http://docs.python-tablib.org/en/latest/) 数据格式转换，支持JSON/XLS/XLSX/YAML等文件格式。

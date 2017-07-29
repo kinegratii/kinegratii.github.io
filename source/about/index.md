@@ -5,11 +5,10 @@ comments: false
 
 ##  关于本人
 
-- 男/90后/福建·福州/Web开发
-- Python/Javascript
-- Email
-    - kinegratii@gmail.com (git账号)
-    - kinegratii@yeah.net (日常使用)
+- 男/90后/福建·福州
+- Web开发 / APP混合开发
+- Python / Javascript
+- kinegratii@yeah.net
 
 ---
 

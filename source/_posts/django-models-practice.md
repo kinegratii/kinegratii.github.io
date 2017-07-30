@@ -53,7 +53,7 @@ tags:
 - 设备含有使用和报警两个状态标识变量。
 - `Alarm.catalog`表示警报类型，定义在choices上。
 
-```
+```python
 class Device(models.Model):
     serial = models.CharField(verbose_name='序列号', max_length=100, unique=True)
     name = models.CharField(verbose_name='名称', max_length=100, null=True, blank=True)
@@ -87,7 +87,7 @@ class Alarm(models.Model):
 
 #### 2.2.1 检索、过滤、外键查询、分页
 
-```
+```python
 # 查询mac地址为'0FFFFFFF561C4030'的设备
 try:
     device = models.Device.objects.get(serial='0FFFFFFF561C4030')
@@ -108,7 +108,7 @@ device_list = models.Device.objects.all()[20:30]
 ```
 #### 2.2.2 更新
 
-```
+```python
 # 单记录更新
 try:
     device = models.Device.objects.get(serial='0FFFFFFF561C4030')
@@ -126,7 +126,7 @@ models.Device.objects.filter(address__isnull=False).update(address=F('address').
 
 #### 2.2.3 删除
 
-```
+```python
 # 删除单条记录
 try:
     device = models.Device.objects.get(serial='0FFFFFFF561C4030')
@@ -178,7 +178,7 @@ models.Alarm.objects.filter(create_time__year=2016).values('serial').annotate(nu
 
 下面是两种方式查询最近30天中每个报警类型的报警数目为例。
 
-```
+```python
 latest_week_qs = models.Alarm.objects.filter(create_time__gt=timezone.now()-timedelta(days=30).
 
 # aggregate方式
@@ -211,7 +211,7 @@ latest_week_qs.values('catalog').annotate(count=Count('catalog'))
 
 以上两种结果中日期类型不一样，第一种返回时datetime对象，第二种只返回其中的分类字段，为整数类型。
 
-```
+```python
 # 查询mac地址为`0FFFFFFF561C4030`的设备最近一周每天报警次数。
 models.Alarm.objects.filter(serial='0FFFFFFF561C4030', create_time__gt=timezone.now()-timedelta(days=7)).extra(
     select={'dt': connection.ops.date_trunc_sql('day', 'create_time')}
@@ -261,7 +261,7 @@ models.Alarm.objects.filter(serial='0FFFFFFF561C4030', create_time__gt=timezone.
 
 这是默认出现的方式，以下 `period_date`函数封装了日期时间段查询函数
 
-```
+```python
 class AlarmManager(models.Manager):
     def period_date(self, field, start_date=None, end_date=None, fmt='%Y-%m-%d'):
         """封装日期开始结束时间段查询"""
@@ -307,7 +307,7 @@ AttributeError: '_QuerySet' object has no attribute 'unread'
 
 将自定义的方法定义从`models.Manager`移到`models.QuerySet`
 
-```
+```python
 class AlarmQuerySet(models.QuerySet):
     def period_date(self, field, start_date=None, end_date=None, fmt='%Y-%m-%d'):
         # 省略具体代码
@@ -329,7 +329,7 @@ class Alarm(models.Model):
 使用管理器上的`from_queryset(queryset_class)`函数创建新的管理器
 在使用django认证用户上一方面需要继承 `django.contrib.auth.models.BaseUserManager`，另一方面又希望能够自定义函数，这时可以使用这种方式。
 
-```
+```python
 class UserQuerySet(models.QuerySet):
     def no_login_in_days(self, days):
         start_time = timezone.now() - timedelta(days=days)
@@ -356,7 +356,7 @@ objects = models.Manager.from_queryset(AlarmQuerySet)
 
 随着业务逻辑越来越复杂，需要编写更多的自定义管理器，通常的做法是单独创建一个名称为`managers`的模块，封装所有数据操作。
 
-```
+```python
 from django.db import models
 from django.contrib.auth.models import BaseUserManager
 
@@ -396,7 +396,7 @@ class UserManager(BaseUserManager.from_queryset(UserQuerySet)):
 
 在获取对象函数会抛出`ObjectDoesNotExist`异常，在这种情况下我们需要使用`try-catch`捕捉异常，会出现大量重复的代码。这时我们可以用下的代码实现封装。
 
-```
+```python
 class BaseManager(models.Manager):
     def get_object(self, **kwargs):
         try:
@@ -440,7 +440,7 @@ Django Migration分为模式迁移（Schema migration）和数据迁移（Data M
 - `dependencies` 属性表示需要依赖的迁移模块名称
 - `operations` 属性表示一系列依次进行的迁移操作，这些都定义在 `django.db.migrations.operations`模块中。
 
-```
+```python
 from django.db import migrations
 
 class Migration(migrations.Migration):
@@ -454,7 +454,7 @@ class Migration(migrations.Migration):
 
 所有的操作被操作 `migrations.RunPython` 类中，要注意的是需要 `django.apps.get_model` 函数引用模型类。
 
-```
+```python
 from __future__ import unicode_literals
 
 from django.db import migrations, models

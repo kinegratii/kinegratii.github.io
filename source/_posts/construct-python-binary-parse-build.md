@@ -1,7 +1,7 @@
 ---
 title: Construct：二进制数据解析器和构建器
 date: 2017-04-07 09:30:11
-categories: 编程
+categories: 技术研究
 tags:
 - Python
 - ORM

@@ -1,7 +1,7 @@
 ---
 title: python项目持续集成与包发布
 date: 2017-04-25 18:11:18
-categories: 编程
+categories: 技术研究
 tags:
 - Python
 - PyPI

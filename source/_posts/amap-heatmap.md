@@ -5,7 +5,7 @@ categories: 编程
 tags:
 - 数据可视化
 - Javascript
-- 地图
+- 高德地图
 ---
 
 ## A 热力图

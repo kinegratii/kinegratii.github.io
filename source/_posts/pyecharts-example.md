@@ -2,6 +2,8 @@
 title: pyecharts使用示例
 date: 2017-08-02 09:26:37
 categories: 技术研究
+tags:
+- 数据可视化
 ---
 
 [pyechart](https://github.com/chenjiandongx/pyecharts) 是一个用于生成 Echarts 图表的类库。实际上就是 Echarts 与 Python 的对接。

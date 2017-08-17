@@ -1,7 +1,7 @@
 ---
 title: select_related函数性能基本测试
 date: 2017-07-11 10:50:58
-categories: 编程
+categories: 技术研究
 tags:
 - Django
 - 测试

@@ -20,7 +20,7 @@ tags:
 $ sudo apt-get install libxml2-dev libxslt-dev python-dev
 $ sudo pip3 install lxml
 ```
-*lxml标准的安装过程*
+*lxml的标准安装过程*
 
 
 <!-- more -->

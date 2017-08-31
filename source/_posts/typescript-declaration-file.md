@@ -1,5 +1,5 @@
 ---
-title: typescript-declaration-file
+title: typescript声明文件
 date: 2017-08-27 18:24:02
 categories: 编程
 tags:

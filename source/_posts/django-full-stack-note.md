@@ -71,7 +71,9 @@ CBV的核心是Mixin模式。
 
 虽然admin是Django的主要优势所在，但是它的使用场景有限，主要由于整合许多功能，比如分页、过滤、搜索、增删改查和批量操作等等，相互之间具有非常高的耦合度。在没有提供公开的API下去实现一些定制往往是“牵一发而动全身”，最后基本上也改的是不成样子。
 
-由于没有使用内置的admin组件，比如增删改查的页面就需要多花一点时间自己去适配。另外日志模型也要自己去设计，项目中我自己添加了ip这个字段，这个是原来所没有的。
+由于项目中没有使用内置的admin组件，增删改查的页面就需要多花一点时间自己去适配。
+
+日志模型也要自己去设计，项目中我自己添加了ip这个字段，这个是原来所没有的。
 
 ## 后端数据API - DRF
 
@@ -99,7 +101,7 @@ Django表单中有一个比较大的问题，如何需要定制控件样式，�
 
 编写 `Resource`， 几点值得注意的地方：
 
-- 需要设置表头，需要显示指定 `Meta.export_order` 的值，一般设置成 `Meta.fields`即可。
+- 需要设置表头，不仅需要指定字段`Meta.fields`，同时也要显示指定 `Meta.export_order` 的值，通常和 `Meta.fields`一样即可。
 - `Meta.fields` 里的元素必须是模型的数据库字段，不能是自定义的 property，这一点和 `ModelAdmin.list_display` 不一样。
 - 可以使用 `dehydrate_FOO` 函数重写导出内容
 
@@ -232,15 +234,13 @@ class BillCreateTestCase(TestCaseBase):
 
 ### docker部署
 
-之前采用的是daocloud这个平台的工具。具体可参考[《使用DaoCloud部署Django项目》](https://kinegratii.github.io/2016/07/23/daocloud-django-deploy/)这篇文章。由于对docker这方面没有一个完整的学习，加上daocloud.io作了一些比较大的改变，后来就决定搬迁到阿里云服务器上，这样相对比较容易把握。
-
-目前采用3版本。
+之前采用的是daocloud这个平台的工具。具体可参考[《使用DaoCloud部署Django项目》](https://kinegratii.github.io/2016/07/23/daocloud-django-deploy/)这篇文章。由于对docker这方面没有一个完整的学习，加上daocloud.io更新到3版本，作了一些比较大的改变，后来就决定搬迁到阿里云服务器上，这样相对比较容易把握。
 
 ## 后记
 
 ### 轮子
 
-什么是轮子 wheel，写多了代码就会发现一些代码具有共同之处，将其抽象并提取，慢慢地就形成了一个库，可以和别人分享。Django也是一个轮子。
+什么是轮子 wheel，写多了代码就会发现一些代码具有共同之处，将其抽象并提取，慢慢地就形成了一个库，可以和别人分享。本质上来说，Django也是一个轮子。
 
 ### 持续开发
 

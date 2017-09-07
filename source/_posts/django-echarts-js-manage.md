@@ -8,23 +8,33 @@ tags:
 
 [django-echarts](https://github.com/kinegratii/django-echarts) 是本人正在开发的一个开源项目，该项目旨在将 [pyecharts](https://github.com/chenjiandongx/pyecharts) 库整合到Django web框架中，从而形成echarts-python-django 大整合的项目。
 
-继之前简单的一个使用示例之后，最近加班加点完成了其中的一个部分：js依赖文件管理。
+继之前简单的一个使用示例之后，最近花了几天完成了一种的一个功能插件：js依赖文件管理。
 
 <!-- more -->
 
-## 引入
+## 1 Django-Echarts概述
 
-要完成一个Echarts图表，从最后渲染完成的HTML结构来看，至少应当包含以下三个部分：
+django-echarts这个项目的目标和pyecharts是一致的，即在目标html页面上渲染图表。要完成一个Echarts图表，从最后渲染完成的HTML结构来看，至少应当包含以下三个部分：
 
-- 图表容器控件，比如`<div></div>`
+- 图表容器控件，比如`<div id="id_mycharts"></div>`
 - js依赖文件，比如 `<script src='/static/echarts/echarts.min.js'></script>`
 - 图表初始化代码,代码中 `myCharts.setOptions(Foo)` 所在的script标签。
 
-需要说明以上排序按照一般出现的顺序，将所有 script 标签放置在body标签的最后，有利于页面的加载。
+这个排序按照一般出现的顺序，将所有 script 标签放置在body标签的最后，有利于页面的加载。
 
-### 目标
+在一过程中，pyecharts 项目为此做了大量的工作，使得我们能够快速地依据功能要求构建出模板渲染所需的数据，这些数据在Django模板系统中称之为 *Context*。
 
-三者之前没有太大的耦合性，是可以单独拿出来讨论其设计思想和实现方式的。js 依赖文件管理最终的目标是**构建js文件路径字符串**。
+在实际应用过程中，每个页面的结构都是各式各样的，不能一概而论，因此django-echarts的主要职责：
+
+- 如何创建上述三个标签（代码片段）。
+- 上述标签在目标html的位置和结构由用户选择。
+- 对于一些简单的页面，可以提供一些shortcut工。
+
+## 2 设计思路
+
+### 2.1 目标
+
+三者之前没有太大的关联性，是可以单独拿出来讨论其设计思想和实现方式的。js 依赖文件管理最终的目标是**构建js文件路径字符串**。
 
 ```html
 <script src='/static/echarts/echarts.min.js'></script>
@@ -41,7 +51,7 @@ def generte_js_link(js_name):
     return '{host}/{js_name}.js'.format(host=host, js_name=js_name)
 ```
 
-### 问题
+### 2.2 问题
 
 综上所述，js 依赖文件管理解决的问题：
 
@@ -50,7 +60,7 @@ def generte_js_link(js_name):
 - 如何在不同repository之间尽可能平稳的切换，即它们之间必须提供统一的API
 - 需要对外提供哪些API，即在哪些情况下可能使用到这个功能
 
-## 仓库(repository)与文件
+## 3 仓库(repository)与文件
 
 按照正常逻辑，文件名由用户根据实际功能需求指定，其有效性应当交由用户确保。在实际过程不同repository可提供的文件是不一样。js文件分为核心库文件和地图数据文件两种。pyecharts能够提供本地和远程两种类型的repository，加上Django整合时，项目静态文件也可以作为一种repository存在，因此共有三种。
 
@@ -78,9 +88,9 @@ def generte_js_link(js_name):
 - 如果可用，通过下载工具下载到本地，并进行一系列开发。
 - 部署上线时，根据需要切换到CDN。
 
-## 配置
+## 4 配置
 
-### 基本配置
+### 4.1 基本配置
 
 配置是项目初始化需要使用的。默认的配置如下：
 
@@ -99,16 +109,16 @@ DEFAULT_SETTINGS = {
 
 由于核心库文件和地图数据文件需要分开托管，因此需要使用两个变量分别指定和设置。二者都有自己有效的可选值。
 
-### 远程/本地切换
+### 4.2 远程/本地切换
 
  `local_host`的作用有两点：
 
 - 提供公用变量，当 `lib_js_host` 和 `map_js_host` 同时制定本地仓库时，可以借助该变量
 - 下载工具的目标目录。
 
-## 运行分析
+## 5 运行分析
 
-### 分开托管和文件识别
+### 5.1 分开托管和文件识别
 
 由于不同仓库提供的文件不同，通常分为可提供核心库文件和地图数据文件，因此需要分别两个查询表（在Python使用一个dict表示即可）。
 
@@ -116,7 +126,7 @@ DEFAULT_SETTINGS = {
 
 这个没有一个百分百正确的答案。目前采用一个简单办法：由于公共CDN提供的核心库文件是一定的，可提供一个核心库文件列表，判断js_name是否在其中即可。
 
-### 输出URL
+### 5.2 输出URL
 
 当确定完某一个仓库后，之后的url构建就比较简单了，本质上来说是python string format的一些封装。仓库路径具体和一些因素有关，这些因素都需要在项目初始化就已经确定了，放在 settings 模块是最为合适了。目前支持以下字段：
 
@@ -153,7 +163,7 @@ class Host(object):
         return '{0}/{1}.js'.format(self._host, js_name)
 ```
 
-### 渲染html
+### 5.3 渲染html
 
 这一过程是Django模板系统负责的，为了方面可以自定义一个模板标签echarts_js_dependencies解决这个问题。
 
@@ -184,11 +194,37 @@ def echarts_js_dependencies(context, *args):
 - 在多个标签输出时，需要去掉那些重复的文件。
 - 因为html结构简单，所以使用`register.simple_tag` 就可以了。
 
-## 文件下载功能
+## 6 文件下载功能
 
-下载工具提供将远程的js文件同步到本地静态文件目录中。该功能为manage命令。在配置方面（源目录、目标目录）仅支持 `DJANGO_ECHARTS` ，暂时还不支持命令行参数传入。这是下一阶段的重点内容。
+下载工具提供将远程的js文件同步到本地静态文件目录中。该功能为manage命令，需符合其的一些用法规范。
 
-## 展望
+```shell
+python manage.py download_echarts_js <js_name> [--js_host] <js_host>
+```
+
+远程仓库的选择和限制条件可以使用伪代码表示如下：
+
+```
+host = ''
+if(命令提供了--js_host参数){
+    host = js_host参数值
+}else{
+    if(js_name是否和核心库文件){
+        host = settings.DJANGO_ECHARTS['lib_js_host']
+    }else{
+        host = settings.DJANGO_ECHARTS['map_js_host']
+    }
+}
+if(host不是本地仓库){
+    执行后续操作
+}
+```
+
+本地仓库的选择：只有一个限制条件就是符合本地仓库的要求，即必须以 settings.STATIC_URL 开头。
+
+在配置方面（源目录、目标目录）仅支持 `DJANGO_ECHARTS` ，暂时还不支持命令行参数传入。这是下一阶段的重点内容。
+
+## 7 展望
 
  本项目是基于 pyecharts 而发展的。[pyecharts](https://github.com/chenjiandongx/pyecharts)是一个非常棒的项目，解决在Python中使用echarts的问题，加强了Python在数据可视化方面的应用。
 

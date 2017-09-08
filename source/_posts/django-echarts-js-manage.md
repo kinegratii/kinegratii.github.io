@@ -22,13 +22,13 @@ django-echarts这个项目的目标和pyecharts是一致的，即在目标html�
 
 这个排序按照一般出现的顺序，将所有 script 标签放置在body标签的最后，有利于页面的加载。
 
-在一过程中，pyecharts 项目为此做了大量的工作，使得我们能够快速地依据功能要求构建出模板渲染所需的数据，这些数据在Django模板系统中称之为 *Context*。
+在这一过程中，pyecharts 项目为此做了大量的工作，使得我们能够快速地依据功能要求构建出模板渲染所需的数据，这些数据在Django模板系统中称之为 *Context*。
 
 在实际应用过程中，每个页面的结构都是各式各样的，不能一概而论，因此django-echarts的主要职责：
 
 - 如何创建上述三个标签（代码片段）。
 - 上述标签在目标html的位置和结构由用户选择。
-- 对于一些简单的页面，可以提供一些shortcut工。
+- 对于一些简单的页面，可以提供一些shortcut工具。
 
 ## 2 设计思路
 
@@ -113,7 +113,7 @@ DEFAULT_SETTINGS = {
 
  `local_host`的作用有两点：
 
-- 提供公用变量，当 `lib_js_host` 和 `map_js_host` 同时制定本地仓库时，可以借助该变量
+- 提供公用变量，当 `lib_js_host` 和 `map_js_host` 同时指定本地仓库时，可以借助该变量
 - 下载工具的目标目录。
 
 ## 5 运行分析
@@ -199,7 +199,7 @@ def echarts_js_dependencies(context, *args):
 下载工具提供将远程的js文件同步到本地静态文件目录中。该功能为manage命令，需符合其的一些用法规范。
 
 ```shell
-python manage.py download_echarts_js <js_name> [--js_host] <js_host>
+python manage.py download_echarts_js <js_name> [--js_host <js_host>]
 ```
 
 远程仓库的选择和限制条件可以使用伪代码表示如下：
@@ -224,7 +224,17 @@ if(host不是本地仓库){
 
 在配置方面（源目录、目标目录）仅支持 `DJANGO_ECHARTS` ，暂时还不支持命令行参数传入。这是下一阶段的重点内容。
 
-## 7 展望
+## 7 和pyecharts的关系
+
+### 7.1 扩展和取舍
+
+Django-Echarts是pyecharts在Django环境的适配，在此过程中难免有所扩展和舍弃。
+
+- 在本地存储（离线模式）中，使用Django项目静态目录取代pyecharts本地js存储，并提供一个下载工具将远程js文件下载到Django静态目录，以便平稳过渡。
+- 提供一些常用CDN
+- 分解ECharts，提供一些模板标签渲染Echarts的每个部分
+
+### 7.2 展望
 
  本项目是基于 pyecharts 而发展的。[pyecharts](https://github.com/chenjiandongx/pyecharts)是一个非常棒的项目，解决在Python中使用echarts的问题，加强了Python在数据可视化方面的应用。
 

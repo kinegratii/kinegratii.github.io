@@ -224,15 +224,15 @@ if(host不是本地仓库){
 
 在配置方面（源目录、目标目录）仅支持 `DJANGO_ECHARTS` ，暂时还不支持命令行参数传入。这是下一阶段的重点内容。
 
-## 7 和pyecharts的关系
+## 7 和pyecharts的异同
 
 ### 7.1 扩展和取舍
 
 Django-Echarts是pyecharts在Django环境的适配，在此过程中难免有所扩展和舍弃。
 
 - 在本地存储（离线模式）中，使用Django项目静态目录取代pyecharts本地js存储，并提供一个下载工具将远程js文件下载到Django静态目录，以便平稳过渡。
-- 提供一些常用CDN
-- 分解ECharts，提供一些模板标签渲染Echarts的每个部分
+- 提供一些常用CDN。
+- 分析ECharts组成，提供一些模板标签渲染Echarts的每个部件。
 
 ### 7.2 展望
 

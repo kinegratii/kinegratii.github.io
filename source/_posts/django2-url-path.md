@@ -10,7 +10,13 @@ tags:
 
 2.0无疑是一个里程碑版本，因为这是第一个只支持Python3.X的版本，和1.x是不兼容的。
 
-今天我们来看看 [What's new in Django2.0](https://docs.djangoproject.com/en/2.0/releases/2.0/#what-s-new-in-django-2-0)  文档中的第一条，**使用path方式表示路由路径** 。具体到代码，主要的变化是新增了 `django.urls.path` 函数，它允许使用一种更加简洁、可读的路由语法。比如之前的版本的代码：
+ [What's new in Django2.0](https://docs.djangoproject.com/en/2.0/releases/2.0/#what-s-new-in-django-2-0)  文档中一共列出了三个新的特性：
+
+- 更简单的URL路由语法 (Simplified URL routing syntax)
+- admin应用的针对移动设备的优化改进(Mobile-friendly `contrib.admin`)
+- 支持SQL开窗表达式(Window expressions)
+
+第一个特性，主要用于动态路由定义上。在Django2.0代码实现中，主要的变化是新增了 `django.urls.path` 函数，它允许使用一种更加简洁、可读的路由语法。比如之前的版本的代码：
 
 ```python
 url(r'^articles/(?P<year>[0-9]{4})/$', views.year_archive),
@@ -87,9 +93,9 @@ urlpatterns = [
 - 捕获值中可以包含一个转化器类型（converter type），比如使用 `<int:name>` 捕获一个整数变量。若果没有转化器，将匹配任何字符串，当然也包括了 `/` 字符。
 - 无需添加前导斜杠。
 
-以下是一些示例及其匹配过程：
+以下是根据 [2.0官方文档](https://docs.djangoproject.com/en/2.0/topics/http/urls/#example) 而整理的示例分析表：
 
-| 请求URL                                    | 匹配项  | 视图调用形式                                   |
+| 请求URL                                    | 匹配项  | 视图函数调用形式                                 |
 | ---------------------------------------- | ---- | ---------------------------------------- |
 | /articles/2005/03/                       | 第3个  | views.month_archive(request, year=2005, month=3) |
 | /articles/2003/                          | 第1个  | views.special_case_2003(request)         |
@@ -233,6 +239,4 @@ urlpatterns = [
 ```
 
 从流程来看，包含了四个步骤：匹配 => 捕获 => 转化 => 视图调用，和之前相比多了转化这一步。　
-
-
 

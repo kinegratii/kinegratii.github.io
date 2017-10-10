@@ -1,10 +1,14 @@
 {
-  "name": "A blog of Kinegratii",
+  "name": "Kinegratii-blog",
   "version": "0.0.0",
   "private": true,
   "hexo": {
-    "version": "3.2.2"
+    "version": "3.3.9"
   },
+  "description": "",
+  "repository": "https://github.com/kinegratii.kinegratii.github.io",
+  "README": "",
+  "license": "MIT",
   "dependencies": {
     "hexo": "^3.2.0",
     "hexo-deployer-git": "^0.2.0",

@@ -227,6 +227,8 @@ post_meta:
 
 post_copyright:
   enable: true
+  license:  CC BY-NC-SA 4.0 
+  license_url: https://creativecommons.org/licenses/by-nc-sa/4.0/
 # Automatically Excerpt. Not recommand.
 # Please use <!-- more --> in the post to control excerpt accurately.
 
@@ -331,9 +333,9 @@ facebook_comments_plugin:
 # Show number of visitors to each article.
 # You can visit https://leancloud.cn get AppID and AppKey.
 leancloud_visitors:
-  enable: false
-  app_id: #<app_id>
-  app_key: #<app_key>
+  enable: true
+  app_id: YlSXBoomxn9Ws7GEb7bfJiaz-gzGzoHsz
+  app_key: usgVEKYx48ugyhewgxrnLjFk
 
 # Show PV/UV of the website/page with busuanzi.
 # Get more information on http://ibruce.info/2015/04/04/busuanzi/

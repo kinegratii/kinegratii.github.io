@@ -6,9 +6,14 @@ tags:
 - Django
 ---
 
+![django](/images/django.png)
+
 9月23日Django发布了2.0a1版本，这是一个 feature freeze 版本，如果没有什么意外的话，2.0正式版不会再增加新的功能了。按照以往的规律，预计正式版将在12月发布。
 
 2.0无疑是一个里程碑版本，因为这是第一个只支持Python3.X的版本，和1.x是不兼容的。
+
+<!-- more -->
+
 
  [What's new in Django2.0](https://docs.djangoproject.com/en/2.0/releases/2.0/#what-s-new-in-django-2-0)  文档中一共列出了三个新的特性：
 
@@ -32,8 +37,6 @@ path('articles/<int:year>/', views.year_archive),
 
 如果你有接触过 Flask 框架，就会发现和 [Variable-Rules](http://flask.pocoo.org/docs/0.12/quickstart/#variable-rules) 的语法形式和功能都是相类似的。
 
-<!-- more -->
-
 ## 问题引入
 
 下面是Django1.X的一段代码：
@@ -53,7 +56,7 @@ def edit_view(request, article_id):
 
 def delete_view(request, article_id):
     pass
-  
+
 urlpatterns = [
     url('articles/(?P<year>[0-9]{4})/', year_archive),
     url('article/(?P<article_id>[a-zA-Z0-9]+)/detail/', detail_view),
@@ -209,7 +212,7 @@ from django.urls import path, register_converter
 
 class ArticleIdConverter:
     regex = '[a-zA-Z0-9]+'
-    
+
     def to_python(self, value):
         return value
     def to_url(self, value):
@@ -229,7 +232,7 @@ def edit_view(request, article_id):
 
 def delete_view(request, article_id):
     pass
-  
+
 urlpatterns = [
     url('articles/(?P<year>[0-9]{4})/', year_archive),
     url('article/<article_id:article_id>/detail/', detail_view),
@@ -239,4 +242,3 @@ urlpatterns = [
 ```
 
 从流程来看，包含了四个步骤：匹配 => 捕获 => 转化 => 视图调用，和之前相比多了转化这一步。　
-

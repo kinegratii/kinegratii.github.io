@@ -128,7 +128,6 @@ font:
 # Value is the target link (E.g. GitHub: https://github.com/iissnan)
 social:
   GitHub: https://github.com/kinegratii
-  微博: http://weibo.com/kinegratii
   osc: https://my.oschina.net/kinegratii
 
 # Social Links Icons
@@ -182,9 +181,9 @@ sidebar:
   #  - always  expand for all pages automatically
   #  - hide    expand only when click on the sidebar toggle icon.
   #  - remove  Totally remove sidebar including sidebar toggler.
-  #display: post
+  display: post
   #display: always
-  display: hide
+  #display: hide
   #display: remove
 
 
@@ -227,7 +226,7 @@ post_meta:
 
 post_copyright:
   enable: true
-  license:  CC BY-NC-SA 4.0 
+  license:  CC BY-NC-SA 4.0
   license_url: https://creativecommons.org/licenses/by-nc-sa/4.0/
 # Automatically Excerpt. Not recommand.
 # Please use <!-- more --> in the post to control excerpt accurately.

@@ -5,6 +5,10 @@ categories: 编程
 tags: Typescript
 ---
 
+本文描述了自己写了一个 Typescript 日历库。
+
+<!-- more -->
+
 ## 1 数据结构
 
 一个日期使用 `CalendarDate` 类表示，其属性如下：

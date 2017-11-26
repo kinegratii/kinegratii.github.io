@@ -8,7 +8,11 @@ tags:
 - 构建
 ---
 
+![PyInstaller](/images/pyinstaller-draft1c-header-trans.png)
+
 本文介绍了py2exe、cx_freeze和PyInstaller这三种Python打包工具的使用方法。
+
+<!-- more -->
 
 ## 1 Python打包工具
 
@@ -45,7 +49,6 @@ setup(name='App',
       )
 
 ```
-<!-- more -->
 
 ### 2.3 命令
 
@@ -134,7 +137,7 @@ setup(
 
 执行pip安装
 
-````
+```
 pip install pyinstaller
 ```
 

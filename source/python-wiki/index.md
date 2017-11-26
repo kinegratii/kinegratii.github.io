@@ -32,6 +32,9 @@ date: 2017-04-28 20:23:57
 - Python 和数据科学
   http://bookdata.readthedocs.io/en/latest/
 
+- Python机器学习
+  https://ljalphabeta.gitbooks.io/python-/content/
+
 ## Python库列表
 
 > 这些都是我自己用过或者觉得非常实用的一些Python库，包括标准库和第三方库。本列表基于 [awesome-python](https://github.com/vinta/awesome-python)。

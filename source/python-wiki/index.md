@@ -54,3 +54,4 @@ date: 2017-04-28 20:23:57
 - [lxml](http://lxml.de/) - xml和html解析处理库。
 - [python-gsmmodem](https://github.com/faucamp/python-gsmmodem) - Python的GSM库，包括收发短信、电话处理等功能，支持常见型号的芯片。
 - [tablib](http://docs.python-tablib.org/en/latest/) 数据格式转换，支持JSON/XLS/XLSX/YAML等文件格式。
+- [python-lunardate](https://github.com/lidaobing/python-lunardate) - 纯Python实现的中国农历库。

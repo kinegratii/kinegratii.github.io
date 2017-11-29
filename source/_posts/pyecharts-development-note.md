@@ -62,6 +62,38 @@ class Chart(object):
 
 ## 功能设计与实现
 
+### html转义与Python实现
+
+转义字符串（Escape Sequence）也称字符实体(Character Entity)。在HTML中，定义转义字符串的原因有两个：第一个原因是像“<”和“>”这类符号已经用来表示HTML标签，因此就不能直接当作文本中的符号来使用。为了在HTML文档中使用这些符号，就需要定义它的转义字符串。当解释程序遇到这类字符串时就把它解释为真实的字符。在输入转义字符串时，要严格遵守字母大小写的规则。第二个原因是，有些字符在ASCII字符集中没有定义，因此需要使用转义字符串来表示。
+
+字符串安全
+
+如果启用了手动转义，按需转义变量就是 **你的** 责任。要转义什么？如果你有 一个 *可能*包含 `>` 、 `<` 、 `&` 或 `"` 字符的变量，你必须转义 它，除非变量中的 HTML 有可信的良好格式。转义通过用管道传递到过滤器 `|e` 来实现: `{{ user.username|e }}` 。
+
+当启用了自动转移，默认会转移一切，除非值被显式地标记为安全的。可以在应用中 标记，也可以在模板中使用 |safe 过滤器标记。这种方法的主要问题是 Python 本 身没有被污染的值的概念，所以一个值是否安全的信息会丢失。如果这个信息丢失， 会继续转义，你最后会得到一个转义了两次的内容。
+
+显示地标记值安全的有两种方式：
+
+- 在模板中使用 `safe` 过滤器
+- 传递给模板的值用 `Markup` 类包裹下
+
+根据 [官方文档](http://jinja.pocoo.org/docs/2.10/api/#jinja2.Markup) ，`Markup` 可以无需转义即可标记一个字符串为安全的。这是通过实现 `__html__` 接口来实现的。`Markup` 是 `unicode` 的直接子类，拥有其众多的方法和属性。
+
+```shell
+>>> Markup("Hello <em>World</em>!")
+Markup(u'Hello <em>World</em>!')
+>>> class Foo(object):
+...  def __html__(self):
+...   return '<a href="#">foo</a>'
+...
+>>> Markup(Foo())
+Markup(u'<a href="#">foo</a>')
+```
+
+> Jinja2 的 [`Markup`](http://docs.jinkan.org/docs/jinja2/api.html#jinja2.Markup) 类至少与 Pylons 和 Genshi 兼容。预计不久更多模板 引擎和框架会采用 `__html__` 的概念。
+
+Django 目前也支持 `__html__` 接口协议。
+
 ### js 内嵌引入的正则替换
 
 主要指的是 `pyecharts.utils.freeze_js` 的原理是先渲染生成 html 文件字符串，再使用正则替换，这在之前是没有问题，引入自定义模板后，模板文件也有可能引用其他文件（如 bootstrap.min.js），这样的话，碰到该行直接出现错误。
@@ -185,35 +217,65 @@ clas DemoMixin(object):
 
 ## Python 2/3
 
-### json.dumps 方法
-
-简而言之，将字典转化为json字符串时，python3 在每一对键值分割符“,”增加了一个空格，看下面的代码：
-
-```shell
-> python
-Python 3.5.2 (v3.5.2:4def2a2901a5, Jun 25 2016, 22:18:55) [MSC v.1900 64 bit (AMD64)] on win32
-Type "help", "copyright", "credits" or "license" for more information.
->>> import json
->>> c = {'date':'2017-01-01', 'a':'1'}
->>> len(json.dumps(c, indent=0))
-34
->>>
-
-
-zhenwei.yan@YZHW-PC C:\Users\zhenwei.yan
-> python2
-Python 2.7.13 (v2.7.13:a06454b1afa1, Dec 17 2016, 20:53:40) [MSC v.1500 64 bit (AMD64)] on win32
-Type "help", "copyright", "credits" or "license" for more information.
->>> import json
->>> c = {'date':'2017-01-01', 'a':'1'}
->>> len(json.dumps(c, indent=0))
-35
->>>
-```
-
-影响到的是最后测试的时候直接使用表达式结果作为 assert 语句的第一个参数，这是一个取巧的方法，因为目前没有引入 `six` 等兼容库，代码需要多写。
+### json.dumps 输出结果
 
 ```python
+import json
+c = {'date':'2017-01-01', 'a':'1'}
+data = json.dumps(c, indent=0)
+print(len(data))
+print('*'.join(data))
+```
+
+上述代码在 2 和 3 环境下运行结果是不同的，结果如下：
+
+环境：Python 3.6.3 (v3.6.3:2c5fed8, Oct  3 2017, 18:11:49) [MSC v.1900 64 bit (AMD64)]
+
+```
+34
+{*
+*"*d*a*t*e*"*:* *"*2*0*1*7*-*0*1*-*0*1*"*,*
+*"*a*"*:* *"*1*"*
+*}
+```
+
+环境：2.7.14 (v2.7.14:84471935ed, Sep 16 2017, 20:25:58) [MSC v.1500 64 bit (AMD64)]
+
+```
+35
+{*
+*"*d*a*t*e*"*:* *"*2*0*1*7*-*0*1*-*0*1*"*,* *
+*"*a*"*:* *"*1*"*
+*}
+```
+
+简而言之，将字典转化为json字符串时，python2 在每一对键值分割符“,”增加了一个空格
+
+下面是测试 `pyecharts.utils.json_dumps` 功能的测试代码（使用 nosetests 框架）。影响到的是最后测试的时候直接使用表达式结果作为 assert 语句的第一个参数，这是一个取巧的方法，因为目前没有引入 `six` 等兼容库，代码需要多写。
+
+```python
+import json
+from datetime import date, datetime
+
+class UnknownTypeEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, (datetime.datetime, datetime.date)):
+            return obj.isoformat()
+        else:
+            try:
+                return obj.astype(float).tolist()
+            except Exception:
+                try:
+                    return obj.astype(str).tolist()
+                except Exception:
+                    return json.JSONEncoder.default(self, obj)
+
+
+def json_dumps(data, indent=0):
+    return json.dumps(data, indent=indent, cls=UnknownTypeEncoder)
+
+
+
 def test_json_encoder():
     """
     Test json encoder.
@@ -227,10 +289,17 @@ def test_json_encoder():
     eq_(json.dumps(data2_e, indent=0), json_dumps(data2))
 ```
 
+上述测试代码是一个不好的实践方法，把测试目标改变了，上面测试的是 `data2_e` 和 `data2` 的 json 输出是否一致，而不是  `data2`  的 json 是否符合预期的 json 格式，这二者是截然不同的，显然我们要测试的是后者。
 
-按照测试原则，assert 语句的第一个应当是表征字面量。
+假设 `json.dumps` 输出不是符合标准的 json 数据，上述测试案例可以通过，但在之后的功能测试是不能通过的。
+
+上述的测试代码已经蕴含了 `json.dumps` 一定能输出标准的 json 数据，这当然是。
+
+按照测试原则，assert 语句的第一个应当是表征字面量，下面就是一个简单的对比。
 
 ```python
+DEFAULT_HOST = 'https://chfw.github.io/jupyter-echarts/echarts'
+
 def test_pyecharts_remote_jshost():
     target_config = PyEchartsConfig(jshost=DEFAULT_HOST)
     eq_('https://chfw.github.io/jupyter-echarts/echarts', target_config.jshost) # 良好的实践

@@ -52,7 +52,7 @@ class Chart(object):
 
 当然，何时公开、怎么公开又是另外一个问题了。
 
-### 持续开发
+### 持续开发与废弃策略
 
 这里的持续性开发指的的公共API的稳定性，更为确切的说是废弃策略。随着项目的不断推进，新代码不断加入，旧代码不断淘汰。但由于开源项目的公开性和考虑其稳定性，无用的代码并总是立即被删除，而是经过一段时间后再删除，在这方面，个人 Django 项目做的比较好，将旧有代码按照淘汰进程分几个等级([链接](https://docs.djangoproject.com/en/1.11/internals/release-process/#deprecation-policy)) ，我自己在此基础上增加了一个等级：Not Recommend ，通常用于重大变更，涉及到核心代码
 
@@ -77,7 +77,17 @@ class Chart(object):
 - 在模板中使用 `safe` 过滤器
 - 传递给模板的值用 `Markup` 类包裹下
 
-根据 [官方文档](http://jinja.pocoo.org/docs/2.10/api/#jinja2.Markup) ，`Markup` 可以无需转义即可标记一个字符串为安全的。这是通过实现 `__html__` 接口来实现的。`Markup` 是 `unicode` 的直接子类，拥有其众多的方法和属性。
+根据 [官方文档](http://jinja.pocoo.org/docs/2.10/api/#jinja2.Markup) ，`Markup` 可以无需转义即可标记一个字符串为安全的。这是通过实现 `__html__` 接口来实现的。`Markup` 是 `unicode` 的直接子类，拥有其众多的方法和属性。核心代码如下：
+
+```python
+class Markup(text_type):
+    def __html__(self):
+        return self
+```
+
+
+
+其使用方式如下：
 
 ```shell
 >>> Markup("Hello <em>World</em>!")
@@ -92,7 +102,20 @@ Markup(u'<a href="#">foo</a>')
 
 > Jinja2 的 [`Markup`](http://docs.jinkan.org/docs/jinja2/api.html#jinja2.Markup) 类至少与 Pylons 和 Genshi 兼容。预计不久更多模板 引擎和框架会采用 `__html__` 的概念。
 
-Django 目前也支持 `__html__` 接口协议。
+Django 目前也支持 `__html__` 接口协议。其数据实体定义在 `django.utils.safestring.SafeData` 。源代码如下：
+
+```python
+class SafeData(object):
+    def __html__(self):
+        """
+        Returns the html representation of a string for interoperability.
+
+        This allows other template engines to understand Django's SafeData.
+        """
+        return self
+```
+
+
 
 ### js 内嵌引入的正则替换
 
@@ -101,6 +124,8 @@ Django 目前也支持 `__html__` 接口协议。
 改进的办法是在渲染的过程就根据配置决定是否替换，因此该函数也可移除。
 
 ### 和 Flask 整合问题
+
+> 此种方式是整合过程中产生一个代码版本，后来发现会破坏 Flask 原有的功能，因此改写为下一节的代码版本。但此种整合方式也是思考的一个过程，因此没有将此删除。
 
 这是上周末刚刚完成的内容，解决在 Flask 框架中使用模板函数的问题。主要代码摘抄如下：
 
@@ -199,6 +224,40 @@ app = MyFlask(__name__)
 
 目前该代码放在 demo 内，没有整合为 pyecharts 一部分。
 
+### web框架整合优化
+
+上一节实现有个重大问题，表面上看会覆盖原有模板目录功能，导致必须现实设置 `echarts_template_dir` 。因此必须继承  `flask.templating.Environment` 以保全全部功能。
+
+```python
+from __future__ import unicode_literals
+
+import random
+import datetime
+
+from flask import Flask, render_template
+from flask.templating import Environment
+
+from pyecharts import HeatMap
+from pyecharts.engine import PyEchartsConfigMixin, ECHAERTS_TEMPLATE_FUNCTIONS
+from pyecharts.conf import PyEchartsConfig
+
+class FlaskEchartsEnvironment(Environment, PyEchartsConfigMixin):
+    pyecharts_config = PyEchartsConfig(
+        jshost='https://cdn.bootcss.com/echarts/3.7.2'
+    )
+
+    def __init__(self, *args, **kwargs):
+        super(FlaskEchartsEnvironment, self).__init__(*args, **kwargs)
+        self.globals.update(ECHAERTS_TEMPLATE_FUNCTIONS)
+
+class MyFlask(Flask):
+    jinja_environment = FlaskEchartsEnvironment
+
+app = MyFlask(__name__)
+```
+
+之后和标准的 Flask 项目一样使用。
+
 ### 命名借鉴
 
 比如 `Page.from_charts` 借鉴了 `django.db.models.Manager.from_queryset` 。
@@ -273,7 +332,6 @@ class UnknownTypeEncoder(json.JSONEncoder):
 
 def json_dumps(data, indent=0):
     return json.dumps(data, indent=indent, cls=UnknownTypeEncoder)
-
 
 
 def test_json_encoder():

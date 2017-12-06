@@ -77,10 +77,10 @@ def generte_js_link(js_name):
 分析如下：
 
 - 首先的是pyecharts本地作为存储仓库是不太合适，同为本地文件存储，Django项目静态库显然是一个更为合适的选择。
-- pyecharts远程库，路径为 https://chfw.github.io/jupyter-echarts/echarts， 该库的优势在于提供了一些列的自定义地图，但弱势是核心库文件没有版本管理。
+- pyecharts远程库，路径为 https://chfw.github.io/jupyter-echarts/echarts， 该库的优势在于提供了一些列的自定义地图，但弱势是核心库文件没有版本管理，而且 github 仓库不建议作为静态文件托管服务。
 - 官方CDN：其实指的是地图文件数据下载的源地址。
 - 公共CDN：优势在于支持版本管理，缺点是不提供地图数据文件。公共CDN仅选择[Echarts官方教程](http://echarts.baidu.com/tutorial.html)提及的三个CDN，其余的已经很久没有更新了。
-- 项目静态目录：通常由 `setttings.STATIC`指定。 这是开发者自己从零开始构建的，因此自由度最大。为了方便，可开发从其他远程仓库下载文件的功能。
+- 项目静态目录：通常由 `setttings.STATIC_URL`指定。 这是开发者自己从零开始构建的，因此自由度最大。为了方便，可开发从其他远程仓库下载文件的功能。
 
 一个通常的使用场景如下：
 
@@ -194,12 +194,18 @@ def echarts_js_dependencies(context, *args):
 - 在多个标签输出时，需要去掉那些重复的文件。
 - 因为html结构简单，所以使用`register.simple_tag` 就可以了。
 
-## 6 文件下载功能
+## 6 CLI与Django命令
+
+基于 django manage command 实现一个简单的 CLI，其核心功能是js文件下载。
 
 下载工具提供将远程的js文件同步到本地静态文件目录中。该功能为manage命令，需符合其的一些用法规范。
 
 ```shell
-python manage.py download_echarts_js <js_name> [--js_host <js_host>]
+usage: manage.py download_echarts_js [-h] [--version] [-v {0,1,2,3}]
+                                     [--settings SETTINGS]
+                                     [--pythonpath PYTHONPATH] [--traceback]
+                                     [--no-color] [--js_host JS_HOST]
+                                     js_name [js_name ...]
 ```
 
 远程仓库的选择和限制条件可以使用伪代码表示如下：
@@ -234,10 +240,10 @@ Django-Echarts是pyecharts在Django环境的适配，在此过程中难免有所
 - 提供一些常用CDN。
 - 分析ECharts组成，提供一些模板标签渲染Echarts的每个部件。
 
+> 由于 pyecharts 尚未实现本地 js 库的完全独立，django_echarts 只是从形式上实现独立，在实际运行过程中还会引用js相关内容，期待pyecharts在这方面有所发展。
+
 ### 7.2 展望
 
  本项目是基于 pyecharts 而发展的。[pyecharts](https://github.com/chenjiandongx/pyecharts)是一个非常棒的项目，解决在Python中使用echarts的问题，加强了Python在数据可视化方面的应用。
 
 另一方面pyecharts刚刚面世两三个，目前着重于Echarts实例创建这一问题上，对于外围环境的问题涉及有所不足。
-
-本项目的另外一个目的就是借由django-echarts的开发推动pyecharts的蓬勃发展。

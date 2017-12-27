@@ -8,9 +8,11 @@ tags:
 
 ![django](/images/django.png)
 
-9月23日Django发布了2.0a1版本，这是一个 feature freeze 版本，如果没有什么意外的话，2.0正式版不会再增加新的功能了。按照以往的规律，预计正式版将在12月发布。
+9月23，[Django](https://www.djangoproject.com/) 发布了2.0a1版本，这是一个 feature freeze 版本，如果没有什么意外的话，2.0正式版不会再增加新的功能了。按照以往的规律，预计正式版将在12月发布。
 
-2.0无疑是一个里程碑版本，因为这是第一个只支持Python3.X的版本，和1.x是不兼容的。
+> 备注：Django 2.0 于12月2日已经正式发布。
+
+2.0无疑是一个里程碑版本，移除了对 Python2.7 的支持，最少需要 3.4 以上，建议使用3.5以上的版本。
 
 <!-- more -->
 
@@ -33,7 +35,7 @@ url(r'^articles/(?P<year>[0-9]{4})/$', views.year_archive),
 path('articles/<int:year>/', views.year_archive),
 ```
 
-新语法支持类型转化，在上述的例子中， year_archive函数接收到的year参数就变成整数而不是字符串。
+新语法支持类型转化，在上述的例子中， year_archive 函数接收到的year参数就变成整数而不是字符串。
 
 如果你有接触过 Flask 框架，就会发现和 [Variable-Rules](http://flask.pocoo.org/docs/0.12/quickstart/#variable-rules) 的语法形式和功能都是相类似的。
 
@@ -69,11 +71,11 @@ urlpatterns = [
 
 第一个问题，函数 `year_archive` 中year参数是字符串类型的，因此需要先转化为整数类型的变量值，当然 `year=int(year)` 不会有诸如如TypeError或者ValueError的异常。那么有没有一种方法，在url中，使得这一转化步骤可以由Django自动完成？
 
-第二个问题，三个路由中article_id都是同样的正则表达式，但是你需要写三遍，当之后article_id规则改变后，需要同时修改三处代码，那么有没有一种方法，只需修改一处即可？
+第二个问题，三个路由中 article_id 在业务中表示同一个字段，使用同样的正则表达式，但是你需要写三遍，当之后 article_id 规则改变后，需要同时修改三处代码，那么有没有一种方法，只需修改一处即可？
 
 在Django2.0中，可以使用 `path` 解决以上的两个问题。
 
-## 基本示例
+## 示例分析
 
 这是一个简单的例子：
 
@@ -190,7 +192,7 @@ urlpatterns = [
 
 `django.urls.path` 可以看成是 `django.conf.urls.url` 的增强形式。
 
-为了方便，其引用路径也有所变化。
+为了方便，其引用路径也有所变化，请注意下 `urls` 包路径的变更，目前和 `views` 、`conf` 为同一层包。
 
 | 1.X                      | 2.0                 | 备注              |
 | ------------------------ | ------------------- | --------------- |
@@ -198,14 +200,14 @@ urlpatterns = [
 | django.conf.urls.include | django.urls.include | 路径变更            |
 | django.conf.urls.url     | django.urls.re_path | 异名同功能，url不会立即废弃 |
 
-## 总结
+## 代码改写
 
 新的path语法可以解决一下以下几个场景：
 
 - 类型自动转化
 - 公用正则表达式
 
-将问题引入一节的代码使用新的path函数可以改写如下：
+将“问题引入”一节的代码使用新的path函数可以改写如下：
 
 ```python
 from django.urls import path, register_converter
@@ -214,9 +216,9 @@ class ArticleIdConverter:
     regex = '[a-zA-Z0-9]+'
 
     def to_python(self, value):
-        return value
+        return int(value)
     def to_url(self, value):
-        return value
+        return str(value)
 
 register_converter(ArticleIdConverter, 'article_id')
 
@@ -241,4 +243,4 @@ urlpatterns = [
 ]
 ```
 
-从流程来看，包含了四个步骤：匹配 => 捕获 => 转化 => 视图调用，和之前相比多了转化这一步。　
+从流程来看，包含了四个步骤：匹配 => 捕获 => 转化 => 视图调用，和之前相比多了 *转化* 这一步。

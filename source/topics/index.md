@@ -4,12 +4,38 @@ date: 2017-06-17 18:48:55
 comments: false
 ---
 
-- [图书/视频/游戏/音乐](/recommends)
+## 技术与项目
 
-## Python Wiki
+[技术与项目](/skills-projects)
 
-[首页](/python-wiki) | 在线电子书 | Python库列表 | [下一代PyPi](https://pypi.org/)
+## 邀请链接
 
-## Python3之旅
+- [为知笔记](https://note.wiz.cn/i/ef369b2e)
 
-[序言](/2017/02/04/the-tour-of-python3-1-catalog/) | [数据类型和操作符](/2017/02/25/the-tour-of-python3-2-data-type-operator/) | [语句](/2017/03/18/the-tour-of-python3-3-statement/) | [函数](/2017/04/08/the-tour-of-oython3-4-function/) | [面向对象和类](/2017/04/29/the-tour-of-python3-5-class/) | [（六）类型提示](/2017/05/20/the-tour-of-python3-6-type-hint/)
+## Python资源
+
+- [python-wiki](/python-wiki)
+- [Python3之旅](/2017/02/04/the-tour-of-python3-1-catalog/)
+
+## 外部资源
+
+### 图书
+
+![Python Book](/images/python-book.jpg)
+
+- [《Python程序设计教程》](http://www.tup.tsinghua.edu.cn/booksCenter/book_07237601.html)
+- [《离散数学及其应用（原书第7版）》](https://book.douban.com/subject/26316200/)
+- [《算法导论（原书第3版） (豆瓣)》](https://book.douban.com/subject/20432061/)
+- [《构建之法 - 现代软件工程》](https://book.douban.com/subject/25965995/)
+- [《想象另一种可能》](https://book.douban.com/subject/26614057/)
+
+### 音乐
+
+- [Victory - Two Steps From Hell](http://music.163.com/m/song?id=31654455)
+- [Star Sky - Two Steps From Hell](http://music.163.com/m/song?id=31654479)
+
+### 游戏
+
+- [Mini Metro](http://dinopoloclub.com/minimetro/)
+- [Mekorama](http://www.mekorama.com/)
+- [nr.01](https://play.google.com/store/apps/details?id=it.redbitgames.nr01.android)

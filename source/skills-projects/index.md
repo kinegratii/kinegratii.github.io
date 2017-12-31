@@ -22,7 +22,7 @@ comments: false
 
 ## 项目
 
-### pyecharts / django-echarts
+### pyecharts & django-echarts
 Python / 2017 / 工具、数据可视化
 
 主页： https://github.com/chenjiandongx/pyecharts

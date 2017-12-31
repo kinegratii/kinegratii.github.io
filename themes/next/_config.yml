@@ -6,7 +6,7 @@
 favicon: /favicon.ico
 
 # Set default keywords (Use a comma to separate)
-keywords: "前端,python,Django"
+keywords: "前端,python,Django,数据分析,机器学习"
 
 # Set rss to false to disable feed link.
 # Leave rss as empty to use site's feed link.
@@ -439,4 +439,4 @@ js: js
 images: images
 
 # Theme version
-version: 5.0.2
+version: 5.1.0

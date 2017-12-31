@@ -26,7 +26,6 @@ date: 2017-04-28 20:23:57
   https://www.fullstackpython.com/table-of-contents.html
 
 - 神经网络与深度学习
-
   https://nndl.github.io/
 
 - Python 和数据科学

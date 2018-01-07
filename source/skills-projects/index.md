@@ -25,17 +25,11 @@ comments: false
 ### pyecharts & django-echarts
 Python / 2017 / 工具、数据可视化
 
-主页： https://github.com/chenjiandongx/pyecharts
+主页： https://github.com/pyecharts/pyecharts
 
 pyecharts 是一个使用Echarts 生成图表的工具库，提供了Echarts 到 Python 之间的接口。pyecharts 实现了大部分 Echarts 图表类型，并支持在不同环境的运行。
 
 django-echarts（主页：https://github.com/kinegratii/django-echarts ） 是一个 Echarts 整合的 Django App，使用 pyecharts 的作为图表构建库。
-
-### boron
-
-Python / 2017 / 工具
-
-Python和Django的开发工具箱。该项目包含了一些可复用的列代码片段，均来源自网络或者自己创建，每个包和模块尽可能包含相对应的单元测试，boron支持python2和3，已托管在PyPI上，主页为 [https://pypi.org/project/boron/](https://pypi.org/project/boron/)。
 
 ### ConfStruct
 

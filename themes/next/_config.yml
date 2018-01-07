@@ -129,6 +129,7 @@ font:
 social:
   GitHub: https://github.com/kinegratii
   osc: https://my.oschina.net/kinegratii
+  pyecharts: https://github.com/pyecharts
 
 # Social Links Icons
 # Icon Mapping:
@@ -143,6 +144,7 @@ social_icons:
   Twitter: twitter
   微博: weibo
   osc: link
+  pyecharts: bar-chart
 
 
 # Sidebar Avatar

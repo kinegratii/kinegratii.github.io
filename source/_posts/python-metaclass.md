@@ -1,5 +1,5 @@
 ---
-title: 使用Python元类简化Django中的Field.choices
+title: 浅谈Python元类在Django中的Field.choices的应用
 date: 2016-11-02 16:05:57
 categories:
 - 编程

@@ -1,5 +1,5 @@
 ---
-title: 电脑软件清单
+title: 电脑开发软件的5个清单
 date: 2017-10-09 19:49:04
 categories: 技术研究
 tags:

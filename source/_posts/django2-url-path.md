@@ -129,7 +129,30 @@ Django默认支持以下5个转化器：
 
 - `to_url(self, value)` 方法，和 `to_python` 相反，value是一个具体的Python变量值，返回其字符串，通常用于url反向引用。
 
-例子：
+先看看默认的几个转化器是怎么实现的：
+
+```python
+class IntConverter:
+    regex = '[0-9]+'
+
+    def to_python(self, value):
+        return int(value)
+
+    def to_url(self, value):
+        return str(value)
+
+
+class StringConverter:
+    regex = '[^/]+'
+
+    def to_python(self, value):
+        return value
+
+    def to_url(self, value):
+        return value
+```
+
+第二个例子，是自己实现的4位年份的转化器。
 
 ```python
 class FourDigitYearConverter:
@@ -192,7 +215,7 @@ urlpatterns = [
 
 `django.urls.path` 可以看成是 `django.conf.urls.url` 的增强形式。
 
-为了方便，其引用路径也有所变化，请注意下 `urls` 包路径的变更，目前和 `views` 、`conf` 为同一层包。
+为了方便，其引用路径也有所变化，请注意下 `urls` 包路径的变更，目前和 `views` 、`conf` 一样，被认为是 Django 的核心组件。
 
 | 1.X                      | 2.0                 | 备注              |
 | ------------------------ | ------------------- | --------------- |
@@ -202,28 +225,26 @@ urlpatterns = [
 
 ## 代码改写
 
-新的path语法可以解决一下以下几个场景：
-
-- 类型自动转化
-- 公用正则表达式
-
 将“问题引入”一节的代码使用新的path函数可以改写如下：
 
 ```python
 from django.urls import path, register_converter
+from django.urls.converters import SlugConverter
 
-class ArticleIdConverter:
-    regex = '[a-zA-Z0-9]+'
+class FourDigitYearConverter:
+    regex = '[0-9]{4}'
 
     def to_python(self, value):
         return int(value)
-    def to_url(self, value):
-        return str(value)
 
-register_converter(ArticleIdConverter, 'article_id')
+    def to_url(self, value):
+        return '%04d' % value
+
+register_converter(SlugConverter, 'article_id')
+register_converter(FourDigitYearConverter, 'year')
 
 def year_archive(request, year):
-    year = int(year) # convert str to int
+    print(type(year)) # <class 'int'>
     # Get articles from database
 
 def detail_view(request, article_id):
@@ -236,11 +257,27 @@ def delete_view(request, article_id):
     pass
 
 urlpatterns = [
-    url('articles/(?P<year>[0-9]{4})/', year_archive),
-    url('article/<article_id:article_id>/detail/', detail_view),
-    url('articles/<article_id:article_id>/edit/', edit_view),
-    url('articles/<article_id:article_id>/delete/', delete_view),
+    path('articles/<year:year>/', year_archive),
+    path('article/<article_id:article_id>/detail/', detail_view),
+    path('articles/<article_id:article_id>/edit/', edit_view),
+    path('articles/<article_id:article_id>/delete/', delete_view),
 ]
 ```
 
-从流程来看，包含了四个步骤：匹配 => 捕获 => 转化 => 视图调用，和之前相比多了 *转化* 这一步。
+## 总结
+
+第一，目前 路由（url）到视图（View）的流程可以概括为四个步骤：
+
+1. url匹配
+2. 正则捕获
+3. 变量类型转化
+4. 视图调用
+
+Django2.0 和之前相比多了 *变量类型转化* 这一步骤。
+
+第二，新的path语法可以解决一下以下几个场景：
+
+- 类型自动转化
+- 公用正则表达式
+
+问题描述可参考 “问题引入” 一节。

@@ -31,8 +31,9 @@ menu:
   home: /
   #categories: /categories
   archives: /archives
-  tags: /tags
   topics: /topics
+
+  pyecharts: /pyecharts-project
   about: /about
   #schedule: /schedule
   #commonweal: /404.html
@@ -55,6 +56,7 @@ menu_icons:
   commonweal: heartbeat
   recommend: thumbs-up
   topics: book
+  pyecharts: bar-chart
 
 
 

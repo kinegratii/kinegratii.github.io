@@ -18,6 +18,7 @@ menu:
   commonweal: 公益404
   project: 项目
   topics: 专题
+  pyecharts: pyecharts
 
 sidebar:
   overview: 站点概览

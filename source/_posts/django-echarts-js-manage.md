@@ -5,6 +5,7 @@ categories: 技术研究
 tags:
 - 数据可视化
 ---
+> 本文已收录于 [《pyecharts 开发专辑》](/pyecharts-project/) 。
 
 [django-echarts](https://github.com/kinegratii/django-echarts) 是本人正在开发的一个开源项目，该项目旨在将 [pyecharts](https://github.com/chenjiandongx/pyecharts) 库整合到Django web框架中，从而形成echarts-python-django 大整合的项目。
 

@@ -6,6 +6,8 @@ tags:
 - 数据可视化
 ---
 
+> 本文已收录于 [《pyecharts 开发专辑》](/pyecharts-project/) 。
+
 [pyechart](https://github.com/chenjiandongx/pyecharts) 是一个用于生成 Echarts 图表的类库。实际上就是 Echarts 与 Python 的对接。
 
 <!-- more -->

@@ -8,6 +8,8 @@ tags:
  - Python
 ---
 
+> 本文已收录于 [《pyecharts 开发专辑》](/pyecharts-project/) 。
+
 本文记录了在 pyecharts 开发过程中的一些想法思路和具体问题分析解决的方案。写作本文的目的主要有两个：一是工作总结，每完成一项工作需要静下心来总结工作得失，这就是一种进步和成长；二是技术分享，对于同一个知识和技术，每个人的理解和思考都是不同的，博客提供了一个很好的分享平台。
 
 本文基于 [PR 自定义模板](https://github.com/chenjiandongx/pyecharts/pull/240) 整理。

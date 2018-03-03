@@ -7,7 +7,7 @@ tags:
 - 项目
 ---
 
-
+> 本文已收录于 [《pyecharts 开发专辑》](/pyecharts-project/) 。
 
 django-echarts v0.3.0 正式发布。该版本将 **仅支持** Python3.5+ 以及 Django2.0+ 的环境，同时该增加了若干个功能特性：
 
@@ -51,7 +51,7 @@ class SettingsStore(object):
 - 函数有两个以上的可选参数（提供了默认参数）
 - 这些参数的功能意义是平等的，通常可任意调换位置
 
-比如 django_echarts.datasets.section_counter.BSectionIndex 类的 `__init__` 就没有使用这个特性，因为 [lower, upper] 更符合实际表达形式。 
+比如 django_echarts.datasets.section_counter.BSectionIndex 类的 `__init__` 就没有使用这个特性，因为 [lower, upper] 更符合实际表达形式。
 
 ```python
 class BSectionIndex(BIndex):
@@ -107,7 +107,7 @@ stargazer_bar.add("", labels, sizes, is_label_show=True, mark_line=["average"])
 
 增加 `--fake` 后，命令将仅打印出对应文件的下载路径、引用路径、存储位置，而 **不会进行任何实际的下载操作** ，可用于预览调试。
 
-例子： 
+例子：
 
 ```
 >>>python manage.py download_echarts_js echarts.min china --fake

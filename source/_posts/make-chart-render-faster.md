@@ -240,6 +240,37 @@ env.render_chart_to_file(line, path='line.html')
 
 改进过程：代码1/ 代码2 -> 代码6 -> 代码8
 
+## 总体架构
+
+![render-structure](/images/render_strutures.jpg)
+
+备注：
+
+- 绿色表示 *纯 Python* 的调用路径；蓝色表示 *Jupyter Notekook* 的调用路径。
+
+经过整合后，
+
+第一，无论是 *纯 Python* 和 *Jupyter Notekook* 两个使用场景在底层均可使用相同的模板代码。
+
+第二，这个模板代码由两部分组成。
+
+1) 代码小片段使用 Python 代码表示，使用 `string.formmat` 函数格式化和渲染。比如
+
+```python
+LINK_SCRIPT_FORMATTER = '<script type="text/javascript" src="{}"></script>'
+EMBED_SCRIPT_FORMATTER = '<script type="text/javascript">\n{}\n</script>'
+CHART_DIV_FORMATTER = '<div id="{chart_id}" style="width:{width};height:{height};"></div>'  # flake8: noqa
+CHART_CONFIG_FORMATTER = """
+var myChart_{chart_id} = echarts.init(document.getElementById('{chart_id}', null, {{renderer: '{renderer}'}}));
+var option_{chart_id} = {options};
+myChart_{chart_id}.setOption(option_{chart_id});
+"""
+```
+
+上述代码由模板函数调用，并组成完整可用的 html 页面，
+
+2) 其他完整的页面，使用 html 页面存储代码，支持用户自定义，使用 `jinja2.Environment` 渲染和传入数据。
+
 ## 更新日志
 
 ### 面向开发者

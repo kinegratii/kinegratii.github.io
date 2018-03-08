@@ -1,5 +1,5 @@
 ---
-title: django-echarts v0.3 发布日志
+title: django-echarts v0.3 系列发布日志
 date: 2018-02-25 18:47:04
 categories: 技术研究
 tags:
@@ -8,6 +8,89 @@ tags:
 ---
 
 > 本文已收录于 [《pyecharts 开发专辑》](/pyecharts-project/) 。
+
+# v0.3.1 发布日志
+
+django-echarts v0.3.1 于 2018 年 3 月 8 日正式发布。版本日志为：
+
+- 恢复对 Django 1.11 LTS 的支持
+- 改善 fetch 模块调用方式，`ifetch_multiple` 函数的关键字参数不再需要重复指定默认值
+- `fetch` 模块函数支持自定义 getter 参数
+- ECharts 默认版本更新至v4.0.4
+- 支持 ECharts 4.0 SVG渲染器的配置
+
+## 1 fetch 模块改进
+
+v0.3.1 基于 [PEP 3102](https://www.python.org/dev/peps/pep-3102/) 调整了 `fetch` 模块所有函数的定义形式。由
+
+```python
+def ifetch_multiple(iterable, defaults, getter, *keys):
+    pass
+```
+更改为
+
+```python
+def ifetch_multiple(iterable, *keys, defaults=None, getter=None):
+    pass
+```
+其中 `default` / `defaults` / 'getter' 三个可选参数均要求以关键字形式传入。
+
+之前无论是否使用自己的  defaults 均必须传入以符合位置参数的要求，现在无需这种做法。
+
+之前：
+
+```python
+ifetch_multiple(DICT_LIST_DATA, {}, None, 'name', 'age')
+```
+
+现在：
+```python
+ifetch_multiple(DICT_LIST_DATA, 'name', 'age')
+```
+
+## 2 增加自定义 getter 回调函数
+
+一个简单的例子：
+
+```python
+class MockItem:
+    def __init__(self, x, y, z):
+        self._data = {'x': x, 'y': y, 'z': z}
+
+    def get(self, key):
+        return self._data.get(key)
+
+my_getter = lambda item, key: item.get(key)
+data_list = [MockItem(1, 2, 3), MockItem(4, 5, 6), MockItem(7, 8, 9)]
+xs, ys, zs = fetch(data_list, 'x', 'y', 'z', getter=my_getter)
+```
+
+getter 必须是一个回调函数，函数符合以下的要求：
+
+- 必须含有名称为 `item` 和 `key` 的两个参数
+- item 表示单个实体类对象；key 表示索引、属性、键值名称
+
+## 3 支持 ECharts SVG 配置
+
+django-echarts 新增了一个名为 renderer 的项目配置项，可选值包括 `'canvas'` 和 `'svg'` 。
+
+django-echarts 按照以下顺序选择渲染方式：
+
+- 图表属性 `Chart.renderer`
+- 项目配置的 `DJANGO_ECHARTS[‘renderer’]` 的设置
+
+django-echarts 默认使用 canvas 渲染器，可以通过以下方式更改为 svg 渲染。
+
+```python
+DJANGO_ECHARTS = {
+    'echarts_version':'4.0.4',
+    'renderer': 'svg'
+}
+```
+
+注意的是只有 echarts_version 大于 4 时，才可以使用 svg 渲染。django-echarts 并不会强制检查这一点，请使用者自行确认。
+
+# v0.3.0 发布日志
 
 django-echarts v0.3.0 正式发布。该版本将 **仅支持** Python3.5+ 以及 Django2.0+ 的环境，同时该增加了若干个功能特性：
 

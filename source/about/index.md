@@ -8,7 +8,7 @@ comments: false
 - 男/90后/福建·福州
 - Web开发 / 数据分析 / APP混合开发
 - Python / Javascript
-- kinegratii@yeah.net
+- zhenwei.yan@hotmail.com
 
 ---
 

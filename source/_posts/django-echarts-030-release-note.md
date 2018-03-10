@@ -9,6 +9,8 @@ tags:
 
 > 本文已收录于 [《pyecharts 开发专辑》](/pyecharts-project/) 。
 
+<!-- more -->
+
 # v0.3.1 发布日志
 
 django-echarts v0.3.1 于 2018 年 3 月 8 日正式发布。版本日志为：
@@ -33,7 +35,7 @@ def ifetch_multiple(iterable, defaults, getter, *keys):
 def ifetch_multiple(iterable, *keys, defaults=None, getter=None):
     pass
 ```
-其中 `default` / `defaults` / 'getter' 三个可选参数均要求以关键字形式传入。
+其中 `default` / `defaults` / `getter` 三个可选参数均要求以关键字形式传入。
 
 之前无论是否使用自己的  defaults 均必须传入以符合位置参数的要求，现在无需这种做法。
 

@@ -11,6 +11,13 @@ tags:
 
 <!-- more -->
 
+# v0.3.2 发布日志
+
+django-echarts v0.3.2 于 2018 年 3 月 13 日正式发布。版本日志为：
+
+- 移除 Django 的显示依赖
+- 移除对 `numpy.Array` 的默认json编码
+
 # v0.3.1 发布日志
 
 django-echarts v0.3.1 于 2018 年 3 月 8 日正式发布。版本日志为：

@@ -10,7 +10,7 @@ tags:
 
 9月23，[Django](https://www.djangoproject.com/) 发布了2.0a1版本，这是一个 feature freeze 版本，如果没有什么意外的话，2.0正式版不会再增加新的功能了。按照以往的规律，预计正式版将在12月发布。
 
-> 备注：Django 2.0 于12月2日已经正式发布。
+> 备注：Django 2.0 于12月2日已经正式发布。 （[链接](https://www.djangoproject.com/weblog/2017/dec/02/django-20-released/)）
 
 2.0无疑是一个里程碑版本，移除了对 Python2.7 的支持，最少需要 3.4 以上，建议使用3.5以上的版本。
 
@@ -39,9 +39,9 @@ path('articles/<int:year>/', views.year_archive),
 
 如果你有接触过 Flask 框架，就会发现和 [Variable-Rules](http://flask.pocoo.org/docs/0.12/quickstart/#variable-rules) 的语法形式和功能都是相类似的。
 
-## 问题引入
+## 一 问题引入
 
-下面是Django1.X的一段代码：
+下面是 Django1.X 的一段代码：
 
 ```python
 from django.conf.urls import url
@@ -73,9 +73,9 @@ urlpatterns = [
 
 第二个问题，三个路由中 article_id 在业务中表示同一个字段，使用同样的正则表达式，但是你需要写三遍，当之后 article_id 规则改变后，需要同时修改三处代码，那么有没有一种方法，只需修改一处即可？
 
-在Django2.0中，可以使用 `path` 解决以上的两个问题。
+在 Django2.0 中，可以使用 `path` 解决以上的两个问题。
 
-## 示例分析
+## 二 使用示例
 
 这是一个简单的例子：
 
@@ -107,7 +107,7 @@ urlpatterns = [
 | /articles/2003                           | 无    | -                                        |
 | /articles/2003/03/building-a-django-site/ | 第4个  | views.article_detail(request, year=2003, month=3, slug="building-a-django-site") |
 
-## path转化器
+## 三 path转化器
 
 > 文档原文是Path converters，暂且翻译为转化器。
 
@@ -119,7 +119,9 @@ Django默认支持以下5个转化器：
 - uuid,匹配格式化的uuid，如 075194d3-6885-417e-a8a8-6c931e272f00。
 - path,匹配任何非空字符串，包含了路径分隔符
 
-## 注册自定义转化器
+## 四 自定义转化器
+
+### 4.1 定义
 
 对于一些复杂或者复用的需要，可以定义自己的转化器。转化器是一个类或接口，它的要求有三点：
 
@@ -129,7 +131,7 @@ Django默认支持以下5个转化器：
 
 - `to_url(self, value)` 方法，和 `to_python` 相反，value是一个具体的Python变量值，返回其字符串，通常用于url反向引用。
 
-先看看默认的几个转化器是怎么实现的：
+先看看默认的 `IntConverter` 和 `StringConverter` 是怎么实现的：
 
 ```python
 class IntConverter:
@@ -165,6 +167,8 @@ class FourDigitYearConverter:
         return '%04d' % value
 ```
 
+### 4.2 注册
+
 使用`register_converter` 将其注册到URL配置中：
 
 ```python
@@ -181,7 +185,7 @@ urlpatterns = [
 ]
 ```
 
-##  使用正则表达式
+##  五 使用正则表达式
 
 如果上述的paths和converters还是无法满足需求，也可以使用正则表达式，这时应当使用 `django.urls.re_path` 函数。
 
@@ -211,11 +215,11 @@ urlpatterns = [
 
 一般来说，不建议使用这种方式，因为有可能引入歧义，甚至错误。
 
-## Import变动
+## 六 Import变动
 
 `django.urls.path` 可以看成是 `django.conf.urls.url` 的增强形式。
 
-为了方便，其引用路径也有所变化，请注意下 `urls` 包路径的变更，目前和 `views` 、`conf` 一样，被认为是 Django 的核心组件。
+为了方便，其引用路径也有所变化，请注意下 `urls` 包路径的变更，不再是 `conf` 的子包了，目前和 `views` 、`conf` 一样，被认为是 Django 的核心组件。
 
 | 1.X                      | 2.0                 | 备注              |
 | ------------------------ | ------------------- | --------------- |
@@ -223,7 +227,7 @@ urlpatterns = [
 | django.conf.urls.include | django.urls.include | 路径变更            |
 | django.conf.urls.url     | django.urls.re_path | 异名同功能，url不会立即废弃 |
 
-## 代码改写
+## 七 代码改写
 
 将“问题引入”一节的代码使用新的path函数可以改写如下：
 
@@ -264,7 +268,7 @@ urlpatterns = [
 ]
 ```
 
-## 总结
+## 八 总结
 
 第一，目前 路由（url）到视图（View）的流程可以概括为四个步骤：
 

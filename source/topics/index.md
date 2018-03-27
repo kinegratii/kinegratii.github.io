@@ -15,7 +15,6 @@ comments: false
 ## Python资源
 
 - [python-wiki](/python-wiki)
-- [Python3之旅](/2017/02/04/the-tour-of-python3-1-catalog/)
 
 ## 外部资源
 

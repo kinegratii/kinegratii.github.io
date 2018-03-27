@@ -188,6 +188,7 @@ sidebar:
   #display: always
   #display: hide
   #display: remove
+  scrollpercent: true
 
 
 # Blogrolls

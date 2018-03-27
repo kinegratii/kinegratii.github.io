@@ -12,7 +12,9 @@ date: 2018-03-02 09:35:58
 
 ## 开发笔记 / 研讨笔记
 
+- 工厂模式：lml库分析与应用
 - pyecharts-contrib 计划
+- django-echarts:js文件托管重构
 - [pyecharts：改善渲染效率](/2018/03/03/make-chart-render-faster/)
 - [pyecharts开发笔记](/2017/11/23/pyecharts-development-note/)
 - [Django-Echarts系列：js依赖文件管理](/2017/09/06/django-echarts-js-manage/)

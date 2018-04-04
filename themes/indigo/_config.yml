@@ -21,9 +21,6 @@ menu:
   github:
     url: https://github.com/kinegratii
     target: _blank
-  weibo:
-    url: http://www.weibo.com/kinegratii
-    target: _blank
 
 # 你的头像url
 avatar: /images/avatar.jpg
@@ -35,7 +32,7 @@ brand: /img/brand.jpg
 favicon: /favicon.ico
 
 # email
-email: kinegratii@yeah.net
+email: zhenwei.yan@hotmail.com
 
 # 设置 Android L Chrome 浏览器状态栏颜色
 color: '#3F51B5'
@@ -60,7 +57,7 @@ share: true
 
 # 是否开启打赏，关闭 reward: false
 reward:
-  title: 谢谢大爷~
+  title: 坚持原创技术分享，您的支持将鼓励我继续创作！
   wechat: /images/wechat_reward.png     #微信，关闭设为 false
   alipay: false     #支付宝，关闭设为 false
 
@@ -134,17 +131,14 @@ canonical: false
 since_year: 2015
 
 # 用户页面中作者相关的描述性文字，如不需要设为 false
-about: 用户页面中作者相关的描述性文字，如不需要设为 false
+about: false
 
 # “不蒜子”访问量统计，详见 http://ibruce.info/2015/04/04/busuanzi/
 visit_counter:
   site_uv: 站点总访客数：
   site_pv: 站点总访问量：
 
-# 动态定义title
-title_change:
-  normal: (つェ⊂)咦!又好了!
-  leave: 死鬼去哪里了！
+# 动态定义title！
 
 # 设置为 true 发布后将使用 unpkg cdn 最新的主题样式
 # 如果想让你的自定义样式生效，把此项设为 false

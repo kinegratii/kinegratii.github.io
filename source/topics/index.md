@@ -23,6 +23,10 @@ comments: false
 ![Python Book](/images/python-book.jpg)
 
 - [《Python程序设计教程》](http://www.tup.tsinghua.edu.cn/booksCenter/book_07237601.html)
+
+![软件架构：Python语言实现](https://img3.doubanio.com/view/ark_article_cover/retina/public/49031506.jpg?v=1521796706.0)
+
+- [《软件架构：Python语言实现》](https://read.douban.com/ebook/49031506/)
 - [《离散数学及其应用（原书第7版）》](https://book.douban.com/subject/26316200/)
 - [《算法导论（原书第3版） (豆瓣)》](https://book.douban.com/subject/20432061/)
 - [《构建之法 - 现代软件工程》](https://book.douban.com/subject/25965995/)

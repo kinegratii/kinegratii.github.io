@@ -11,6 +11,28 @@ tags:
 
 <!-- more -->
 
+# v0.3.5 发布日志
+
+django-echarts v0.3.5 于 2018 年 5 月 4 日正式发布。版本日志为：
+
+- `NamedCharts` 命名图表访问改为字典访问方式
+
+# v0.3.4 发布日志
+
+django-echarts v0.3.4 于 2018 年 4 月 23 日正式发布。版本日志为：
+
+- 适配 pyecharts v0.4.x
+- 发布独立的 `borax.fetch` 工具包，`django_echarts.datasets.fetch` 将在 v0.4 后移除
+- 新增 `django_echarts.datasets.NamedCharts` 的多图表类，支持图表可命名
+- 原有的 `pyecharts.custom.page.Page` 类不再推荐使用
+
+# v0.3.3 发布日志
+
+django-echarts v0.3.3 于 2018 年 4 月 3 日正式发布。版本日志为：
+
+- 发布独立的 `fetch` 模块文档
+- 重写 example 项目的部分逻辑
+
 # v0.3.2 发布日志
 
 django-echarts v0.3.2 于 2018 年 3 月 13 日正式发布。版本日志为：

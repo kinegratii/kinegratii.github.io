@@ -13,7 +13,7 @@ tags:
 
 ## 清单1：基本软件
 
-- 百度输入法
+- 微软自带输入法
 - 好压：压缩软件
 - 美图看看
 - everything：文件搜索
@@ -27,10 +27,12 @@ tags:
 - Fences桌面整理软件 ：主要是图标分类分区显示
 - OneDrive文件存储
 - 网易云音乐
+- closeAD  弹窗广告拦截器
 
 ## 清单2：基本开发工具
 
 - notepad++:记事本
+- atom 代码编辑器
 - typora:Markdown编辑器
 - git：代码管理库
   - git账号设置
@@ -69,3 +71,4 @@ tags:
 - Hexo博客
   - Hexo安装
   - 依赖重新安装
+- Graphviz 可视化工具

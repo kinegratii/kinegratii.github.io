@@ -32,8 +32,7 @@ menu:
   #categories: /categories
   archives: /archives
   topics: /topics
-
-  pyecharts: /pyecharts-project
+  library: /library
   about: /about
   #schedule: /schedule
   #commonweal: /404.html
@@ -55,7 +54,8 @@ menu_icons:
   archives: archive
   commonweal: heartbeat
   recommend: thumbs-up
-  topics: book
+  topics: file
+  library: book
   pyecharts: bar-chart
 
 

@@ -5,9 +5,10 @@ comments: false
 
 ##  关于本人
 
+- @Kinegratii
 - 男/90后/福建·福州
-- Web开发 / 数据分析 / APP混合开发
 - Python / Javascript
+- Web开发 / 数据分析 / APP混合开发
 - zhenwei.yan#hotmail.com （将#改为@）
 - 技能与项目（[点此进入](/skills-projects)）
 

@@ -1,5 +1,5 @@
 ---
-title: 常用的 Python 第三方库
+title: 我的 Python 第三方库
 date: 2018-06-10 20:37:33
 categories: 编程
 tags:
@@ -9,6 +9,14 @@ tags:
 自己常用的 Python 第三方库。
 
 <!-- more -->
+
+## six
+
+> 2 x 3 = 6
+
+- 地址： https://pythonhosted.org/six/
+
+Python2和3的兼容库。
 
 ## wheel / twine
 
@@ -22,7 +30,7 @@ tags:
 
 Python web 领域两大框架之一，遵循 “大而全”、“开箱即用”的原则和规范。Django 源代码内部耦合度高、文档齐全、使用者众多。
 
-在实际业务开发方面，有非常多的第三方库可以使用，具体可参见 [Django Packages](https://djangopackages.org/) 网站。
+在实际业务开发方面，有非常多的第三方库可以使用，具体可参见 [Django Packages](https://djangopackages.org/) 和 [Awesome Django](http://awesome-django.com/)。
 
 使用姿势： Python 3.6 + Django 2.0
 
@@ -130,7 +138,7 @@ if __name__ == '__main__':
 
 ## 其他
 
-- [Six](https://pythonhosted.org/six/) - Python2和3的兼容库。
+
 - [Django Rest Framework](https://github.com/encode/django-rest-framework) - Django的Restful框架。
 - [django-tenant-schemas](https://github.com/bernardopires/django-tenant-schemas) - 通过PostgreSQL Schemas在Django中实现多租户特性。当初用的时候Django1.7刚刚发布，因为Migrations的缘故，这个库还不支持，只好乖乖的使用1.6了，系统一直运行良好，也就没有必要更新了。
 - [django-crispy-forms](https://github.com/django-crispy-forms/django-crispy-forms) - 渲染表单用的，支持Bootstrap2/3/4、Foundation、uni-form等UI框架，非常好用基本上一个模板tags或者filter就可实现，不用再在Python代码中写什么 `{'class':'form-control'}` 了。Django 1.11 也引入了类似 crispy-form 的[基于模板的控件渲染](https://docs.djangoproject.com/en/1.11/ref/forms/renderers/)  - 目前API还没有稳定下来，估计要等到2.0了。

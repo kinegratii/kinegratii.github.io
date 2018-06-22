@@ -12,8 +12,11 @@ tags:
 
 <!-- more -->
 
+## 1 Python 版本支持
 
-## 1 查看(view)权限
+Python 版本要求 3.5+ ，不再支持 3.4 。
+
+## 2 查看(view)权限
 
 一直以来，Django 的模型默认有三种权限：
 
@@ -27,7 +30,7 @@ Django 2.1 新增了 **查看(View)** 权限。在 Admin 中新增了函数  `Mo
 
 作为向后兼容，若一个用户具有修改权限，自然也具查看权限。
 
-## 2 Cookie 的 SameSite 配置
+## 3 Cookie 的 SameSite 配置
 
 SameSite-cookies是一种机制，用于定义cookie如何跨域发送。SameSite-cookies的目的是尝试阻止CSRF（Cross-site request forgery 跨站请求伪造）以及XSSI（Cross Site Script Inclusion (XSSI) 跨站脚本包含）攻击。
 
@@ -51,7 +54,7 @@ CSRF_COOKIE_SAMESITE = 'Lax'
 
 (3) None：禁用该特性。
 
-## 3 用户 - 权限 - 动作
+## 4 用户 - 权限 - 动作
 
 ![user-permission-action](/images/user-permission-action.png)
 
@@ -71,27 +74,68 @@ make_published.allowed_permissions = ('change',)
 
 `allowed_permissions` 中的多个权限是 “或” 的关系，只要通过任何一个即可，用户就可以使用该 动作（Action）。
 
-## 4 模型初始化
+## 5 模型初始化
 
 模型类支持 ` __init_subclass__` 重写，相关内容 参见 [PEP 487](https://www.python.org/dev/peps/pep-0487/)。
+
+```
+>>> class QuestBase:
+...    # this is implicitly a @classmethod (see below for motivation)
+...    def __init_subclass__(cls, swallow, **kwargs):
+...        cls.swallow = swallow
+...        super().__init_subclass__(**kwargs)
+
+>>> class Quest(QuestBase, swallow="african"):
+...    pass
+
+>>> Quest.swallow
+'african'
+```
 
 一般来说，这个特性提供了 metaclass 处理复杂类继承的另一种解决方案，很少会用得到。
 
 > Metaclasses are a powerful tool to customize class creation. They have, however, the problem that there is no automatic way to combine metaclasses. If one wants to use two metaclasses for a class, a new metaclass combining those two needs to be created, typically manually.
 
-## 5 验证类视图
+## 6 验证类视图
 
 文档： https://docs.djangoproject.com/en/dev/topics/auth/default/#all-authentication-views
 
 用户验证登录模块的函数视图被移除，可以使用对应的类视图，比如 `contrib.auth.views.LoginView` 类。
 
-## 6 模型字段
+比如函数视图：
 
-`BooleanField` 允许 `null=True` 的设置，用以替代 ，`NullBooleanField` 的功能，这也意味着后者可能在未来的版本中移除。
+```python
 
-## 7 其他
+from django.urls import re_path
+from django.contrib.auth import views as auth_views
+
+urlpatterns = [
+    re_path(r'^login/$', auth_views.login, {'template_name': 'accounts/login.html'}, name='account_login'),
+    re_path(r'^logout/$', auth_views.logout, {'template_name': 'accounts/logout.html'}, name='account_logout')
+]
+```
+
+可以改写为：
+
+```python
+
+from django.urls import re_path
+from django.contrib.auth import views as auth_views
+
+urlpatterns = [
+    re_path(r'^login/$', auth_views.LoginView.as_view(), {'template_name': 'accounts/login.html'}, name='account_login'),
+    re_path(r'^logout/$', auth_views.LogoutView.as_view(), {'template_name': 'accounts/logout.html'}, name='account_logout')
+]
+```
+
+## 7 模型字段
+
+`BooleanField` 允许 `null=True` 的设置，用以替代 `NullBooleanField` 的功能，这也意味着后者可能在未来的版本中移除。
+
+## 8 其他
 
 - 基于内存的缓存使用 LRU 选择算法，而不是之前的 伪随机算法。
+- 默认的 jQuery 版本从 2.3.3 更新至 3.3.1
 
 ## 8 参考文档
 

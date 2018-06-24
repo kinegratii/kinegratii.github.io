@@ -18,17 +18,34 @@ Python 版本要求 3.5+ ，不再支持 3.4 。
 
 ## 2 查看(view)权限
 
-一直以来，Django 的模型默认有三种权限：
+Django 2.1 新增了 **查看(View)** 权限。至此 Django 的模型默认有四种权限：
 
-- 增加（Add）
-- 删除（Delete）
-- 修改（Change）
+| 权限 | Code |
+| ------ | ------ |
+| 增加（Add） | `<app_label>.add_<modelname>` |
+| 删除（Delete） | `<app_label>.delete_<modelname>` |
+| 修改（Change） | `<app_label>.change_<modelname>` |
+| 查看（View） | `<app_label>.view_<modelname>` |
 
-和 数据库原子操作 “CURD” 相比，Django 没有单独的查看权限。
+正好和数据库原子操作 “CURD” 一一对应。需要注意的是，*一个用户具有修改权限，自然也具查看权限。* 这既符合实际逻辑，又保证了旧有版本的兼容性。
 
-Django 2.1 新增了 **查看(View)** 权限。在 Admin 中新增了函数  `ModelAdmin.has_view_permission() ` ，控制用户是否具有可读权限。
+### has_view_permission函数
 
-作为向后兼容，若一个用户具有修改权限，自然也具查看权限。
+在 Admin 中新增了函数  `ModelAdmin.has_view_permission() ` ，控制用户是否具有可读权限。函数签名为：
+
+```
+ModelAdmin.has_view_permission(request, obj=None)
+```
+
+该函数应当返回一个布尔值，表明 查看某个具体的模型对象 obj 的操作是否被允许。如果 obj 为 None ，则表示 该模型类型的所有对象的查看操作是否被允许。
+
+默认实现上，如果一个用户具有 “Change” 或 "View" 权限，则返回 True 。
+
+### 兼容性
+
+因为新的查看权限的权限码（code）使用了 `<app_label>.view_<modelname>` 的格式，因此如果之前你将该权限码用于自定义的权限并且和查看权限有冲突时，应当更新自己定义的权限的权限码。
+
+另外，如果之前使用了 [django-admin-view-permission](https://github.com/ctxis/django-admin-view-permission) 库，可能需要花费一定的时间完成整合工作。
 
 ## 3 Cookie 的 SameSite 配置
 
@@ -44,7 +61,7 @@ SESSION_COOKIE_SAMESITE = 'Lax'
 CSRF_COOKIE_SAMESITE = 'Lax'
 ```
 
-可选的值有三种：
+可选的值有三种（请注意下首字母大写）：
 
 (1) "Strict"： 表明这个 cookie 在任何情况下都不可能作为第三方 cookie，绝无例外。
 
@@ -130,7 +147,16 @@ urlpatterns = [
 
 ## 7 模型字段
 
+### BooleanField
+
 `BooleanField` 允许 `null=True` 的设置，用以替代 `NullBooleanField` 的功能，这也意味着后者可能在未来的版本中移除。
+
+### JSONField
+
+查询严格区分以下两种形式：
+
+- 键 key 的值为 null ： 使用 `Q(key=None)`
+- 缺少键 key ：使用 `Q(key__isnull=True)`
 
 ## 8 其他
 

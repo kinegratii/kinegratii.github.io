@@ -13,6 +13,7 @@ date: 2018-06-12 10:06:56
 - [Python Cookbook 3rd Edition Documentation — python3-cookbook 2.0.0 文档](http://python3-cookbook.readthedocs.io/zh_CN/latest/index.html)
 - [The Hitchhiker’s Guide to Python!](http://docs.python-guide.org/en/latest/)
 - [Full Stack Python](https://www.fullstackpython.com/table-of-contents.html)
+- [Django Design Patterns](https://www.agiliq.com/books/djangodesignpatterns)
 - [神经网络与深度学习](https://nndl.github.io/)
 - [Python 和数据科学](http://bookdata.readthedocs.io/en/latest/)
 - [Python机器学习](https://ljalphabeta.gitbooks.io/python-/content/)
@@ -36,8 +37,10 @@ date: 2018-06-12 10:06:56
 - 《机器学习实战》
 - 《数据科学入门》
 - 《Data Structures and Algorithms in Python》
+- 《Two Scoops of Django,Best Practices for the Django 1.8》
 - 《Two Scoops of Django 1.11 Best Practices for the Django Web Framework, Fourth Edition》
 - 《流畅的python》
+- 《修改代码的艺术》
 
 ## 书籍
 

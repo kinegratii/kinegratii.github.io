@@ -163,6 +163,6 @@ urlpatterns = [
 - 基于内存的缓存使用 LRU 选择算法，而不是之前的 伪随机算法。
 - 默认的 jQuery 版本从 2.3.3 更新至 3.3.1
 
-## 8 参考文档
+## 9 参考文档
 
 - [SameSite Cookie，防止 CSRF 攻击](http://www.cnblogs.com/ziyunfei/p/5637945.html)

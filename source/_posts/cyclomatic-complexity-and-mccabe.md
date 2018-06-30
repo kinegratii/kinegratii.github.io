@@ -1,13 +1,15 @@
 ---
 title: 圈复杂度和McCabe
 date: 2018-04-08 19:40:35
-categories: 技术研究
+categories: 读书笔记
 tags:
 
 - 软件架构
 ---
 
-圈复杂度（Cyclomatic Complexity）是衡量计算机程序复杂程度的一种措施。它根据程序从开始到结束的线性独立路径的数量计算得来的。在 Python 中可以使用 mccabe 包测量程序的圈复杂度。
+- **【书名】**：软件架构——Python语言实现
+- **【主题】**：圈复杂度
+- **【摘要】**：圈复杂度（Cyclomatic Complexity）是衡量计算机程序复杂程度的一种措施。它根据程序从开始到结束的线性独立路径的数量计算得来的。在 Python 中可以使用 mccabe 包测量程序的圈复杂度。
 
 <!-- more -->
 

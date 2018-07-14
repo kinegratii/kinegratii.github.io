@@ -41,6 +41,7 @@ date: 2018-06-12 10:06:56
 - 《Two Scoops of Django 1.11 Best Practices for the Django Web Framework, Fourth Edition》
 - 《流畅的python》
 - 《修改代码的艺术》
+- 《学会提问（中文版）》
 
 ## 书籍
 

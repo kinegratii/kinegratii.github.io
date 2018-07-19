@@ -27,14 +27,14 @@ Django 2.1 新增了 **查看(View)** 权限。至此 Django 的模型默认有�
 | 修改（Change） | `<app_label>.change_<modelname>` |
 | 查看（View） | `<app_label>.view_<modelname>` |
 
-正好和数据库原子操作 “CURD” 一一对应。需要注意的是，*一个用户具有修改权限，自然也具查看权限。* 这既符合实际逻辑，又保证了旧有版本的兼容性。
+正好和数据库原子操作 “CURD” 一一对应。需要注意的是，**一个用户具有修改权限，自然也具查看权限。** 这既符合实际逻辑，又保证了旧有版本的兼容性。
 
 ### has_view_permission函数
 
 在 Admin 中新增了函数  `ModelAdmin.has_view_permission() ` ，控制用户是否具有可读权限。函数签名为：
 
-```
-ModelAdmin.has_view_permission(request, obj=None)
+```python
+ModelAdmin.has_view_permission(request:HttpRequest, obj:Model=None) -> bool
 ```
 
 该函数应当返回一个布尔值，表明 查看某个具体的模型对象 obj 的操作是否被允许。如果 obj 为 None ，则表示 该模型类型的所有对象的查看操作是否被允许。
@@ -49,7 +49,7 @@ ModelAdmin.has_view_permission(request, obj=None)
 
 ## 3 Cookie 的 SameSite 配置
 
-SameSite-cookies是一种机制，用于定义cookie如何跨域发送。SameSite-cookies的目的是尝试阻止CSRF（Cross-site request forgery 跨站请求伪造）以及XSSI（Cross Site Script Inclusion (XSSI) 跨站脚本包含）攻击。
+[SameSite-cookies](https://www.owasp.org/index.php/SameSite) 是一种安全机制，用于定义cookie如何跨域发送。SameSite-cookies的目的是尝试阻止CSRF（Cross-site request forgery 跨站请求伪造）以及XSSI（Cross Site Script Inclusion (XSSI) 跨站脚本包含）攻击。
 
 配置模块新增 *SESSION_COOKIE_SAMESITE* 和 *CSRF_COOKIE_SAMESITE* 项，如下：
 
@@ -93,7 +93,7 @@ make_published.allowed_permissions = ('change',)
 
 ## 5 模型初始化
 
-模型类支持 ` __init_subclass__` 重写，相关内容 参见 [PEP 487](https://www.python.org/dev/peps/pep-0487/)。
+模型类支持 ` __init_subclass__` 函数重写。
 
 ```
 >>> class QuestBase:
@@ -109,15 +109,15 @@ make_published.allowed_permissions = ('change',)
 'african'
 ```
 
-一般来说，这个特性提供了 metaclass 处理复杂类继承的另一种解决方案，很少会用得到。
+这个特性提供了 metaclass 处理复杂类继承的另一种解决方案。当一个类需要使用两个以上的元类（Metaclass）时，需要手动创建一个新的 元类 以合并这几个元类。现在可以重写 `__init_subclass__` 来自定义类的创建流程，而无需创建用于合并的元类。
 
-> Metaclasses are a powerful tool to customize class creation. They have, however, the problem that there is no automatic way to combine metaclasses. If one wants to use two metaclasses for a class, a new metaclass combining those two needs to be created, typically manually.
+一般来说，这个特性很少会用得到。，相关内容 参见 [PEP 487](https://www.python.org/dev/peps/pep-0487/)。
 
 ## 6 验证类视图
 
 文档： https://docs.djangoproject.com/en/dev/topics/auth/default/#all-authentication-views
 
-用户验证登录模块的函数视图被移除，可以使用对应的类视图，比如 `contrib.auth.views.LoginView` 类。
+`contrib.auth` （用户验证登录模块）的函数视图 *被移除* (Removed)，可以使用对应的类视图，比如 `contrib.auth.views.LoginView` 类。在更新到 Django 2.1 时，必须完成这一个改变。
 
 比如函数视图：
 
@@ -153,16 +153,37 @@ urlpatterns = [
 
 ### JSONField
 
-查询严格区分以下两种形式：
+`django.contrib.postgres.fields.JSONField` 查询严格区分以下两种 “空值” 形式：
 
 - 键 key 的值为 null ： 使用 `Q(key=None)`
 - 缺少键 key ：使用 `Q(key__isnull=True)`
 
-## 8 其他
+> 这个特性和之前有所变化，并且是第一次完整的列在文档中，因此需要按照最新的文档来检视现有的代码。
+
+## 8 数据库查询高级特性
+
+Django 数据库查询的高级特性通常包括：
+
+- 自定义 Lookup
+- 查询表达式
+- 条件表达式
+- 数据库函数
+
+自 1.8 以来，Django 在数据库查询支持方面越来越完善，每个版本都会有新的类和函数被添加进来，使用这些特性的优点在于：
+
+- 将复杂的数据处理放在数据库层，符合 web 开发的最佳实践
+- 可以适应于不同的数据库类型
+- 避免多线程下的 *竞态条件* 问题
+
+这些特性通常是业务相关的，可以使用 `extra` 和 `raw` 这两个原始 SQL 调用函数。 
+
+一般来说，如果现有代码可以正常工作，可以不必立即使用这些新特性。
+
+## 9 其他
 
 - 基于内存的缓存使用 LRU 选择算法，而不是之前的 伪随机算法。
 - 默认的 jQuery 版本从 2.3.3 更新至 3.3.1
 
-## 9 参考文档
+## 10 参考文档
 
 - [SameSite Cookie，防止 CSRF 攻击](http://www.cnblogs.com/ziyunfei/p/5637945.html)

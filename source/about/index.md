@@ -5,7 +5,7 @@ comments: false
 
 ##  关于本人
 
-- @Kinegratii
+- 程序员Barnes (@Kinegratii)
 - 男/90后/福建·福州
 - Python / Javascript
 - Web开发 / 数据分析 / APP混合开发

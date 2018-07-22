@@ -5,6 +5,7 @@ categories: 技术研究
 tags:
 - Django
 ---
+2018年7月18日，Django 2.1 RC 1发布。
 
 2018年6月18日，Django 发布 2.1Beta1，这是 2.1 系列的第一个公测版本，正式版预计于8月初发布。
 
@@ -162,6 +163,10 @@ urlpatterns = [
 
 ## 8 数据库查询高级特性
 
+文档 https://docs.djangoproject.com/en/dev/ref/models/database-functions
+
+2.1 新增了一系列的文本数据库函数，包含了 Chr, Left, LPad, LTrim, Ord, Repeat, Replace, Right, RPad, RTrim, and Trim 。
+
 Django 数据库查询的高级特性通常包括：
 
 - 自定义 Lookup
@@ -175,7 +180,7 @@ Django 数据库查询的高级特性通常包括：
 - 可以适应于不同的数据库类型
 - 避免多线程下的 *竞态条件* 问题
 
-这些特性通常是业务相关的，可以使用 `extra` 和 `raw` 这两个原始 SQL 调用函数。 
+这些特性通常是业务相关的，可以使用 `extra` 和 `raw` 这两个原始 SQL 调用函数。
 
 一般来说，如果现有代码可以正常工作，可以不必立即使用这些新特性。
 

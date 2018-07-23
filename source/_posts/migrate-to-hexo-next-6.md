@@ -1,5 +1,5 @@
 ---
-title: Hexo6升级笔记
+title: Hexo Next 6升级笔记
 date: 2018-07-23 15:18:52
 categories: 技术研究
 tags:
@@ -40,7 +40,7 @@ tags:
 - 主题配置文件 *themes\next\_config.yml*
 - 语言翻译文件 *themes\next\languages\zh-CN.yml*
 
-### 语言
+### 语言&翻译
 
 在 Next 6 中，简体中文的名称变为 zh-CN ，因此在 **博客配置文件** 里需要将原有的：
 
@@ -58,7 +58,7 @@ language: zh-CN
 
 ### 菜单链接
 
-Hexo 6 将分开的 链接 和 图标 配置合并在了一个配置项中，并使用 || 分割。受这一特性影响，以下配置项目有所变化，需手动修改：
+Next 6 将分开的 链接 和 图标 配置合并在了一个配置项中，并使用 || 分割。受这一特性影响，以下配置项目有所变化，需手动修改：
 
 - 菜单 theme.menu
 - 社交 theme.social
@@ -115,6 +115,8 @@ menu:
 | 顶部进度条 | [theme-next-pace](https://github.com/theme-next/theme-next-pace) | 插件 | theme.pace |
 | leancloud访问计数 | [leancloud-visitors](https://github.com/theme-next/hexo-leancloud-counter-security) | 插件 | theme.leancloud_visitors |
 
+**引入方式**
+
 以包方式引入比较简单，使用 命令 `npm install <package-name> -save` 即可。
 
 以插件方式引入，在 *theme\next* 目录使用代码克隆命令。
@@ -123,8 +125,50 @@ menu:
 git clone <github-url> source\lib\<plugin-name>
 ```
 
+**进度条**
+
+进度条使用 [pace.js](http://github.hubspot.com/pace/) 插件，[点此](http://github.hubspot.com/pace/docs/welcome/) 查看每个配置的效果图。
+
 ## E 评论系统
 
-## F 参考资料
+Next 6 已经集成这个功能了，只要设置 app_id 和 app_key 即可，leancloud 应用可以和访问量是同一个。
+
+```yaml
+valine:
+  enable: true
+  appid:   # your leancloud application appid
+  appkey:  # your leancloud application appkey
+  notify: false # mail notifier , https://github.com/xCss/Valine/wiki
+  verify: false # Verification code
+  placeholder: Just go go # comment box placeholder
+  avatar: mm # gravatar style
+  guest_info: nick,mail # custom comment header
+  pageSize: 10 # pagination size
+```
+
+## F 部署
+
+修改 *theme\next\.gitignore* 文件，将 *theme\next\source\lib* 下的文件也提交到版本库。
+
+具体做法是删除以下内容：
+
+```
+# Ignore optional external libraries
+source/lib/*
+
+# Track internal libraries & Ignore unused verdors files
+source/lib/font-awesome/less/
+source/lib/font-awesome/scss/
+!source/lib/font-awesome/*
+
+!source/lib/jquery/
+
+source/lib/ua-parser-js/*
+!source/lib/ua-parser-js/dist/
+
+!source/lib/velocity/
+```
+
+## G 参考资料
 
 - [hexo-theme-next](https://github.com/theme-next/hexo-theme-next)

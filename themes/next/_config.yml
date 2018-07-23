@@ -66,11 +66,11 @@ footer:
   icon:
     # Icon name in fontawesome, see: https://fontawesome.com/v4.7.0/icons
     # `heart` is recommended with animation in red (#ff0000).
-    name: user
+    name: heart
     # If you want to animate the icon, set it to true.
     animated: false
     # Change the color of icon, using Hex Code.
-    color: "#808080"
+    color: "#ff0000"
 
   # If not defined, will be used `author` from Hexo main config.
   copyright:
@@ -119,7 +119,7 @@ index_with_subtitle: false
 menu:
   home: / || home
   archives: /archives/ || archive
-  topics: /topic/ || file
+  topics: /topics/ || file
   library: /library/ || book
   about: /about/ || user
   #tags: /tags/ || tags
@@ -139,9 +139,9 @@ menu_settings:
 
 # Schemes
 #scheme: Muse
-scheme: Mist
+#scheme: Mist
 #scheme: Pisces
-#scheme: Gemini
+scheme: Gemini
 
 
 # ---------------------------------------------------------------
@@ -503,14 +503,14 @@ changyan:
 # You can get your appid and appkey from https://leancloud.cn
 # more info please open https://valine.js.org
 valine:
-  enable: false
-  appid:  # your leancloud application appid
-  appkey:  # your leancloud application appkey
+  enable: true
+  appid:  YlSXBoomxn9Ws7GEb7bfJiaz-gzGzoHsz # your leancloud application appid
+  appkey: usgVEKYx48ugyhewgxrnLjFk # your leancloud application appkey
   notify: false # mail notifier , https://github.com/xCss/Valine/wiki
   verify: false # Verification code
   placeholder: Just go go # comment box placeholder
   avatar: mm # gravatar style
-  guest_info: nick,mail,link # custom comment header
+  guest_info: nick,mail # custom comment header
   pageSize: 10 # pagination size
 
 
@@ -753,7 +753,7 @@ note:
   #  - modern    bs-callout new (v2-v3) alert style.
   #  - flat      flat callout style with background, like on Mozilla or StackOverflow.
   #  - disabled  disable all CSS styles import of note tag.
-  style: simple
+  style: modern
   icons: false
   border_radius: 3
   # Offset lighter of background in % for modern and flat styles (modern: -12 | 12; flat: -18 | 6).
@@ -836,7 +836,7 @@ pace: true
 #pace-theme-minimal
 # For example
 # pace_theme: pace-theme-center-simple
-pace_theme: pace-theme-center-circle
+pace_theme: pace-theme-corner-indicator
 
 # Canvas-nest
 # Dependencies: https://github.com/theme-next/theme-next-canvas-nest

@@ -131,7 +131,11 @@ git clone <github-url> source\lib\<plugin-name>
 
 ## E 评论系统
 
-Next 6 已经集成这个功能了，只要设置 app_id 和 app_key 即可，leancloud 应用可以和访问量是同一个。
+Next 6 已经集成这个功能了，可以使用和访问量同一个应用。
+
+1 在云端的 leancloud 应用中创建一个名为 `Comment` 的类，使用默认的 ACL 权限设置。
+
+2 在主题配置文件中设置 app_id 和 app_key 即可。
 
 ```yaml
 valine:

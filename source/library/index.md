@@ -20,28 +20,69 @@ date: 2018-06-12 10:06:56
 
 ## 电子书
 
-> 本节收集了一些有关开发的 PDF 电子书，如有需要可发邮件至 zhenwei.yan@hotmail.com 索取。
+本节收集了一些有关开发的 PDF 电子书，如有需要可相应网盘链接或发邮件至 zhenwei.yan@hotmail.com 索取。内容不定期更新。
 
-- 《AT指令中文手册》
-- 《Pascal入门》
+### Python语言
+
+> 链接: https://pan.baidu.com/s/1m01ZYLkSdh3NdkOqB9qHrw 密码: pp84
+
+- 《Python3程序开发指南（第二版）》
+- 《Python核心编程（第二版）》
+- 《流畅的python》
+- 《深入浅出：使用Python编程》
+- 《Tkinter界面编程手册》：学习界面编程推荐，具有很强的系统体系，可以配合官方文档。
+- 《复杂网络分析库networkx学习笔记》
+- 《Data Structures and Algorithms in Python》
+- 《Foundations.of.Python.3.Network.Programming.2nd.Edition.Dec.2010》
+- 《Packt.Software.Architecture.with.Python.2017.4》：中文名称为[《软件架构：Python语言实现》](https://read.douban.com/ebook/49031506/)
 - 《Python网络数据采集》
 - 《树莓派学习指南》
-- 《Java编程思想》
+
+### Django框架
+
+> 链接: https://pan.baidu.com/s/1aqYYKcLPaDF1fmOmN2JWYQ 密码: zqqj
+
+- 《Two Scoops of Django,Best Practices for the Django 1.8》
+- 《Two Scoops of Django 1.11 Best Practices for the Django Web Framework, Fourth Edition》
+- 《Django Design Patterns and Best Practices》
+- 《Django Book 2 中文版》
+- 《Django Web 开发指南》
+
+### Python机器学习
+
+> 链接: https://pan.baidu.com/s/1rrKBOHBhuUlIyRNLPZaxog 密码: hrik
+
+- 《Python科学计算》
+- 《数据科学入门》
+- 《机器学习_周志华》
+- 《机器学习实战》
+- 《深度学习 AI圣经》
+
+
+### 软件工程
+
+> 链接: https://pan.baidu.com/s/1XHnK9hoJj5TBZR_Oh9SP4Q 密码: f9xy
+
 - 《程序员修炼之道》
-- 《代码大全》
+- 《代码大全（第二版）》
 - 《离散数学及其应用（第6版）》
 - 《软件工程的事实与谬误》
 - 《软件工程（第9版）》
-- 《软件开发和服务项目价格构成及评估方法》
 - 《重构与模式》
-- 《机器学习实战》
-- 《数据科学入门》
-- 《Data Structures and Algorithms in Python》
-- 《Two Scoops of Django,Best Practices for the Django 1.8》
-- 《Two Scoops of Django 1.11 Best Practices for the Django Web Framework, Fourth Edition》
-- 《流畅的python》
 - 《修改代码的艺术》
+- 《Git权威指南》
+- 《Java编程思想》
+- 《软件开发和服务项目价格构成及评估方法》
+
+### 思维
+
 - 《学会提问（中文版）》
+
+### 其他
+
+- 《AT指令中文手册》
+- 《Pascal入门》
+
 
 ## 书籍
 

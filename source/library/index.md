@@ -8,19 +8,22 @@ date: 2018-06-12 10:06:56
 > 本节搜集了那些有关于Python方面的电子书，你可以直接点击链接进行在线阅读。
 
 - [Python 入门指南 — Python tutorial 3.6.0 documentation](http://www.pythondoc.com/pythontutorial3/index.html)
+- [Python之旅](http://funhacks.net/explore-python/)
+- [Python进阶](https://eastlakeside.gitbooks.io/interpy-zh/content/)
 - [python-3-patterns-idioms](https://bitbucket.org/MatToufoutu/python-3-patterns-idioms)
 - [Python 3 Module of the Week — PyMOTW 3](https://pymotw.com/3/)
 - [Python Cookbook 3rd Edition Documentation — python3-cookbook 2.0.0 文档](http://python3-cookbook.readthedocs.io/zh_CN/latest/index.html)
 - [The Hitchhiker’s Guide to Python!](http://docs.python-guide.org/en/latest/)
 - [Full Stack Python](https://www.fullstackpython.com/table-of-contents.html)
 - [Django Design Patterns](https://www.agiliq.com/books/djangodesignpatterns)
+- [Python并行编程](http://python-parallel-programmning-cookbook.readthedocs.io/zh_CN/latest/)
 - [神经网络与深度学习](https://nndl.github.io/)
 - [Python 和数据科学](http://bookdata.readthedocs.io/en/latest/)
 - [Python机器学习](https://ljalphabeta.gitbooks.io/python-/content/)
 
 ## 电子书
 
-本节收集了一些有关开发的 PDF 电子书，如有需要可相应网盘链接或发邮件至 zhenwei.yan@hotmail.com 索取。内容不定期更新。
+本节收集了一些有关开发的 PDF 电子书，如有需要可点击相应网盘链接或发邮件至 zhenwei.yan@hotmail.com 索取。内容不定期更新。
 
 ### Python语言
 

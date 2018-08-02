@@ -5,11 +5,14 @@ categories: 技术研究
 tags:
 - Django
 ---
+
+2018年8月1日，Django 2.1 正式版发布。
+
 2018年7月18日，Django 2.1 RC 1发布。
 
 2018年6月18日，Django 发布 2.1Beta1，这是 2.1 系列的第一个公测版本，正式版预计于8月初发布。
 
-本文仅列出一些比较重要的改变，具体可详见 https://docs.djangoproject.com/en/dev/releases/2.1/ 。
+本文仅列出一些比较重要的改变，具体可详见 https://docs.djangoproject.com/en/2.1/releases/2.1/ 。
 
 <!-- more -->
 
@@ -116,7 +119,7 @@ make_published.allowed_permissions = ('change',)
 
 ## 6 验证类视图
 
-文档： https://docs.djangoproject.com/en/dev/topics/auth/default/#all-authentication-views
+文档： https://docs.djangoproject.com/en/2.1/topics/auth/default/#all-authentication-views
 
 `contrib.auth` （用户验证登录模块）的函数视图 *被移除* (Removed)，可以使用对应的类视图，比如 `contrib.auth.views.LoginView` 类。在更新到 Django 2.1 时，必须完成这一个改变。
 
@@ -163,7 +166,7 @@ urlpatterns = [
 
 ## 8 数据库查询高级特性
 
-文档 https://docs.djangoproject.com/en/dev/ref/models/database-functions
+文档 https://docs.djangoproject.com/en/2.1/ref/models/database-functions
 
 2.1 新增了一系列的文本数据库函数，包含了 Chr, Left, LPad, LTrim, Ord, Repeat, Replace, Right, RPad, RTrim, and Trim 。
 

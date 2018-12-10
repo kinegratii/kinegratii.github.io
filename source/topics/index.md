@@ -8,6 +8,12 @@ comments: false
 
 - [pyecharts 开发专辑](/pyecharts-project/)
 
+## 图片
+
+- [Pixabay](https://pixabay.com/)
+- [pexels](https://www.pexels.com/)
+- [unsplash](https://unsplash.com/)
+
 ## 音乐
 
 - [Victory - Two Steps From Hell](http://music.163.com/m/song?id=31654455)

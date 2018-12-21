@@ -25,3 +25,6 @@ comments: false
 - [Mekorama](http://www.mekorama.com/)
 - [nr.01](https://play.google.com/store/apps/details?id=it.redbitgames.nr01.android)
 - [记账城市](https://play.google.com/store/apps/details?id=com.fourdesire.fortunecity)
+- [Connection](https://play.google.com/store/apps/details?id=com.infinitygames.connection)
+- [Influence](https://play.google.com/store/apps/details?id=com.teremok.influence)
+- [WordCross](https://play.google.com/store/apps/details?id=com.peoplefun.wordcross)

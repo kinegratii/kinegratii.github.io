@@ -4,15 +4,38 @@ date: 2018-10-29 18:54:38
 categories: 编程
 ---
 
+WordScapes 是一个有关英文单词的简单游戏，游戏要求从打乱的字母选择若干个组成一系列有效的单词，填入图中的纵横框。
+
 游戏链接： https://play.google.com/store/apps/details?id=com.peoplefun.wordcross
 
 # 1 概述
 
-这是一个游戏 [WordScapes](https://play.google.com/store/apps/details?id=com.peoplefun.wordcross) 的工具, 该脚本列出从给定的字母中排序组成和合法英文单词。脚本使用 enchant 作为英文词典库。在 WordScapes 中，缩略词不被认为是一个有效的单词。
+这是一个游戏 [WordScapes](https://play.google.com/store/apps/details?id=com.peoplefun.wordcross) 的工具, 该脚本列出从给定的字母中排序组成和合法英文单词。脚本使用 enchant 作为英文词典库。
 
 <!-- more -->
 
 ![WordScapes](https://user-images.githubusercontent.com/9875406/49424677-48213d00-f7d6-11e8-8bc0-acf41dad27b9.jpg)
+
+对于该局游戏，依次使用下面命令：
+
+```shell
+$ python word_scapes.py dvmeo 3
+med
+emo
+doe
+mod
+ode
+$ python word_scapes.py dvmeo 4
+dome
+move
+mode
+dove
+demo
+$ python word_scapes.py dvmeo 5
+moved
+```
+
+需要注意的是，脚本的输出包括了缩略词，但在 WordScapes 中，缩略词不被认为是一个有效的单词。
 
 # 2 安装和部署
 
@@ -22,8 +45,7 @@ categories: 编程
 pip install pyenchant
 ```
 
-在 PyEnchant 中最主要的就是 `Dict` 对象，我们可以使用它来检查单词的拼写是否正确，同时还可以对拼写错误的单词提供几个可能的正确拼写。
-首先介绍如何创建 `Dict` 对象，并用其检查某个单词的拼写：
+在 PyEnchant 中最主要的就是 `Dict` 对象，我们可以使用它来检查单词的拼写是否正确，使用的方式也很简单：
 
 ```shell
 >>> import enchant
@@ -34,7 +56,7 @@ True
 False
 ```
 
-# 3 使用方法
+# 3 API文档
 
 该脚本共有两种使用方式
 

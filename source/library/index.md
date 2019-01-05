@@ -3,7 +3,7 @@ title: 图书馆
 date: 2018-06-12 10:06:56
 ---
 
-## 在线电子书
+## 在线阅读
 
 > 本节搜集了那些有关于Python方面的电子书，你可以直接点击链接进行在线阅读。
 
@@ -21,9 +21,9 @@ date: 2018-06-12 10:06:56
 - [Python 和数据科学](http://bookdata.readthedocs.io/en/latest/)
 - [Python机器学习](https://ljalphabeta.gitbooks.io/python-/content/)
 
-## 电子书
+## 电子书分享
 
-本节收集了一些有关开发的 PDF 电子书，如有需要可点击相应网盘链接或发邮件至 zhenwei.yan@hotmail.com 索取。内容不定期更新。
+本节收集了一些有关开发的 PDF 电子书，内容不定期更新。
 
 ### Python语言
 
@@ -87,7 +87,7 @@ date: 2018-06-12 10:06:56
 - 《Pascal入门》
 
 
-## 书籍
+## 书籍推荐
 
 ![Python Book](/images/python-book.jpg)
 

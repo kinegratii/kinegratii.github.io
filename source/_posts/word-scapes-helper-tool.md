@@ -10,7 +10,7 @@ WordScapes 是一个有关英文单词的简单游戏，游戏要求从打乱的
 
 # 1 概述
 
-这是一个游戏 [WordScapes](https://play.google.com/store/apps/details?id=com.peoplefun.wordcross) 的工具, 该脚本列出从给定的字母中排序组成和合法英文单词。脚本使用 enchant 作为英文词典库。
+在玩游戏时，写了一个简单的脚本， 列出从给定的字母中排序组成和合法英文单词。
 
 <!-- more -->
 
@@ -39,9 +39,12 @@ moved
 
 # 2 安装和部署
 
-脚本仅依赖 拼音检查库 [PyEnchant](https://sourceforge.net/projects/pyenchant/) 库，因此可以直接使用下面的命令安装：
+脚本仅依赖 拼音检查库 [PyEnchant](https://sourceforge.net/projects/pyenchant/)
+
+需要先安装Enchant，才能再安装 PyEnchant，可以使用下面的命令安装：
 
 ```shell
+apt-get install enchant
 pip install pyenchant
 ```
 
@@ -58,7 +61,7 @@ False
 
 # 3 API文档
 
-该脚本共有两种使用方式
+该脚本共有两种使用方式。
 
 ## 方式 1: 生成特定长度的英文单词  
 

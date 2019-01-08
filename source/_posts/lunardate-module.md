@@ -1,5 +1,5 @@
 ---
-title: lunardate模块
+title: lunardate农历日期模块
 date: 2019-01-05 14:34:29
 categories: 技术研究
 tags:
@@ -7,9 +7,10 @@ tags:
 - 项目
 ---
 
+
 ## 概述
 
-`borax.calendars.lunardate` 模块是一个处理中国农历日期的工具库。支持1900 - 2100 （农历）年范围的日期、干支纪、节气等历法信息。
+`lunardate` 模块是一个处理中国农历日期的工具库。支持1900 - 2100 农历年范围的日期、干支纪年、节气等历法信息。
 
 
 本模块的数据和算法引用自项目 [jjonline/calendar.js](https://github.com/jjonline/calendar.js) ，具体内容包括：
@@ -17,8 +18,6 @@ tags:
 - 1900-2100年农历月份信息
 - 节气数据及其表示方法
 - 干支纪年算法
-
-项目代码是基于 [python-lunardate](https://github.com/lidaobing/python-lunardate) 修改和完善，使用 GPLv3 开源协议发布。
 
 <!-- more -->
 
@@ -81,24 +80,23 @@ LunarDate(2100, 12, 29, 0)
 
 ## 属性
 
-和公历日期对象 `datetime.date` 类似，`LunarDate` 是不可变对象(Immutable Object)，可以作为字典的键值。
+和公历日期对象 `datetime.date` 类似，`LunarDate` 是不可变对象(Immutable Object)，可以作为字典的键值。全部属性如下表（以 `LunarDate(2018, 6, 26, False)` 为例）：
 
-可用的属性如下（以 `LunarDate(2018, 6, 26, False)` 为例）：
-
-| 属性 | 类型 | 描述 | 示例值 | 格式描述符 |
-| ------ | ------ | ------ | ------ | ------ |
-| year | `int` | 农历年 | 2018 | %y |
-| month | `int` | 农历月 | 6 | %m |
-| day | `int` | 农历日 | 26 | %d |
-| leap | `bool` | 是否闰月 | False | %l |
-| term | `str` 或 `None` | 节气名称 | 立秋 | %t |
-| cn_year | `str` | 中文年 | 二〇一八年 | %Y |
-| cn_month | `str` | 中文月 | 六月 | %M |
-| cn_day | `str` | 中文日 | 廿六日 | %D |
-| gz_year | `str` | 干支年份 | 戊戌 | %o |
-| gz_month | `str` | 干支月份 | 庚申 | %p |
-| gz_day | `str` | 干支日 | 辛未 | %q |
-| animal | `str` | 年生肖 | 狗 | %a |
+| 属性 | 类型 | 描述 | 示例值 | 格式描述符 | 备注 |
+| ------ | ------ | ------ | ------ | ------ | ------ |
+| year | `int` | 农历年 | 2018 | %y | |
+| month | `int` | 农历月 | 6 | %m | |
+| day | `int` | 农历日 | 26 | %d | |
+| leap | `bool` | 是否闰月 | False | %l | (1) |
+| offset | `int` | 距下限的偏移量 | 43287 | - | |
+| term | `str` 或 `None` | 节气名称 | 立秋 | %t | |
+| cn_year | `str` | 中文年 | 二〇一八年 | %Y | (2) |
+| cn_month | `str` | 中文月 | 六月 | %M | (2) |
+| cn_day | `str` | 中文日 | 廿六日 | %D | (2) |
+| gz_year | `str` | 干支年份 | 戊戌 | %o | |
+| gz_month | `str` | 干支月份 | 庚申 | %p | |
+| gz_day | `str` | 干支日 | 辛未 | %q | |
+| animal | `str` | 年生肖 | 狗 | %a | |
 
 
 ## 格式化显示
@@ -115,15 +113,19 @@ LunarDate(2100, 12, 29, 0)
 
 在汉字表示法中，为了统一字符串长度，日期使用 “廿六” 形式，而不是 “二十六”；“十一月”、“十二月”使用“冬月”、“腊月”形式。
 
-### 自定义
+### 格式符描述
 
 > v1.2.0 新增。
 
-`LunarDate.strftime` 提供了通过格式描述符来自定义显示日期字符串。在“属性”一节中已经列出所有属性的格式描述符。
 
-- 描述符长度为2，由"%"紧跟一个字母组成
-- '%l' 将闰月标志格式化为数字，如“0”、“1”
-- '%Y'、'%M'、'%D' 三个中文名称不包含“年”、“月”、“日”后缀汉字
+- **LunarDate.strftime(fmt)**
+
+`strftime`通过描述符(Directive)格式化给定的日期字符串。在“属性”一节中已经列出所有属性的格式描述符。
+
+备注信息：
+
+- (1) '%l' 将闰月标志格式化为数字，如“0”、“1”
+- (2) '%Y'、'%M'、'%D' 三个中文名称不包含“年”、“月”、“日”后缀汉字
 
 例子：
 
@@ -152,7 +154,7 @@ datetime.date(2018, 8, 7)
 **▶ 加减操作符**
 
 
-`LunarDate` 支持和 `datetime.timedelta` 进行加减计算。
+`LunarDate` 支持和 `datetime.timedelta` 或 `datetime.date` 进行加减计算。
 
 
 | 左操作数类型 | 操作符 | 右操作数类型 | 结果类型 |
@@ -182,16 +184,18 @@ timedelta(days=15)
 ```
 >>> ld = LunarDate(2018, 6, 3)
 >>>ld.after(3)
-LunarDate(2018, 6, 6)
+LunarDate(2018, 6, 6, 0)
 >>>ld.before(2)
-LunarDate(2018, 6, 1)
+LunarDate(2018, 6, 1, 0)
+>>>ld.after(-2)
+LunarDate(2018, 6, 1, 0)
 ```
 
 **replace函数**
 
-返回一个替换给定值后的日期对象。
+`replace(self, *, year=None, month=None, day=None, leap=None)`
 
-函数签名 `replace(self, *, year=None, month=None, day=None, leap=None)` 所有参数必须以关键字形式传入。如果该日期不存在，将抛出 `ValyeError` 异常。
+返回一个替换给定值后的日期对象。所有参数必须以关键字形式传入。如果该日期不存在，将抛出 `ValyeError` 异常。
 
 ```
 >>>ld = LunarDate(2018, 5, 3)
@@ -203,11 +207,18 @@ ValueError: month out of range
 
 ## 日期比较
 
-两个 `LunarDate` 对象可以进行比较。
+`LunarDate` 支持和 `datetime.date` 对象进行比较，对象所代表的日期更新其“数值”更大。
 
 ```
 >>>LunarDate(2018, 6, 2) > LunarDate(2018, 6, 14)
+False
+>>>LunarDate(2018, 6, 2) > date(2018, 6, 2)
 True
 ```
 
- `LunarDate` 和 `datetime.date` 的对象无法进行比较，会抛出 `TypeError` 异常。
+## 参考资料
+
+- [香港天文台农历信息](http://www.hko.gov.hk/gts/time/conversion.htm)
+- [农历维基词条](https://en.wikipedia.org/wiki/Chinese_calendar)
+- [jjonline/calendar.js](https://github.com/jjonline/calendar.js)
+- [lidaobing/python-lunardate](https://github.com/lidaobing/python-lunardate)

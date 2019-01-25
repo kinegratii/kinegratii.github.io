@@ -1,5 +1,5 @@
 ---
-title: lunardate农历日期模块
+title: Borax-Lunar开发笔记
 date: 2019-01-05 14:34:29
 categories: 技术研究
 tags:
@@ -8,22 +8,55 @@ tags:
 ---
 
 
-## 概述
-
-`lunardate` 模块是一个处理中国农历日期的工具库。支持1900 - 2100 农历年范围的日期、干支纪年、节气等历法信息。
-
-
-本模块的数据和算法引用自项目 [jjonline/calendar.js](https://github.com/jjonline/calendar.js) ，具体内容包括：
-
-- 1900-2100年农历月份信息
-- 节气数据及其表示方法
-- 干支纪年算法
+本文简要介绍了我国传统的农历历法知识，并叙述了 Borax-Lunar 工具库开发背后的一些算法原理和技术资料。
 
 <!-- more -->
 
-## 日期范围
+# 1 农历概述
 
-`LunarDate` 实例表示一个具体日期，该类可以表示的日期起止范围如下表：
+农历是我国的传统历法，依据太阳和月球位置的精确预报以及约定的日期编排规则编排日期，并以传统命名方法表述日期。
+
+2017年，我国已经颁布了国家推荐性标准《GB/T 33661-2017 农历的编算和颁行》。
+
+## 1.1 编排规则
+
+农历属于一种阴阳合历，基本规则如下：其年份分为平年和闰年。平年为十二个月；闰年为十三个月。月份分为大月和小月，大月三十天，小月二十九天。一年中哪个月大，哪个月小，可由“置闰规则”计算决定。
+
+> 若从某个农历十一月开始到下一个农历十一月（不含）之间有13个农历月，则需要置闰。置闰规则为：去其中最先出现的一个不包含中气的农历月为农历闰月。
+
+除此之外，还有生肖纪年、干支纪年、二十四节气等。
+
+## 1.2 表示方法
+
+农历日期通常有以下几种表示方法：
+
+- 农历乙未年正月初一
+- 农历牛年闰五月十一
+- 农历甲午年七月庚戌日
+- 公元2016年农历丙申年十一月廿九
+
+## 1.3 二十四节气
+
+一个回归年内24个太阳地心视黄经等于15度的整数倍的时刻的总称，每个时刻成为一个节气。太阳每年运行360度，共经历二十四个节气，分别为立春（315度）、雨水（330度）、惊蛰（345度）、春分（0度、360度）、清明（15度）、谷雨（30度）、立夏（45度）、小满（60度）、芒种（75度）、夏至（90度）、小暑（105度）、大暑（120度）、立秋（135度）、处暑（150度）、白露（165度）、秋分（180度）、寒露（195度）、霜降（210度）、立冬（225度）、小雪（240度）、大雪（255度）、冬至（270度）、小寒（285度）、大寒（300度）。可以通过下面的儿歌记忆这些节气。
+
+```
+春雨惊春清谷天，
+夏满芒夏暑相连，
+秋处露秋寒霜降，
+冬雪雪冬小大寒，
+每月两节不变更，
+最多相差一两天
+```
+
+2016年11月30日，中国“二十四节气”被正式列入联合国教科文组织人类非物质文化遗产代表作名录。
+
+# 2 数据结构
+
+农历月份大小、农历闰/平年、二十四节气的日期没有什么特定的规律，只能使用原始的“查表法”存储和查询这些信息。
+
+## 2.1 大小月和闰月
+
+从香港天文台网站可以获取1900 - 2100年的农历信息，每一天包含公历日期、农历日期、星期、节气四项基本信息。日期范围的基本信息如下表：
 
 | 项目 | 起始日 | ... | 2100年 | 2101年 | ... | 截止日 |
 | ------ | ------ | ------ | ------ | ------ | ------ | ------ |
@@ -32,13 +65,148 @@ tags:
 | offset | 0 | ... | 73383 | 73384 | ... | 73411 |
 | 干支 | 庚午年丙子月壬辰日 | ... | 庚申年戊子月丁未日 | - | ... | - |
 
-## 创建日期对象
+具体到一个农历年中，从中可以看出以下几点信息：
 
-可以通过以下几种方法创建。
+- 每个月有多少天；哪些是大月（30天），哪些是小月（29天）
+- 本年是否有闰月；如果有，是哪个月份
 
-**▶ 农历日期**
+如何使用精炼的数据结构表述这些信息，是一个重要的前提，主要要求算法简单、内存占用少。网上有许多种方式，一种比较通行的做法是使用5字节的数据，高3位总是“000”，实际使用的低17位二进制。
 
-依次传入农历年、月、日、闰月标志等4个参数创建一个新对象，其中闰月标志可省略，表示为平月。
+| 字段 | 闰月大小标志 | 月份大小标志 | 闰月月份 |
+| ------ | ------ | ------ | ------ |
+| 大小 | 4b | 12b | 4b |
+| 2017年示例 | 0001 | 0101 0001 0111 | 0110 |
+| 描述 | 闰六月是大月 | 2,4,8,10,11,12为大月 | 闰六月 |
+| 2019年示例 | 0000 | 1010 1001 0011 | 0000 |
+| 描述 | 无闰月 | 1,3,5,8,11,12为大月 | 无闰月 |
+
+综上所述，2017年信息可以使用 0x15176 表示；2019年信息可使用 0x0a930 表示。
+
+## 2.2 节气的数据结构
+
+**36位字符串**
+
+二十四节气开始的日期，与通用的公历几乎一致，最多相差一两天，因为是按照地球一年绕太阳公转一周作为依据。比如小寒通常落在在1月5-7日，立春落在2月3-5日，冬至落在12月21-23日。即每个月都会有2个节气，1月只能有小寒、大寒这两个节气。
+
+构建两个含有24元素的数组，
+
+第一个数组以小寒为第1个节气重新排列这24个节气。
+
+```
+小寒, 大寒, 立春, 雨水, 惊蛰, 春分, 清明, 谷雨, 立夏, 小满, 芒种, 夏至,
+小暑, 大暑, 立秋, 处暑, 白露, 秋分, 寒露, 霜降, 立冬, 小雪, 大雪, 冬至
+```
+
+第二个数组表示对应节气对应的日期数字。
+
+```
+6 20 4 19 6 21 5 20 6 21 6 22 7 23 8 23 8 23 9 24 8 23 7 22
+```
+
+综合这两个数组，可记录在一个公历年中，二十四个节气分别是在哪一天。比如上述的24个数字可解释为：1月6日是小寒、1月20日是大寒...12月7日是大雪、12月22日是冬至。
+
+在 Python 语言层面，可以使用字符串（基本数据类型）代替上述数组（复合数据类型），即`"620419621520621622723823823924823722"` ，需要36位字符存储。
+
+解析表中数据的 Python 代码实现如下：
+
+```python
+def parse_term(year_info):
+    result = []
+    for i in range(0, 36, 3):
+        s = year_info[i:i + 3]
+        result.extend([int(s[0]), int(s[1:3])])
+    return result
+```
+
+
+
+**30位字符串**
+
+[jjonline/calendar.js](https://github.com/jjonline/calendar.js) 提供了一种用更为简单的表示方法：利用十六进制压缩数字的位数，进一步简化为30位的字符串。具体计算过程如下：
+
+```
+  9778397bd097c36b0b6fc9274c91aa  # 按长度5分割，共6组
+  
+  97783 97bd0 97c36 b0b6f c9274 c91aa  # 转化为十进制
+  
+  620419 621520 621622 723823 823924 823722  # 按长度1,2,1,2细分
+  
+  6 20 4 19 6 21 5 20 6 21 6 22 7 23 8 23 8 23 9 24 8 23 7 22
+```
+
+使用 Python代码实现上述算法如下：
+
+```python
+def parse_term(term_info):
+    values = [str(int(term_info[i:i + 5], 16)) for i in range(0, 30, 5)]
+    term_day_list = []
+    for v in values:
+        term_day_list.extend([
+            int(v[0]), int(v[1:3]), int(v[3]), int(v[4:6])
+        ])
+    return term_day_list
+```
+
+**24位字符串**
+
+> 从 Borax v1.2.0 开始使用算法。
+
+统计1900-2100年之前节气日期统计可知，中气的日期都是在18-24日之间，这些均为两位数，可以通过线性变化转为一位数的数字，结合月份特点，可以通过减去一个固定偏移量15就是比较好的选择。
+
+同样的按照上述处理，具体过程如下：
+
+```
+654466556667788888998877 # 按长度1分割
+
+6 5 4 4 6 6 5 5 6 6 6 7 7 8 8 8 8 8 9 9 8 8 7 7 # 增加偏移量，奇位置为0，偶位置为15
+
+6 20 4 19 6 21 5 20 6 21 6 22 7 23 8 23 8 23 9 24 8 23 7 22
+```
+
+同样的使用Python 代码如下：
+
+```python
+def parse_term_days(term_info):
+    return [int(c) + [0, 15][i % 2] for i, c in enumerate(term_info)]
+```
+
+
+
+# 3 Borax-Lunar概述
+
+到2019年1月为止，关于农历的主题，github/PyPI 上已经有非常多的代码项目，语言有C、Java、Python等，具体的思路也不一样。综合来看，这些库有的功能单一，只覆盖某几个方面；有的已经很久没有更新了，主要是农历信息已在多年之前就采集完成，但是对于一些最新的数据修正未能及时涵盖；也有的在代码层面没有很好的适用最新的 Python 语言特性。
+
+基于此，本人利用收集整理的一些技术资料开发出了 Borax-Lunar 这个库，主要的目标和特点有：
+
+- **完整的农历信息**
+
+在开发过程中我收集网络上的几个重要农历数据，包含了干支、生肖、节气等事项，并同时将它们作为数据验证的参考标准。
+
+另外，一些术语命名（比如天干、地支等）采用 《GB/T 33661-2017 农历的编算和颁行》 所规定的文字。
+
+- **功能完备**
+
+Borax-Lunar 库分为三个部分：1) 基于 `LunarDate` 的农历日期表示；2）类似于 `datetime.strftime` 的字符串格式系统；3） 一些常用的农历工具接口。
+
+其中第2,3部分是网络上的农历库比较少涉及的，Borax-Lunar 在这一方面非常有优势的。
+
+- **对标datetime**
+
+在模块/类层面的组织和分类上，Borax-Lunar 对标标准库的 `datetime`  和 `calendar` 模块，实现了这两个模块中与农历日期相联系的方法，`LunarDate` 和 `date` 类有许多相同的特性，包括不可变类、可比较性、时间加减等。 甚至有些命名也是一样的，比如 `strftime` 方法。
+
+```
+lunardate.LunarDate    <------>   datetime.date
+
+lunardate.LCalendars   <------>   calendar.Calendar
+```
+
+# 4 模块设计
+
+## 4.1 LunarDate日期类
+
+### 4.1.1 初始化日期对象
+
+`LunarDate` 是一个重要的类，每一个对象表示一个农历日期，一个特定的农历日期可以由农历年、月、日、闰月标志4个字段唯一确定，可以使用这些字段初始化对象。
 
 ```
 >>>from borax.calendars.lunardate import LunarDate
@@ -46,19 +214,7 @@ tags:
 LunarDate(2018, 7, 1, 0)
 ```
 
-**▶ 公历日期**
-
-将公历日期转化为农历日期。
-
-```
->>>ld = LunarDate.from_solar_date(2018, 8, 11)
->>>ld
-LunarDate(2018, 7, 1, 0)
-```
-
-**▶ 特定的日期**
-
-获取今日/昨日/明日的农历日期。
+对于一些特定的日期，也可以通过类方法创建这些日期对象。
 
 ```shell
 >>>LunarDate.today()
@@ -69,18 +225,22 @@ LunarDate(2018, 6, 29, 0)
 LunarDate(2018, 7, 2, 0)
 ```
 
-`lunardate` 模块可用的日期上下限
+### 4.1.2 基准日期
 
-```shell
->>>LunarDate.min
-LunarDate(1990, 1, 1, 0)
->>>LunarDate.max
-LunarDate(2100, 12, 29, 0)
+`LunarDate` 类使用可表示范围的下限作为基准日期（即`LunarDate(1990, 1, 1, False)`）。对象的 offset 属性表示与基准日期相差的天数，这也是一种可以唯一确定日期的方法。
+
+## 4.2 格式化显示
+
+### 4.2.1 使用方法
+
+`LunarDate` 提供了 `strftime` 方法，可以将一个农历日期按照给定的格式转化为字符串。 
+
+```python
+class LunarDate:
+    def strftime(fmt:str) -> str: pass
 ```
 
-## 属性
-
-和公历日期对象 `datetime.date` 类似，`LunarDate` 是不可变对象(Immutable Object)，可以作为字典的键值。全部属性如下表（以 `LunarDate(2018, 6, 26, False)` 为例）：
+格式字符串使用 '%' 加一个字母的描述符(Directive)表示日期对象的一个字段，常用的描述符见下表：
 
 | 属性 | 类型 | 描述 | 示例值 | 格式描述符 | 备注 |
 | ------ | ------ | ------ | ------ | ------ | ------ |
@@ -97,37 +257,16 @@ LunarDate(2100, 12, 29, 0)
 | gz_month | `str` | 干支月份 | 庚申 | %p | |
 | gz_day | `str` | 干支日 | 辛未 | %q | |
 | animal | `str` | 年生肖 | 狗 | %a | |
+| - | `str` | 两位数字的月份 | 06 | %A | |
+| - | `str` | 两位数字的日期 | 26 | %B | |
 
 
-## 格式化显示
-
-### 内置方法
-
-一共有三种显示方式：
-
-| 显示方式 | 调用形式 | 示例 | 格式描述符 |
-| ------ | ------ | ------ | ------ |
-| 默认表示法 | `str(ld)` | LunarDate(2018, 6, 26, False) | - |
-| 汉字表示法 | `ld.cn_str()` | 2018年六月廿六日 | %C |
-| 干支表示法 | `ld.gz_str()` | 戊戌年庚申月辛未日 | %G |
-
-在汉字表示法中，为了统一字符串长度，日期使用 “廿六” 形式，而不是 “二十六”；“十一月”、“十二月”使用“冬月”、“腊月”形式。
-
-### 格式符描述
-
-> v1.2.0 新增。
-
-
-- **LunarDate.strftime(fmt)**
-
-`strftime`通过描述符(Directive)格式化给定的日期字符串。在“属性”一节中已经列出所有属性的格式描述符。
-
-备注信息：
+备注：
 
 - (1) '%l' 将闰月标志格式化为数字，如“0”、“1”
 - (2) '%Y'、'%M'、'%D' 三个中文名称不包含“年”、“月”、“日”后缀汉字
 
-例子：
+下面是几个使用 `strftime` 的例子：
 
 ```
 >>>today = LunarDate.today()
@@ -137,88 +276,123 @@ LunarDate(2100, 12, 29, 0)
 '今天的干支表示法为：戊戌年庚申月辛未日'
 ```
 
-## 公历转化
+### 4.2.2 源码解析
 
-- **LunarDate.to_solar_date()**
-
-将当前日期转化为公历日期
+`strftime` 的具体实现定义在 `lunardate.Formatter` 类。该类接受一个 %形式的格式字符串，转化为命名字段形式的格式字符串，并格式化给定的日期对象，如下图：
 
 ```
->>> ld = LunarDate(2018, 6, 26, False)
->>>ld.to_solar_date()
-datetime.date(2018, 8, 7)
+'%Y-%M-%D'  ==>  '{cn_year}-{cn_month}-{cn_day}'  ==> '二〇一八-六-廿六'
 ```
 
-## 日期推算
+某个字段 field 的具体值，根据下列顺序依次确定。
 
-**▶ 加减操作符**
+-  `Formatter.get_<field>`
+- `obj.<field>()`
+- `obj.<field>`
 
-
-`LunarDate` 支持和 `datetime.timedelta` 或 `datetime.date` 进行加减计算。
-
-
-| 左操作数类型 | 操作符 | 右操作数类型 | 结果类型 |
-| ------ | ------ | ------ | ------ |
-| `LunarDate` | + | `datetime.timedelta` | `LunarDate` |
-| `datetime.timedelta` | + | `LunarDate` | `LunarDate` |
-| `LunarDate` | - | `datetime.timedelta` | `LunarDate` |
-| `datetime.date` | - | `LunarDate` | `datetime.timedelta` |
-| `LunarDate` | - | `datetime.date` | `datetime.timedelta` |
-| `LunarDate` | - | `LunarDate` | `datetime.timedelta` |
-
-例子：
+核心代码如下：
 
 ```
->>> LunarDate(2018, 6, 3) + timedelta(days=3)
-LunarDate(2018, 6, 6, 0)
->>> LunarDate(2018, 6, 18) - LunarDate(2018, 6, 3)
-timedelta(days=15)
+class Formatter:
+    def resolve(self, obj, field):
+        try:
+            func = getattr(self, 'get_' + field)
+            return func(obj)
+        except AttributeError:
+            attr = getattr(obj, field)
+            if callable(attr):
+                return attr()
+            else:
+                return attr
 ```
 
-**▶ 日期推算**
+## 4.3 类型标注
 
-**before/after函数**
+### 4.3.1 概述
 
-返回向前/向后推算 n 天的日期。n 允许取负值，即 `ld.after(5)` 和 `ld.before(-5)` 返回表示同一个日期的实例。
+[PEP 484](https://www.python.org/dev/peps/pep-0484) 和 [PEP526](https://www.python.org/dev/peps/pep-0526) 提供了一种针对 Python 语言的类型标注方法。在 Python3.5+ 以上，可以使用 `typing` 标准模块实现这一目的，需要说明的是：
 
-```
->>> ld = LunarDate(2018, 6, 3)
->>>ld.after(3)
-LunarDate(2018, 6, 6, 0)
->>>ld.before(2)
-LunarDate(2018, 6, 1, 0)
->>>ld.after(-2)
-LunarDate(2018, 6, 1, 0)
-```
+- 方便使用者了解所调用函数的参数类型和返回值类型
+- 类型标注不会影响运行，不会抛出异常，只是警告
+- 配合IDE的语法语义检查功能，增强智能提示功能
 
-**replace函数**
+ 下面是一个参数和返回值都是字符串的函数标注：
 
-`replace(self, *, year=None, month=None, day=None, leap=None)`
-
-返回一个替换给定值后的日期对象。所有参数必须以关键字形式传入。如果该日期不存在，将抛出 `ValyeError` 异常。
-
-```
->>>ld = LunarDate(2018, 5, 3)
->>>ld.replace(year=2019)
-LunarDate(2019, 5, 3, 0)
->>>ld.replace(leap=True)
-ValueError: month out of range
+```python
+def greeting(name: str) -> str:
+    return 'Hello ' + name
 ```
 
-## 日期比较
+除了一些基本类型，常用的符合数据类型还有 `Any`、`Union`、`Tuple`、`List`、`Callable`、`TyVar`、` Generic` 等。
 
-`LunarDate` 支持和 `datetime.date` 对象进行比较，对象所代表的日期更新其“数值”更大。
+需要注意的是，Python 的语言特性也可能给类型标准的使用带来了一些麻烦，比如变量在使用过程中其类型有所变化。基于目标用户是API使用者，大概可以整理出几条实用的原则：
 
+- 只应用在公共接口（类、函数、方法、变量）加上类型标注。
+- 全局常量不使用类型标注
+- 魔术方法不使用类型标注
+- 私有方法可以不使用类型标注
+
+### 4.3.2 常用的使用示例
+
+类型标注学习起来也不困难，掌握几种常见的情形即可。
+
+使用 `:`表示参数类型，使用 `->` 表示返回值类型，如上述的 `greeting` 函数 。
+
+默认参数
+
+```python
+def foo(arg: int = 0) -> None: pass
 ```
->>>LunarDate(2018, 6, 2) > LunarDate(2018, 6, 14)
-False
->>>LunarDate(2018, 6, 2) > date(2018, 6, 2)
-True
+
+可选参数，需要使用 `Optional`，通常和上面的默认参数相互配合。
+
+```python
+def ndays(year: int, month: Optional[int] = None, leap: bool = False) -> int:
+    pass
 ```
 
-## 参考资料
+自定义类型、混合类型，闰月标记可以使用布尔值或者整数。
+
+```python
+Leap = Union[bool, int]
+```
+
+后向引用，如果使用的类还没有定义，可以使用包含类名的字符串，以便后续实例化。一般用于创建对象的方法或者树形结构的定义。
+
+```python
+class LunarDate:
+    @classmethod
+    def from_solar_date(cls, year: int, month: int, day: int) -> 'LunarDate':
+        pass
+```
+
+类型绑定。在后向引用的例子中，通常需要在多个地方使用字符串方式，为避免拼写错误，可以使用 `TypeVar` 的  bound 参数提前预定义。
+
+```python
+from typing import TypeVar
+
+T = TypeVar('T', bound='LunarDate')
+
+class LunarDate:
+    @classmethod
+    def from_solar_date(cls, year: int, month: int, day: int) -> T:
+        pass
+```
+
+迭代器，使用 `Iterator`。
+
+```python
+def hello(n:int) -> Iterator[int]:
+    for i in range(n):
+        yield i
+```
+
+
+
+# 5 参考资料
 
 - [香港天文台农历信息](http://www.hko.gov.hk/gts/time/conversion.htm)
-- [农历维基词条](https://en.wikipedia.org/wiki/Chinese_calendar)
+- [“农历”维基词条](https://en.wikipedia.org/wiki/Chinese_calendar)
 - [jjonline/calendar.js](https://github.com/jjonline/calendar.js)
 - [lidaobing/python-lunardate](https://github.com/lidaobing/python-lunardate)
+- [Forward references - Stackflow](https://stackoverflow.com/questions/33533148/how-do-i-specify-that-the-return-type-of-a-method-is-the-same-as-the-class-itsel)

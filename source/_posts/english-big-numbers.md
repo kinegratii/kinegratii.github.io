@@ -22,7 +22,7 @@ Idle Aiport Tycoon 游戏中出现的那些大数字。
 | quintillion | - | 10^18 | Q |
 | sextillion | - | 10^21 | s |
 | septillion | - | 10^24 | S |
-| octillion | - | 10^27 | O |
+| octillion | - | 10^27 | o |
 | nonillion | - | 10^30 | N |
 | decillion | - | 10^33 | d |
 | undecillion | 涧 | 10^36 |  |

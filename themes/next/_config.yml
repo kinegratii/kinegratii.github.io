@@ -122,6 +122,7 @@ menu:
   topics: /topics/ || file
   library: /library/ || book
   about: /about/ || user
+  Borax: /borax-project/ || tasks
   #tags: /tags/ || tags
   #categories: /categories/ || th
   #schedule: /schedule/ || calendar
@@ -438,7 +439,7 @@ font:
 # Math Equations Render Support
 math:
   enable: false
-  
+
   # Default(true) will load mathjax/katex script on demand
   # That is it only render those page who has 'mathjax: true' in Front Matter.
   # If you set it to false, it will load mathjax/katex srcipt EVERY PAGE.

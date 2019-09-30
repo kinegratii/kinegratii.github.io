@@ -9,6 +9,17 @@ tags: Python
 
 <!-- more -->
 
+## string.split
+
+空字符串分隔符返回值
+
+```
+>>>''.split(',')
+['']
+```
+
+
+
 ## raise的用法
 
 ### 直接抛出异常

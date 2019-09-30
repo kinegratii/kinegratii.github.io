@@ -8,6 +8,7 @@ date: 2018-06-12 10:06:56
 > 本节搜集了那些有关于Python方面的电子书，你可以直接点击链接进行在线阅读。
 
 - [PySheeet](https://www.pythonsheets.com/)
+- [Data Structures and Algorithms with Python](http://knuth.luther.edu/~leekent/CS2Plus/genindex.html)
 - [Python 入门指南 — Python tutorial 3.6.0 documentation](http://www.pythondoc.com/pythontutorial3/index.html)
 - [Python之旅](http://funhacks.net/explore-python/)
 - [Python进阶](https://eastlakeside.gitbooks.io/interpy-zh/content/)

@@ -1,5 +1,5 @@
 ---
-title: 博客升级笔记
+title: 博客V5.0升级笔记
 date: 2019-09-30 10:48:54
 categories:
  - 技术研究
@@ -15,6 +15,15 @@ comments: false
 | hexo-theme-next | 7.4.0    | 6.3.0    |
 
 <!-- more -->
+
+## 更新内容
+
+- Hexo 更新至 v3.9.0
+- NextT 主题更新至 v7.4.0
+- 新增 pjax 特性
+- 新增 github Banner
+- 新增相关文章模块
+- 更新正文字体大小
 
 ## 升级步骤
 

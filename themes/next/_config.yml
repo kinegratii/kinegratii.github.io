@@ -337,7 +337,7 @@ reward_settings:
   # You can show or hide reward in a specific article throuth `reward: true | false` in Front-matter.
   enable: true
   animation: true
-  #comment: ¼á³ÖÔ­´´¼¼Êõ·ÖÏí£¬ÄúµÄÖ§³Ö½«¹ÄÀøÎÒ¼ÌĞø´´×÷£¡
+  comment: åšæŒåŸåˆ›æŠ€æœ¯åˆ†äº«ï¼Œæ‚¨çš„æ”¯æŒå°†é¼“åŠ±æˆ‘ç»§ç»­åˆ›ä½œï¼
 
 reward:
   wechatpay: /images/wechat_reward.png
@@ -557,11 +557,11 @@ math:
 # Easily enable fast Ajax navigation on your website.
 # Dependencies: https://github.com/theme-next/theme-next-pjax
 # For moreinformation: https://github.com/MoOx/pjax
-pjax: false
+pjax: true
 
 # FancyBox is a tool that offers a nice and elegant way to add zooming functionality for images.
 # For more information: https://fancyapps.com/fancybox
-fancybox: false
+fancybox: true
 
 # A JavaScript library for zooming images like Medium.
 # Do not enable both `fancybox` and `mediumzoom`.

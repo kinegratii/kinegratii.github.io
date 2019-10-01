@@ -4,18 +4,14 @@ date: 2017-04-03 20:33:29
 comments: false
 ---
 
-## 技能
+## 技术栈
 
-- Python web开发
-  - Django
-  - Bottle
+- Python web开发：Django / Flask / Bottle
 - Python网络编程
-- 多种wsgi项目部署
+- web开发环境
   - Windows + Apache + mod_wsgi
   - Ubuntu + Docker + DaoCloud + wsgi
-  - Docker
-- 基本的爬虫方法：正则提取
-- Python项目持续集成、打包、发布
+- Python项目持续集成和质量控制
 - jQuery及其插件的应用
 - ionic混合开发
 ---
@@ -30,14 +26,6 @@ Python / 2017 / 工具、数据可视化
 pyecharts 是一个使用Echarts 生成图表的工具库，提供了Echarts 到 Python 之间的接口。pyecharts 实现了大部分 Echarts 图表类型，并支持在不同环境的运行。
 
 django-echarts（主页：https://github.com/kinegratii/django-echarts ） 是一个 Echarts 整合的 Django App，使用 pyecharts 的作为图表构建库。
-
-### ConfStruct
-
-Python / 2017 / 工具、二进制数据
-
-ConfStruct是一个解决了具有“length-body”结构的二进制数据的解析和构建的Python库,实现了Python对象和二进制数据之间转化。项目参考了 [Construct](http://construct.readthedocs.io/en/latest/) 并支持整合部分特性。
-
-项目具有单元测试、持续集成等开源项目的特性，已发布在PyPI，主页为 [https://pypi.org/project/ConfStruct/](https://pypi.org/project/ConfStruct/)。
 
 ### 水资源费征收工作平台
 

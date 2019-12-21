@@ -10,6 +10,7 @@ comments: false
 
 | 库              | 现有版本 | 原有版本 |
 | --------------- | -------- | -------- |
+| node            | 8.11.2   | 8.11.2   |
 | hexo-cli        | 2.0.0    | 1.1.0    |
 | hexo            | 3.9.0    | 3.2.2    |
 | hexo-theme-next | 7.4.0    | 6.3.0    |
@@ -18,8 +19,7 @@ comments: false
 
 ## 更新内容
 
-- Hexo 更新至 v3.9.0
-- NextT 主题更新至 v7.4.0
+- 博客新增版本记录
 - 新增 pjax 特性
 - 新增 github Banner
 - 新增相关文章模块
@@ -73,11 +73,34 @@ npm install -g npm-check
 npm-check -u --registry https://registry.npm.taobao.org
 ```
 
+升级后的版本如下：
+
+```
+"dependencies": {
+  "hexo": "^3.9.0",
+  "hexo-deployer-git": "^2.0.0",
+  "hexo-generator-archive": "^1.0.0",
+  "hexo-generator-category": "^1.0.0",
+  "hexo-generator-feed": "^2.0.0",
+  "hexo-generator-index": "^1.0.0",
+  "hexo-generator-searchdb": "^1.0.8",
+  "hexo-generator-sitemap": "^1.2.0",
+  "hexo-generator-tag": "^1.0.0",
+  "hexo-related-popular-posts": "^3.0.6",
+  "hexo-renderer-ejs": "^1.0.0",
+  "hexo-renderer-marked": "^2.0.0",
+  "hexo-renderer-stylus": "^1.1.0",
+  "hexo-server": "^1.0.0",
+  "hexo-symbols-count-time": "^0.6.1",
+  "hexo-wordcount": "^6.0.1"
+}
+```
+
 ### Next主题更新
 
 几个文档采用手动合并更新：
 
 - next主题配置文件：_config.yaml  （必须以现有配置文件为基础）
-- 中文翻译文件： zh-CN.yaml
+- 中文翻译文件： zh-CN.yml
 - 插件库：lib
-- 插件库版本忽略文件：.gitignore
+- 插件库版本忽略文件：themes\next\.gitignore

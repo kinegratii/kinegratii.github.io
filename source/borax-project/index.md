@@ -7,6 +7,8 @@ date: 2019-02-16 12:45:51
 
 Borax 是一个Python3开发工具集合库，包含了常用的数据结构和设计模式的实现，以及一些简单的函数封装。
 
+[![PyPI](https://img.shields.io/pypi/v/borax.svg)](https://pypi.org/project/borax) 
+
 ## 模块
 
 Borax 包括了以下模块：

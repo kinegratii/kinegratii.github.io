@@ -18,6 +18,22 @@ comments: false
 
 ## 项目
 
+### 水资源费征收工作平台
+
+Django / 2016-2019 / 网站平台
+
+该平台包括了企业管理、价格管理、抄表缴费、数据查询和统计报表等功能，覆盖了水资源费征收全部的业务流程,实现了相关业务的电子信息化，符合现代软件工程“人工管理 -> 文件管理 -> 数据库系统”的数据管理技术的发展趋势。
+
+平台使用 Python3 + Django1.10 进行开发，并且自v1.2起，项目不再支持Python2.x。在部署方案上，平台不仅支持 Apache 、uwsgo等常规方案，还支持[DaoClound](https://www.daocloud.io/)等云部署。
+
+技术路线：
+
+| 版本 | 技术栈 |
+| ------ | ------ |
+| V1.x | Python3 + Django1.10 + MySQL5.7 + AmazeUI|
+| V3.x | Python3 + Django2.2 + postgresql11 + vue2 |
+
+
 ### pyecharts & django-echarts
 Python / 2017 / 工具、数据可视化
 
@@ -26,14 +42,6 @@ Python / 2017 / 工具、数据可视化
 pyecharts 是一个使用Echarts 生成图表的工具库，提供了Echarts 到 Python 之间的接口。pyecharts 实现了大部分 Echarts 图表类型，并支持在不同环境的运行。
 
 django-echarts（主页：https://github.com/kinegratii/django-echarts ） 是一个 Echarts 整合的 Django App，使用 pyecharts 的作为图表构建库。
-
-### 水资源费征收工作平台
-
-Django / 2016 / 网站平台
-
-该平台包括了企业管理、价格管理、抄表缴费、数据查询和统计报表等功能，覆盖了水资源费征收全部的业务流程,实现了相关业务的电子信息化，符合现代软件工程“人工管理 -> 文件管理 -> 数据库系统”的数据管理技术的发展趋势。
-
-平台使用 Python3 + Django1.10 进行开发，并且自v1.2起，项目不再支持Python2.x。在部署方案上，平台不仅支持 Apache 、uwsgo等常规方案，还支持[DaoClound](https://www.daocloud.io/)等云部署。
 
 ### 家谱APP
 
@@ -47,7 +55,7 @@ Javascript / 2016 /  MIT / 插件
 
 基于高德地图的位置选择jQuery插件。该项目结合了个人相关开发经验，分离功能独立的构件，严格遵守javascript开发规范。在开发过程中，参考了[Eonasdan / bootstrap-datetimepicker](https://github.com/Eonasdan/bootstrap-datetimepicker)等项目的模块结构。现已收录于开源中国中，主页为 https://www.oschina.net/p/amappositionpicker 。
 
-### STRCS
+### 基于modbus协议的污水处理远程控制系统（STRCS）
 python / 2015 / 项目、行业
 
 STRCS，全称为 Sewage Treament Remote Control System，中文全称为污水处理设备远程控制系统。该系统实现了从 web 界面控制远程的污水处理设备。该系统由 web 平台、中间设备服务器、PLC 设备和污水处理设备等组成。系统基于 modbus 主从协议 和 TCP/IP 协议，将远程的PLC作为 Slave 设备。

@@ -1,5 +1,5 @@
 ---
-title: compile-python-files
+title: 编译Python脚本
 date: 2019-04-25 20:37:10
 categories: 技术研究
 tags:

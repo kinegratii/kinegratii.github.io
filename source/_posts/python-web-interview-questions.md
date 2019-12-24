@@ -1,5 +1,5 @@
 ---
-title: Python开放工程师笔试题（web方向）
+title: Python开发工程师笔试题（web方向）
 date: 2019-12-20 20:28:25
 categories: 技术研究
 tags:
@@ -7,7 +7,7 @@ tags:
 - Django
 ---
 
-Python开放工程师（web方向）
+Python开发工程师（web方向）
 
 <!-- more -->
 

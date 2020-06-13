@@ -160,7 +160,10 @@ menu:
   archives: /archives/ || archive
   topics: /topics/ || file
   library: /library/ || book
-  about: /about/ || user
+  about:
+    default: /about/ || user
+    changelog: /changelog/ || user
+    about-author: /about-author/ || user
   Borax: /borax-project/ || tasks
   #tags: /tags/ || tags
   #categories: /categories/ || th

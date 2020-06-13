@@ -1,7 +1,7 @@
 ---
 title: Hexo NexT 6升级笔记
 date: 2018-07-23 15:18:52
-categories: 技术研究
+categories: 博客
 tags:
 - 软件迁移
 ---

@@ -2,7 +2,7 @@
 title: 博客V5.0升级笔记
 date: 2019-09-30 10:48:54
 categories:
- - 技术研究
+ - 博客
 comments: false
 ---
 
@@ -42,7 +42,7 @@ npm update -g hexo-cli
 查看可升级的包：
 
 ```
-> npm outupdated
+> npm outdated
 Package                  Current  Wanted  Latest  Location
 hexo                       3.2.2   3.9.0   3.9.0  Kinegratii-blog
 hexo-deployer-git          0.2.0   0.2.0   2.0.0  Kinegratii-blog

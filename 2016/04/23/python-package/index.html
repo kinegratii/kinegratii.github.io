@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/logo/apple_touch_icon.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/logo/logo_16.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-corner-indicator.min.css?v=1.0.2">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="本文介绍了py2exe、cx_freeze和PyInstaller这三种Python打包工具的使用方法。">
+<meta name="keywords" content="Python,构建">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python打包工具">
+<meta property="og:url" content="http://kinegratii.github.io/2016/04/23/python-package/index.html">
+<meta property="og:site_name" content="程序员Barnes的博客">
+<meta property="og:description" content="本文介绍了py2exe、cx_freeze和PyInstaller这三种Python打包工具的使用方法。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://kinegratii.github.io/images/pyinstaller-draft1c-header-trans.png">
+<meta property="og:updated_time" content="2020-11-08T06:32:52.269Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="python打包工具">
+<meta name="twitter:description" content="本文介绍了py2exe、cx_freeze和PyInstaller这三种Python打包工具的使用方法。">
+<meta name="twitter:image" content="http://kinegratii.github.io/images/pyinstaller-draft1c-header-trans.png">
+  <link rel="alternate" href="/atom.xml" title="程序员Barnes的博客" type="application/atom+xml">
+  <link rel="canonical" href="http://kinegratii.github.io/2016/04/23/python-package/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>python打包工具 | 程序员Barnes的博客</title>
+  <meta name="generator" content="Hexo 3.9.0">
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">程序员Barnes的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">逍遥于天地之间，而心意自得。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档<span class="badge">46</span></a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-topics">
+      
+    
+      
+    
+
+    <a href="/topics/" rel="section"><i class="menu-item-icon fa fa-fw fa-file"></i> <br>专题</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-library">
+      
+    
+      
+    
+
+    <a href="/library/" rel="section"><i class="menu-item-icon fa fa-fw fa-book"></i> <br>图书馆</a>
+
+  </li>
+      
+      
+      
+        
+          
+          
+          
+            
+            
+    
+  
+  <li class="menu-item menu-item-about">
+      
+    
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+
+
+          
+        
+          
+          
+          
+        
+          
+          
+          
+        
+      
+      
+      
+      
+        
+        <li class="menu-item menu-item-borax">
+      
+    
+      
+    
+
+    <a href="/borax-project/" rel="section"><i class="menu-item-icon fa fa-fw fa-tasks"></i> <br>Borax</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/kinegratii" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://kinegratii.github.io/2016/04/23/python-package/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="程序员Barnes">
+      <meta itemprop="description" content="逍遥于天地之间，而心意自得。">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="程序员Barnes的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">python打包工具
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2016-04-23 08:34:21" itemprop="dateCreated datePublished" datetime="2016-04-23T08:34:21+08:00">2016-04-23</time>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/编程/" itemprop="url" rel="index"><span itemprop="name">编程</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            <span id="/2016/04/23/python-package/" class="post-meta-item leancloud_visitors" data-flag-title="python打包工具" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+        
+      
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2016/04/23/python-package/#comments" itemprop="discussionUrl"><span class="post-comments-count valine-comment-count" data-xid="/2016/04/23/python-package/" itemprop="commentCount"></span></a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><img src="/images/pyinstaller-draft1c-header-trans.png" alt="PyInstaller"></p>
+<p>本文介绍了py2exe、cx_freeze和PyInstaller这三种Python打包工具的使用方法。</p>
+<a id="more"></a>
+
+<h2 id="1-Python打包工具"><a href="#1-Python打包工具" class="headerlink" title="1 Python打包工具"></a>1 Python打包工具</h2><p>目前在windows平台上将Python程序打包成exe文件主要有三个工具。</p>
+<ul>
+<li>py2exe <a href="http://www.py2exe.org/" target="_blank" rel="noopener">http://www.py2exe.org/</a></li>
+<li>cx_freeze <a href="http://cx-freeze.sourceforge.net/" target="_blank" rel="noopener">http://cx-freeze.sourceforge.net/</a></li>
+<li>PyInstaller <a href="http://pythonhosted.org/PyInstaller/" target="_blank" rel="noopener">http://pythonhosted.org/PyInstaller/</a></li>
+</ul>
+<p>今天将一个Tkinter写的界面程序打包成exe文件，三个工具都试了一遍，感觉PyInstaller会比较好用一些。</p>
+<h2 id="2-py2exe"><a href="#2-py2exe" class="headerlink" title="2 py2exe"></a>2 py2exe</h2><h3 id="2-1-下载安装"><a href="#2-1-下载安装" class="headerlink" title="2.1 下载安装"></a>2.1 下载安装</h3><p>从这里<a href="https://sourceforge.net/projects/py2exe/files/py2exe/0.6.9/" target="_blank" rel="noopener">https://sourceforge.net/projects/py2exe/files/py2exe/0.6.9/</a> 选择python版本和计算机位数对应的exe文件，双击即可安装。</p>
+<h3 id="2-2-启动脚本"><a href="#2-2-启动脚本" class="headerlink" title="2.2 启动脚本"></a>2.2 启动脚本</h3><p>写一个setup_py2exe.py文件</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> distutils.core <span class="keyword">import</span> setup</span><br><span class="line"><span class="keyword">import</span> py2exe</span><br><span class="line">options = &#123;<span class="string">'py2exe'</span>: &#123;<span class="string">'compressed'</span>: <span class="number">1</span>,</span><br><span class="line">                      <span class="string">'optimize'</span>: <span class="number">2</span>,</span><br><span class="line">                      <span class="string">'bundle_files'</span>: <span class="number">1</span>, &#125;&#125;</span><br><span class="line">setup(name=<span class="string">'App'</span>,</span><br><span class="line">      author=<span class="string">'kinegratii'</span>,</span><br><span class="line">      version=<span class="string">'1.0.0'</span>,</span><br><span class="line">      options=options,</span><br><span class="line">      windows=[&#123;<span class="string">"script"</span>: <span class="string">"app.py"</span>&#125;],</span><br><span class="line">      zipfile=<span class="literal">None</span></span><br><span class="line">      )</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-3-命令"><a href="#2-3-命令" class="headerlink" title="2.3 命令"></a>2.3 命令</h3><p>执行python setup_py2exe.py py2exe即可，dist目录就是最后生成的结果。</p>
+<h3 id="2-4-Q-amp-A"><a href="#2-4-Q-amp-A" class="headerlink" title="2.4 Q&amp;A"></a>2.4 Q&amp;A</h3><p><strong>import py2exe</strong></p>
+<p><code>import py2exe</code>这个语句要保留，因为用PyCharm自动格式化的时候总会把这个语句优化掉。</p>
+<p><strong>UnicodeDecodeError异常</strong></p>
+<p>之前加了<code>from __future__ import unicode_literals</code>这个语句，会报<code>UnicodeDecodeError: &#39;utf8&#39; codec can&#39;t decode byte 0xd1 in position 3: invalid continuation byte</code></p>
+<p><strong>lxml库</strong></p>
+<p>程序报的异常是<code>ImportError: No module named lxml._elementpath</code>，但按照网上的说法加了includes参数可以解决。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">options=&#123;</span><br><span class="line">    <span class="string">'py2exe'</span>: &#123;</span><br><span class="line">        <span class="string">'includes'</span>: [<span class="string">'lxml.etree'</span>, <span class="string">'lxml._elementpath'</span>, <span class="string">'gzip'</span>],</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>TypeError: expected string or buffer</strong></p>
+<p>这个异常是docx这个库出现的。找了很久还没有什么头绪。</p>
+<h2 id="3-cx-freeze"><a href="#3-cx-freeze" class="headerlink" title="3 cx_freeze"></a>3 cx_freeze</h2><h3 id="3-1-pip安装"><a href="#3-1-pip安装" class="headerlink" title="3.1 pip安装"></a>3.1 pip安装</h3><p>执行pip命令即可安装</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install cx_Freeze</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-2-启动脚本"><a href="#3-2-启动脚本" class="headerlink" title="3.2 启动脚本"></a>3.2 启动脚本</h3><p>setup_cx.py文件如下</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> __future__ <span class="keyword">import</span> unicode_literals</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">from</span> cx_Freeze <span class="keyword">import</span> setup, Executable</span><br><span class="line"></span><br><span class="line">base = <span class="literal">None</span></span><br><span class="line"><span class="keyword">if</span> sys.platform == <span class="string">"win32"</span>:</span><br><span class="line">    base = <span class="string">"Win32GUI"</span></span><br><span class="line">includeFiles = [</span><br><span class="line">    (<span class="string">r"D:\py\tcl\tcl8.5"</span>, <span class="string">"tcl"</span>),</span><br><span class="line">    (<span class="string">r"D:\py\tcl\tk8.5"</span>, <span class="string">"tk"</span>)</span><br><span class="line">]</span><br><span class="line">setup(</span><br><span class="line">    name=<span class="string">"App"</span>,</span><br><span class="line">    version=<span class="string">"1.0"</span>,</span><br><span class="line">    description=<span class="string">"A demo app"</span>,</span><br><span class="line">    options=&#123;<span class="string">"build_exe"</span>: &#123;<span class="string">"include_files"</span>: includeFiles, &#125;&#125;,</span><br><span class="line">    executables=[Executable(<span class="string">"app.py"</span>, base=base, includes=[<span class="string">'lxml'</span>, <span class="string">'lxml.tree'</span>, <span class="string">'lxml._namepath'</span>])]</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-3-命令"><a href="#3-3-命令" class="headerlink" title="3.3 命令"></a>3.3 命令</h3><p>执行命令python setup_cx.py build，dist下的exe.开头的文件夹（名字跟具体环境有关，比如我的是exe.win32-2.7）就是最后的生成的文件夹。</p>
+<h3 id="3-4-Q-amp-A"><a href="#3-4-Q-amp-A" class="headerlink" title="3.4 Q&amp;A"></a>3.4 Q&amp;A</h3><p><strong>lxml</strong></p>
+<p>也需要明确包含<code>lxml._elementpath</code></p>
+<p><strong>docx</strong></p>
+<p>也出现了和py2exe一样的异常。</p>
+<h2 id="4-PyInstaller"><a href="#4-PyInstaller" class="headerlink" title="4 PyInstaller"></a>4 PyInstaller</h2><h3 id="4-1-pip安装"><a href="#4-1-pip安装" class="headerlink" title="4.1  pip安装"></a>4.1  pip安装</h3><p>执行pip安装</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install pyinstaller</span><br></pre></td></tr></table></figure>
+
+<p>安装成功后在python的目录下\Scripts文件夹多出pyinstaller.exe、pyinstaller.exe.manifest、pyinstaller-script.py等几个文件。</p>
+<h3 id="4-2-命令方式构建"><a href="#4-2-命令方式构建" class="headerlink" title="4.2 命令方式构建"></a>4.2 命令方式构建</h3><p>把Scripts目录加到系统的环境变量中，cd到脚本所在的目录，然后执行下面的命令。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pyinstaller app.py -F -w --clean</span><br></pre></td></tr></table></figure>
+
+<p>app.py 脚本文件</p>
+<p>几个选项含义</p>
+<ul>
+<li>-F 打包为单一文件，和打包为一个文件夹相对，默认为后者</li>
+<li>-w 窗口程序，与控制台相对</li>
+<li>–clean 每次清理中间产生的构建文件</li>
+</ul>
+<p>生成的相关文件包括</p>
+<ul>
+<li>app.spec 配置文件</li>
+<li>build文件夹 构建中产生的中间文件</li>
+<li>dist/app文件夹 这里的文件都是运行所需要的</li>
+</ul>
+<h3 id="4-3-启动脚本方式"><a href="#4-3-启动脚本方式" class="headerlink" title="4.3 启动脚本方式"></a>4.3 启动脚本方式</h3><p>命令行带太多参数的话，每次都要输入，比较麻烦，可以统统写在一个py脚本中。</p>
+<p>PyInstaller也是一个标准的Python包，提供了<code>PyInstaller.main.run</code>这个方法。</p>
+<p>4.2节中等效的python脚本如下</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    <span class="keyword">from</span> PyInstaller.main <span class="keyword">import</span> run</span><br><span class="line">    params=[app.py<span class="string">', '</span>-F<span class="string">', '</span>-w<span class="string">', '</span>--clean<span class="string">']</span></span><br><span class="line"><span class="string">    run(params)</span></span><br></pre></td></tr></table></figure>
+
+<p>用Python解释器执行这个脚本就可以了。</p>
+<h3 id="4-4-Q-amp-A"><a href="#4-4-Q-amp-A" class="headerlink" title="4.4 Q&amp;A"></a>4.4 Q&amp;A</h3><p><strong>lxml</strong></p>
+<p>可以解决lxml包含的问题，无需明确指定</p>
+<p><strong>调试</strong></p>
+<p>由于用了没有控制台的-w方式，如果程序启动有错的话，只会弹出app return -1的对话框，没有具体异常信息。可以先去掉-w，用控制台进行调试，所有的异常和程序中的print函数就显示在控制台上，方便调试。</p>
+<p><strong>单exe资源文件路径问题</strong></p>
+<p>这个问题应该只要是最后打包成单个exe都会出现的问题。描述如下</p>
+<p>最后打包的文件结构如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">- XxxApp</span><br><span class="line">    - app.exe</span><br><span class="line">    - data</span><br><span class="line">        - wpa.db</span><br></pre></td></tr></table></figure>
+
+<p>程序中用下面语句引用wpa.db文件，会出现文件打不开的情况</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">BASE_DIR = os.path.abspath(os.path.dirname(__file__))</span><br><span class="line">DB_FILE = os.path.join(BASE_DIR,&apos;data&apos;, &apos;wpa.db&apos;)</span><br></pre></td></tr></table></figure>
+
+<p>调试打印出<code>BASE_DIR</code>，发现路径不是XxxApp，而是在用户目录下的某一个位置，类似如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">c:\Users\kinegratii\AppData&apos;Local\Temp\_MEI11~1\data\wpa.db</span><br></pre></td></tr></table></figure>
+
+<p>这是因为<strong>在单文件模式中运行程序的时候先将文件解压到sys._MEIPASS指向的目录下，所以引用资源文件就需要添加os.path.join(sys._MEIPASS,filename)</strong>，</p>
+<p>第一种方法，具体判断程序当前模式。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> getattr(sys, <span class="string">'frozen'</span>, <span class="literal">False</span>):</span><br><span class="line">      BASE_DIR = sys._MEIPASS</span><br><span class="line">  <span class="keyword">else</span>:</span><br><span class="line">      BASE_DIR = os.path.dirname(__file__)</span><br></pre></td></tr></table></figure>
+
+<p>第二种，就是将 <code>__file__</code> 改为 <code>sys.args[0]</code>，即</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">BASE_DIR = os.path.abspath(os.path.dirname(sys.argv[0]))</span><br></pre></td></tr></table></figure>
+
+<p>这样打印的路径就是正确的了，原因在于<code>__file__</code>和<code>sys.args[0]</code>有点区别。</p>
+<blockquote>
+<p><code>__file__</code> is the name of the current file, which may be different from the main script if you are inside a module or if you start a script using execfile() rather than by invoking python scriptname.py.  <code>__file__</code> is generally your safer bet.</p>
+</blockquote>
+<p>来自 <a href="http://stackoverflow.com/a/5851608" target="_blank" rel="noopener">http://stackoverflow.com/a/5851608</a></p>
+<p><strong>icon图标无法显示问题</strong></p>
+<p>使用icon选项即可添加图标，但有时候发现资源管理器的图标可以显示，但运行程序后任务栏上的图标却无法显示。关于这个问题 。</p>
+<blockquote>
+<p>在不同情况下（比如资源管理器文件列表前面的图标、桌面、开始菜单等）需要不一样尺寸的图标。如果尺寸不合适的话，可能出现有的地方显示正确有的显示不正确的情况。最后几个地方都要检查一遍。</p>
+</blockquote>
+<p>解决方案</p>
+<blockquote>
+<p>应该准备四张不同尺寸（具体尺寸参见 <a href="http://stackoverflow.com/questions/3236115/which-icon-sizes-should-my-windows-applications-icon-include" target="_blank" rel="noopener">http://stackoverflow.com/questions/3236115/which-icon-sizes-should-my-windows-applications-icon-include</a> ）的png文件<br>用png2icon脚本把它们合成一张icon图标文件即可</p>
+</blockquote>
+<h2 id="5-参考资料"><a href="#5-参考资料" class="headerlink" title="5 参考资料"></a>5 参考资料</h2><ul>
+<li>py2exe lxml error <a href="http://stackoverflow.com/a/5309733" target="_blank" rel="noopener">http://stackoverflow.com/a/5309733</a></li>
+<li>Creating an Executable from a Python Script | Matt Borgerson<br><a href="https://mborgerson.com/creating-an-executable-from-a-python-script" target="_blank" rel="noopener">https://mborgerson.com/creating-an-executable-from-a-python-script</a></li>
+<li>pyinstaller打包pyqt文件 - dcb3688 - 博客园<br><a href="http://www.cnblogs.com/dcb3688/p/4211390.html" target="_blank" rel="noopener">http://www.cnblogs.com/dcb3688/p/4211390.html</a></li>
+<li>使用pyinstaller打包python程序 - 魏哲的空间<br><a href="https://blog.weizhe.net/?p=412" target="_blank" rel="noopener">https://blog.weizhe.net/?p=412</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      
+        <div class="popular-posts-date">2017-04-25</div>
+      
+      
+      <div class="popular-posts-title"><a href="/2017/04/25/python-project-ci-publish/" rel="bookmark">python项目持续集成与包发布</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+        <div class="popular-posts-date">2017-04-07</div>
+      
+      
+      <div class="popular-posts-title"><a href="/2017/04/07/construct-python-binary-parse-build/" rel="bookmark">Construct：二进制数据解析器和构建器</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+        <div class="popular-posts-date">2018-06-10</div>
+      
+      
+      <div class="popular-posts-title"><a href="/2018/06/10/my-python-packages-and-libraries/" rel="bookmark">我的 Python 第三方库</a></div>
+      
+    </li>
+  
+  </ul>
+
+        
+      
+        <div id="reward-container">
+  <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+  <button id="reward-button" disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/wechat_reward.png" alt="程序员Barnes 微信支付">
+        <p>微信支付</p>
+      </div>
+
+  </div>
+</div>
+
+      
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>程序员Barnes</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://kinegratii.github.io/2016/04/23/python-package/" title="python打包工具">http://kinegratii.github.io/2016/04/23/python-package/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+</div>
+
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/Python/" rel="tag"><i class="fa fa-tag"></i> Python</a>
+            
+              <a href="/tags/构建/" rel="tag"><i class="fa fa-tag"></i> 构建</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2015/11/12/python-pytz-6-minutes/" rel="next" title="pytz东八区6分钟问题">
+                  <i class="fa fa-chevron-left"></i> pytz东八区6分钟问题
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2016/05/17/osc-tweet-publish/" rel="prev" title="自动发送动弹到开源中国">
+                  自动发送动弹到开源中国 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="comments"></div>
+  
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Python打包工具"><span class="nav-text">1 Python打包工具</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-py2exe"><span class="nav-text">2 py2exe</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-下载安装"><span class="nav-text">2.1 下载安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-启动脚本"><span class="nav-text">2.2 启动脚本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-命令"><span class="nav-text">2.3 命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-Q-amp-A"><span class="nav-text">2.4 Q&amp;A</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-cx-freeze"><span class="nav-text">3 cx_freeze</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-pip安装"><span class="nav-text">3.1 pip安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-启动脚本"><span class="nav-text">3.2 启动脚本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-命令"><span class="nav-text">3.3 命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-4-Q-amp-A"><span class="nav-text">3.4 Q&amp;A</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-PyInstaller"><span class="nav-text">4 PyInstaller</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-pip安装"><span class="nav-text">4.1  pip安装</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-命令方式构建"><span class="nav-text">4.2 命令方式构建</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-启动脚本方式"><span class="nav-text">4.3 启动脚本方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-4-Q-amp-A"><span class="nav-text">4.4 Q&amp;A</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-参考资料"><span class="nav-text">5 参考资料</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.jpg"
+      alt="程序员Barnes">
+  <p class="site-author-name" itemprop="name">程序员Barnes</p>
+  <div class="site-description" itemprop="description">逍遥于天地之间，而心意自得。</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">46</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/kinegratii" title="GitHub &rarr; https://github.com/kinegratii" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://my.oschina.net/kinegratii" title="oschina &rarr; https://my.oschina.net/kinegratii" rel="noopener" target="_blank"><i class="fa fa-fw fa-link"></i>oschina</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://kinegratii.github.io/borax/" title="Borax &rarr; https://kinegratii.github.io/borax/"><i class="fa fa-fw fa-link"></i>Borax</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2015 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">程序员Barnes</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  <script src="/lib/pjax/pjax.min.js?v=0.2.8"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[pjax], script#page-configurations, #pjax script').forEach(element => {
+    var id = element.id || '';
+    var src = element.src || '';
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (id !=='') {
+      script.id = element.id;
+    }
+    if (src !== '') {
+      script.src = src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+  var GUEST = ['nick', 'mail', 'link'];
+  var guest = 'nick,mail,link';
+  guest = guest.split(',').filter(item => {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#comments',
+    verify: false,
+    notify: false,
+    appId: 'YlSXBoomxn9Ws7GEb7bfJiaz-gzGzoHsz',
+    appKey: 'usgVEKYx48ugyhewgxrnLjFk',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: guest,
+    pageSize: '10' || 10,
+    visitor: true,
+    lang: '' || 'zh-cn',
+    path: location.pathname
+  });
+}, window.Valine);
+</script>
+
+    </div>
+</body>
+</html>

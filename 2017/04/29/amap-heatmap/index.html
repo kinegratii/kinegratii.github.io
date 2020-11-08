@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/logo/apple_touch_icon.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/logo/logo_16.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-corner-indicator.min.css?v=1.0.2">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="A 热力图热力图以高亮形式显示数据密集程度。根据密集程度的不同，图上会呈现不同的颜色，以直观的形式展现数据密度。 在设备检测领域，采用热力图可以直观地显示哪些区域的设备具有很高的报警率，为监控决策和提前介入提供了数据依据。 AMap.Heatmap 是高德地图热力图插件，基于heatmapjs。高德地图API引用了heatmap.js最新版本v2.0，v2.0基于新的渲染模型，具有更高的渲染效率和">
+<meta name="keywords" content="数据可视化,Javascript,高德地图">
+<meta property="og:type" content="article">
+<meta property="og:title" content="高德地图热力图和设备监测">
+<meta property="og:url" content="http://kinegratii.github.io/2017/04/29/amap-heatmap/index.html">
+<meta property="og:site_name" content="程序员Barnes的博客">
+<meta property="og:description" content="A 热力图热力图以高亮形式显示数据密集程度。根据密集程度的不同，图上会呈现不同的颜色，以直观的形式展现数据密度。 在设备检测领域，采用热力图可以直观地显示哪些区域的设备具有很高的报警率，为监控决策和提前介入提供了数据依据。 AMap.Heatmap 是高德地图热力图插件，基于heatmapjs。高德地图API引用了heatmap.js最新版本v2.0，v2.0基于新的渲染模型，具有更高的渲染效率和">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://kinegratii.github.io/images/amap-heatmap.png">
+<meta property="og:updated_time" content="2020-11-08T06:32:52.265Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="高德地图热力图和设备监测">
+<meta name="twitter:description" content="A 热力图热力图以高亮形式显示数据密集程度。根据密集程度的不同，图上会呈现不同的颜色，以直观的形式展现数据密度。 在设备检测领域，采用热力图可以直观地显示哪些区域的设备具有很高的报警率，为监控决策和提前介入提供了数据依据。 AMap.Heatmap 是高德地图热力图插件，基于heatmapjs。高德地图API引用了heatmap.js最新版本v2.0，v2.0基于新的渲染模型，具有更高的渲染效率和">
+<meta name="twitter:image" content="http://kinegratii.github.io/images/amap-heatmap.png">
+  <link rel="alternate" href="/atom.xml" title="程序员Barnes的博客" type="application/atom+xml">
+  <link rel="canonical" href="http://kinegratii.github.io/2017/04/29/amap-heatmap/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>高德地图热力图和设备监测 | 程序员Barnes的博客</title>
+  <meta name="generator" content="Hexo 3.9.0">
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">程序员Barnes的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">逍遥于天地之间，而心意自得。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档<span class="badge">46</span></a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-topics">
+      
+    
+      
+    
+
+    <a href="/topics/" rel="section"><i class="menu-item-icon fa fa-fw fa-file"></i> <br>专题</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-library">
+      
+    
+      
+    
+
+    <a href="/library/" rel="section"><i class="menu-item-icon fa fa-fw fa-book"></i> <br>图书馆</a>
+
+  </li>
+      
+      
+      
+        
+          
+          
+          
+            
+            
+    
+  
+  <li class="menu-item menu-item-about">
+      
+    
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+
+
+          
+        
+          
+          
+          
+        
+          
+          
+          
+        
+      
+      
+      
+      
+        
+        <li class="menu-item menu-item-borax">
+      
+    
+      
+    
+
+    <a href="/borax-project/" rel="section"><i class="menu-item-icon fa fa-fw fa-tasks"></i> <br>Borax</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/kinegratii" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://kinegratii.github.io/2017/04/29/amap-heatmap/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="程序员Barnes">
+      <meta itemprop="description" content="逍遥于天地之间，而心意自得。">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="程序员Barnes的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">高德地图热力图和设备监测
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2017-04-29 18:42:05" itemprop="dateCreated datePublished" datetime="2017-04-29T18:42:05+08:00">2017-04-29</time>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/编程/" itemprop="url" rel="index"><span itemprop="name">编程</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            <span id="/2017/04/29/amap-heatmap/" class="post-meta-item leancloud_visitors" data-flag-title="高德地图热力图和设备监测" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+        
+      
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2017/04/29/amap-heatmap/#comments" itemprop="discussionUrl"><span class="post-comments-count valine-comment-count" data-xid="/2017/04/29/amap-heatmap/" itemprop="commentCount"></span></a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="A-热力图"><a href="#A-热力图" class="headerlink" title="A 热力图"></a>A 热力图</h2><p>热力图以高亮形式显示数据密集程度。根据密集程度的不同，图上会呈现不同的颜色，以直观的形式展现数据密度。</p>
+<p>在设备检测领域，采用热力图可以直观地显示哪些区域的设备具有很高的报警率，为监控决策和提前介入提供了数据依据。</p>
+<p><a href="http://lbs.amap.com/api/javascript-api/reference/layer/#m_AMap.Heatmap" target="_blank" rel="noopener">AMap.Heatmap</a> 是高德地图热力图插件，基于<a href="https://www.patrick-wied.at/static/heatmapjs/" target="_blank" rel="noopener">heatmapjs</a>。高德地图API引用了heatmap.js最新版本v2.0，v2.0基于新的渲染模型，具有更高的渲染效率和更强的性能。支持chrome、firefox、safari、ie9及以上浏览器。</p>
+<a id="more"></a>
+
+<h2 id="B-后端数据API"><a href="#B-后端数据API" class="headerlink" title="B 后端数据API"></a>B 后端数据API</h2><p>根据热力图的文档，后端API需要返回的数据格式如下：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">[</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="attr">"device_serial"</span>: <span class="string">"F023D02900010002"</span>,</span><br><span class="line">        <span class="attr">"lng"</span>: <span class="number">119.368489</span>,</span><br><span class="line">        <span class="attr">"lat"</span>: <span class="number">25.729161</span>,</span><br><span class="line">        <span class="attr">"address"</span>: <span class="string">"XXX"</span>,</span><br><span class="line">        <span class="attr">"count"</span>: <span class="number">830</span></span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="attr">"device_serial"</span>: <span class="string">"F023D02900010003"</span>,</span><br><span class="line">        <span class="attr">"lng"</span>: <span class="number">119.53378</span>,</span><br><span class="line">        <span class="attr">"lat"</span>: <span class="number">26.206372</span>,</span><br><span class="line">        <span class="attr">"address"</span>: <span class="string">"XXX"</span>,</span><br><span class="line">        <span class="attr">"count"</span>: <span class="number">220</span></span><br><span class="line">    &#125;</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+
+<p>总体为一个列表，每个元素表示一个设备，包括了设备序列号、设备经纬度、地址和报警数目。其中 <code>lng</code> 、 <code>lat</code> 和 <code>count</code> 是必要的数据，其他两个是可选的。</p>
+<h2 id="C-页面布局设计"><a href="#C-页面布局设计" class="headerlink" title="C 页面布局设计"></a>C 页面布局设计</h2><p>页面布局包括两大部分：</p>
+<ul>
+<li>地图控件(div#id_map_container)，放置地图的控件，必须设置其高度。</li>
+<li>时间选择器， 使用 <code>position: absolute;z-index: 2;</code>等样式，将时间段选择控件(div#id_time_radio_panel)以绝对定位方式放置在地图控件的右上角。</li>
+</ul>
+<p>最外层使用Bootstrap Panel作为容器，并实现了折叠(collapse)效果。</p>
+<blockquote>
+<p>时间选择器只提供了 “最近一年”和“全部”两个时段，时间段太短数据量偏少，不具有很好的代表性。</p>
+</blockquote>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"row"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"col-md-12"</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"panel panel-default"</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"panel-heading"</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">strong</span>&gt;</span>报警区域分布图<span class="tag">&lt;/<span class="name">strong</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"panel-body"</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"id_map_container"</span> <span class="attr">style</span>=<span class="string">"height: 655px;"</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;<span class="name">div</span>  <span class="attr">id</span>=<span class="string">"id_time_radio_panel"</span> <span class="attr">class</span>=<span class="string">"panel panel-default"</span></span></span><br><span class="line"><span class="tag">                         <span class="attr">style</span>=<span class="string">"position: absolute;width:23%;z-index: 2;top:5px;right: 5px;"</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"panel-heading"</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;<span class="name">a</span> <span class="attr">data-toggle</span>=<span class="string">"collapse"</span> <span class="attr">href</span>=<span class="string">"#id_time_radio"</span>&gt;</span>时间段设置<span class="tag">&lt;/<span class="name">a</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;<span class="name">div</span> <span class="attr">id</span>=<span class="string">"id_time_radio"</span> <span class="attr">class</span>=<span class="string">"collapse in"</span>&gt;</span></span><br><span class="line">                            <span class="tag">&lt;<span class="name">div</span> <span class="attr">class</span>=<span class="string">"panel-body"</span>&gt;</span></span><br><span class="line">                                <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"radio"</span> <span class="attr">name</span>=<span class="string">"timeDelta"</span> <span class="attr">value</span>=<span class="string">"365d"</span> <span class="attr">checked</span>/&gt;</span>最近一年&amp;nbsp;</span><br><span class="line">                                <span class="tag">&lt;<span class="name">input</span> <span class="attr">type</span>=<span class="string">"radio"</span> <span class="attr">name</span>=<span class="string">"timeDelta"</span> <span class="attr">value</span>=<span class="string">""</span>/&gt;</span>全部时间</span><br><span class="line">                            <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">                        <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">                    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="D-js实现"><a href="#D-js实现" class="headerlink" title="D js实现"></a>D js实现</h2><p>主要步骤如下：</p>
+<ol>
+<li>首先引入高德地图js库文件，使用注册好的API KEY。</li>
+<li>通过 <code>isSupportCanvas</code> 判断是否支持canvas，否则提示相关信息。</li>
+<li>创建地图对象，并初始化工具插件。</li>
+<li>编写时间选择器切换响应函数，在函数中请求远程数据，并渲染热力图层。</li>
+<li><code>setDataSet</code> 除了数据链表外，还需要设置热力图数值最大最小值。</li>
+<li>渲染完成后将地图移动到数值最大的点上。</li>
+</ol>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">loadHeatmapData</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> heatmap;</span><br><span class="line">    $.<span class="keyword">get</span>('/api/alarm/heatmap/?timeDelta=' + $("input[name=timeDelta]:checked").val(), function (data) &#123;</span><br><span class="line">        gMapObj.plugin([<span class="string">"AMap.Heatmap"</span>], <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">            <span class="comment">//初始化heatmap对象</span></span><br><span class="line">            heatmap = <span class="keyword">new</span> AMap.Heatmap(gMapObj, &#123;</span><br><span class="line">                radius: <span class="number">20</span>,</span><br><span class="line">                opacity: [<span class="number">0</span>, <span class="number">0.8</span>]</span><br><span class="line">            &#125;);</span><br><span class="line">            <span class="keyword">var</span> maxVal = <span class="number">0</span>, minVal = <span class="number">10000</span>;</span><br><span class="line">            <span class="keyword">var</span> cIndex = <span class="number">-1</span>;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; data.length; i++) &#123;</span><br><span class="line">                <span class="keyword">if</span> (data[i].count &gt; maxVal) &#123;</span><br><span class="line">                    maxVal = data[i].count;</span><br><span class="line">                    cIndex = i;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (data[i].count &lt; minVal) &#123;</span><br><span class="line">                    minVal = data[i].count;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            heatmap.setDataSet(&#123;</span><br><span class="line">                data: data,</span><br><span class="line">                max: maxVal,</span><br><span class="line">                min: minVal</span><br><span class="line">            &#125;);</span><br><span class="line">            <span class="keyword">if</span> (cIndex &gt; <span class="number">-1</span>) &#123;</span><br><span class="line">                gMapObj.setCenter(<span class="keyword">new</span> AMap.LngLat(data[cIndex].lng, data[cIndex].lat));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">isSupportCanvas</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> elem = <span class="built_in">document</span>.createElement(<span class="string">'canvas'</span>);</span><br><span class="line">    <span class="keyword">return</span> !!(elem.getContext &amp;&amp; elem.getContext(<span class="string">'2d'</span>));</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">var</span> gMapObj = <span class="keyword">new</span> AMap.Map(<span class="string">"id_map_container"</span>, &#123;</span><br><span class="line">    zoom: <span class="number">15</span></span><br><span class="line">&#125;);</span><br><span class="line">AMap.plugin([<span class="string">'AMap.ToolBar'</span>, <span class="string">'AMap.Scale'</span>], <span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">    gMapObj.addControl(<span class="keyword">new</span> AMap.ToolBar());</span><br><span class="line">    gMapObj.addControl(<span class="keyword">new</span> AMap.Scale());</span><br><span class="line">    gMapObj.addControl(<span class="keyword">new</span> AMap.OverView());</span><br><span class="line">&#125;);</span><br><span class="line"><span class="keyword">if</span> (!isSupportCanvas()) &#123;</span><br><span class="line">    alert(<span class="string">"'热力图仅对支持canvas的浏览器适用,您所使用的浏览器不能使用热力图功能,请换个浏览器试试"</span>);</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    loadHeatmapData();</span><br><span class="line">    $(<span class="string">":radio"</span>).click(<span class="function"><span class="keyword">function</span> (<span class="params"></span>) </span>&#123;</span><br><span class="line">        loadHeatmapData();</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="E-示例"><a href="#E-示例" class="headerlink" title="E 示例"></a>E 示例</h2><p>这是系统经过一个月运行后生成的热力图，虽然数据量还是偏少，但设备之间还是有很好的区分度，比如国惠大酒店旁的设备报警次数就比其他多了几个等级。</p>
+<p><img src="/images/amap-heatmap.png" alt="amap-heatmap"></p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      
+        <div class="popular-posts-date">2018-02-25</div>
+      
+      
+      <div class="popular-posts-title"><a href="/2018/02/25/django-echarts-030-release-note/" rel="bookmark">django-echarts v0.3 系列发布日志</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+        <div class="popular-posts-date">2017-09-06</div>
+      
+      
+      <div class="popular-posts-title"><a href="/2017/09/06/django-echarts-js-manage/" rel="bookmark">Django-Echarts系列：js依赖文件管理</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+        <div class="popular-posts-date">2017-11-23</div>
+      
+      
+      <div class="popular-posts-title"><a href="/2017/11/23/pyecharts-development-note/" rel="bookmark">pyecharts 开发笔记</a></div>
+      
+    </li>
+  
+  </ul>
+
+        
+      
+        <div id="reward-container">
+  <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+  <button id="reward-button" disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/wechat_reward.png" alt="程序员Barnes 微信支付">
+        <p>微信支付</p>
+      </div>
+
+  </div>
+</div>
+
+      
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>程序员Barnes</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://kinegratii.github.io/2017/04/29/amap-heatmap/" title="高德地图热力图和设备监测">http://kinegratii.github.io/2017/04/29/amap-heatmap/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+</div>
+
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/数据可视化/" rel="tag"><i class="fa fa-tag"></i> 数据可视化</a>
+            
+              <a href="/tags/Javascript/" rel="tag"><i class="fa fa-tag"></i> Javascript</a>
+            
+              <a href="/tags/高德地图/" rel="tag"><i class="fa fa-tag"></i> 高德地图</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2017/04/25/python-project-ci-publish/" rel="next" title="python项目持续集成与包发布">
+                  <i class="fa fa-chevron-left"></i> python项目持续集成与包发布
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2017/05/14/install-lxml-on-respberry-pi/" rel="prev" title="在树莓派安装lxml">
+                  在树莓派安装lxml <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="comments"></div>
+  
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#A-热力图"><span class="nav-text">A 热力图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#B-后端数据API"><span class="nav-text">B 后端数据API</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C-页面布局设计"><span class="nav-text">C 页面布局设计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#D-js实现"><span class="nav-text">D js实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#E-示例"><span class="nav-text">E 示例</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.jpg"
+      alt="程序员Barnes">
+  <p class="site-author-name" itemprop="name">程序员Barnes</p>
+  <div class="site-description" itemprop="description">逍遥于天地之间，而心意自得。</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">46</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/kinegratii" title="GitHub &rarr; https://github.com/kinegratii" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://my.oschina.net/kinegratii" title="oschina &rarr; https://my.oschina.net/kinegratii" rel="noopener" target="_blank"><i class="fa fa-fw fa-link"></i>oschina</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://kinegratii.github.io/borax/" title="Borax &rarr; https://kinegratii.github.io/borax/"><i class="fa fa-fw fa-link"></i>Borax</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2015 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">程序员Barnes</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  <script src="/lib/pjax/pjax.min.js?v=0.2.8"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[pjax], script#page-configurations, #pjax script').forEach(element => {
+    var id = element.id || '';
+    var src = element.src || '';
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (id !=='') {
+      script.id = element.id;
+    }
+    if (src !== '') {
+      script.src = src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+  var GUEST = ['nick', 'mail', 'link'];
+  var guest = 'nick,mail,link';
+  guest = guest.split(',').filter(item => {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#comments',
+    verify: false,
+    notify: false,
+    appId: 'YlSXBoomxn9Ws7GEb7bfJiaz-gzGzoHsz',
+    appKey: 'usgVEKYx48ugyhewgxrnLjFk',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: guest,
+    pageSize: '10' || 10,
+    visitor: true,
+    lang: '' || 'zh-cn',
+    path: location.pathname
+  });
+}, window.Valine);
+</script>
+
+    </div>
+</body>
+</html>

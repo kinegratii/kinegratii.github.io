@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/logo/apple_touch_icon.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/logo/logo_16.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-corner-indicator.min.css?v=1.0.2">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="本文依据《Python Packaging User Guide (Python打包用户手册)》，以 ConfStruct 为例子描述了Python项目的持续集成和包发布等开发流程，并了解 Travis CI、wheel和twine等工具的使用。  ConfStruct是一个使用类似ORM声明式描述特定场景下的协议数据结构，并提供Python对象和二进制数据之间的转化的Python库。该库解决了使">
+<meta name="keywords" content="Python,构建,测试,PyPI,持续集成">
+<meta property="og:type" content="article">
+<meta property="og:title" content="python项目持续集成与包发布">
+<meta property="og:url" content="http://kinegratii.github.io/2017/04/25/python-project-ci-publish/index.html">
+<meta property="og:site_name" content="程序员Barnes的博客">
+<meta property="og:description" content="本文依据《Python Packaging User Guide (Python打包用户手册)》，以 ConfStruct 为例子描述了Python项目的持续集成和包发布等开发流程，并了解 Travis CI、wheel和twine等工具的使用。  ConfStruct是一个使用类似ORM声明式描述特定场景下的协议数据结构，并提供Python对象和二进制数据之间的转化的Python库。该库解决了使">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://kinegratii.github.io/images/travis-build-success.png">
+<meta property="og:image" content="https://travis-ci.org/kinegratii/ConfStruct.svg?branch=master">
+<meta property="og:image" content="https://badge.fury.io/py/ConfStruct.svg">
+<meta property="og:updated_time" content="2020-11-08T06:32:52.269Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="python项目持续集成与包发布">
+<meta name="twitter:description" content="本文依据《Python Packaging User Guide (Python打包用户手册)》，以 ConfStruct 为例子描述了Python项目的持续集成和包发布等开发流程，并了解 Travis CI、wheel和twine等工具的使用。  ConfStruct是一个使用类似ORM声明式描述特定场景下的协议数据结构，并提供Python对象和二进制数据之间的转化的Python库。该库解决了使">
+<meta name="twitter:image" content="http://kinegratii.github.io/images/travis-build-success.png">
+  <link rel="alternate" href="/atom.xml" title="程序员Barnes的博客" type="application/atom+xml">
+  <link rel="canonical" href="http://kinegratii.github.io/2017/04/25/python-project-ci-publish/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>python项目持续集成与包发布 | 程序员Barnes的博客</title>
+  <meta name="generator" content="Hexo 3.9.0">
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">程序员Barnes的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">逍遥于天地之间，而心意自得。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档<span class="badge">46</span></a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-topics">
+      
+    
+      
+    
+
+    <a href="/topics/" rel="section"><i class="menu-item-icon fa fa-fw fa-file"></i> <br>专题</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-library">
+      
+    
+      
+    
+
+    <a href="/library/" rel="section"><i class="menu-item-icon fa fa-fw fa-book"></i> <br>图书馆</a>
+
+  </li>
+      
+      
+      
+        
+          
+          
+          
+            
+            
+    
+  
+  <li class="menu-item menu-item-about">
+      
+    
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+
+
+          
+        
+          
+          
+          
+        
+          
+          
+          
+        
+      
+      
+      
+      
+        
+        <li class="menu-item menu-item-borax">
+      
+    
+      
+    
+
+    <a href="/borax-project/" rel="section"><i class="menu-item-icon fa fa-fw fa-tasks"></i> <br>Borax</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/kinegratii" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://kinegratii.github.io/2017/04/25/python-project-ci-publish/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="程序员Barnes">
+      <meta itemprop="description" content="逍遥于天地之间，而心意自得。">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="程序员Barnes的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">python项目持续集成与包发布
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2017-04-25 18:11:18" itemprop="dateCreated datePublished" datetime="2017-04-25T18:11:18+08:00">2017-04-25</time>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/技术研究/" itemprop="url" rel="index"><span itemprop="name">技术研究</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            <span id="/2017/04/25/python-project-ci-publish/" class="post-meta-item leancloud_visitors" data-flag-title="python项目持续集成与包发布" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+        
+      
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2017/04/25/python-project-ci-publish/#comments" itemprop="discussionUrl"><span class="post-comments-count valine-comment-count" data-xid="/2017/04/25/python-project-ci-publish/" itemprop="commentCount"></span></a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>本文依据<a href="https://packaging.python.org/" target="_blank" rel="noopener">《Python Packaging User Guide (Python打包用户手册)》</a>，以 <a href="https://github.com/kinegratii/ConfStruct" target="_blank" rel="noopener">ConfStruct</a> 为例子描述了Python项目的持续集成和包发布等开发流程，并了解 Travis CI、wheel和twine等工具的使用。</p>
+<blockquote>
+<p>ConfStruct是一个使用类似ORM声明式描述特定场景下的协议数据结构，并提供Python对象和二进制数据之间的转化的Python库。该库解决了使用若干个“类型-长度-值”无序二进制片段传输字典的问题。</p>
+</blockquote>
+<p>主要步骤</p>
+<ul>
+<li>准备项目代码</li>
+<li>运行本地单元测试</li>
+<li>Travis持续集成</li>
+<li>编写setup.py文件</li>
+<li>生成wheel安装包</li>
+<li>发布到PyPI</li>
+<li>添加徽章</li>
+</ul>
+<a id="more"></a>
+
+<h2 id="1-准备项目代码"><a href="#1-准备项目代码" class="headerlink" title="1 准备项目代码"></a>1 准备项目代码</h2><p>首先准备好项目代码和文本，包括：</p>
+<ul>
+<li>源代码</li>
+<li>完全通过的测试用例代码</li>
+<li>requirements.txt依赖文件</li>
+<li>.gitignore文件</li>
+<li>[可选] README文件</li>
+<li>[可选] 开源协议文件</li>
+</ul>
+<h2 id="2-运行本地单元测试"><a href="#2-运行本地单元测试" class="headerlink" title="2 运行本地单元测试"></a>2 运行本地单元测试</h2><p>依据开发规范，测试代码放置在tests包下，每个测试文件以test_开头。Python的测试框架有：</p>
+<ul>
+<li><a href="https://docs.python.org/3/library/unittest.html" target="_blank" rel="noopener">unittest</a></li>
+<li><a href="http://pytest.org/" target="_blank" rel="noopener">pytest</a></li>
+<li><a href="https://nose.readthedocs.io/en/latest/" target="_blank" rel="noopener">nose</a></li>
+<li><a href="https://tox.readthedocs.io/en/latest/" target="_blank" rel="noopener">tox</a></li>
+</ul>
+<p>本博客使用的是最简单自带的unittest。执行以下命令以运行测试用例。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python -m unittest discover</span><br></pre></td></tr></table></figure>
+
+<p>结果如下，完全测试通过。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">E:\projects\ConfStruct&gt;python -m unittest discover</span><br><span class="line">.......</span><br><span class="line">----------------------------------------------------------------------</span><br><span class="line">Ran 7 tests in 0.002s</span><br><span class="line"></span><br><span class="line">OK</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-Travis持续集成"><a href="#3-Travis持续集成" class="headerlink" title="3 Travis持续集成"></a>3 Travis持续集成</h2><p>Travis是一个在线持续集成的平台，支持github登录。</p>
+<p>第一步，在项目根目录下创建 .travis.yaml文件，写入相关配置。</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">language:</span> <span class="string">python</span></span><br><span class="line"><span class="attr">python:</span></span><br><span class="line"><span class="bullet">  -</span> <span class="string">"2.7"</span></span><br><span class="line"><span class="bullet">  -</span> <span class="string">"3.4"</span></span><br><span class="line"><span class="bullet">  -</span> <span class="string">"3.5"</span></span><br><span class="line"><span class="bullet">  -</span> <span class="string">"3.6"</span></span><br><span class="line"><span class="attr">install:</span></span><br><span class="line"><span class="bullet">  -</span> <span class="string">pip</span> <span class="string">install</span> <span class="bullet">-r</span> <span class="string">requirements_dev.txt</span></span><br><span class="line"><span class="attr">script:</span> <span class="string">python</span> <span class="bullet">-m</span> <span class="string">unittest</span></span><br></pre></td></tr></table></figure>
+
+<p>该.travis.yaml文件表明ConfStruct项目需在python2.7和python3.4+环境下使用unittest进行单元测试，测试环境使用不同的依赖文件requirements_dev.txt。</p>
+<p>第二步，在github创建一个空项目。并使用github登录Travis,打开这个项目的自动构建开关，每当有新的push或者PR时就会自动触发，并给出是否构建成功的消息。</p>
+<p>第三步，使用git将本地代码上传到github，过一两分钟后可在Travis查看相关构建信息，下面是构建成功的结果：</p>
+<p><img src="/images/travis-build-success.png" alt="travis-build-success"></p>
+<h2 id="4-编写setup-py文件"><a href="#4-编写setup-py文件" class="headerlink" title="4 编写setup.py文件"></a>4 编写setup.py文件</h2><p>使用 setuptools来分发写好的模块。在项目目录下新建一个setup.py，主要内容类似如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">from __future__ import unicode_literals</span><br><span class="line"></span><br><span class="line">from setuptools import setup</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">lib_classifiers = [</span><br><span class="line">    &quot;Development Status :: 4 - Beta&quot;,</span><br><span class="line">    &quot;Programming Language :: Python :: 2&quot;,</span><br><span class="line">    &quot;Programming Language :: Python :: 2.7&quot;,</span><br><span class="line">    &quot;Programming Language :: Python :: 3&quot;,</span><br><span class="line">    &quot;Programming Language :: Python :: 3.4&quot;,</span><br><span class="line">    &quot;Programming Language :: Python :: 3.5&quot;,</span><br><span class="line">    &quot;Programming Language :: Python :: 3.6&quot;,</span><br><span class="line">    &quot;Intended Audience :: Developers&quot;,</span><br><span class="line">    &quot;License :: OSI Approved :: MIT License&quot;,</span><br><span class="line">    &quot;Topic :: Software Development :: Libraries&quot;,</span><br><span class="line">    &quot;Topic :: Utilities&quot;,</span><br><span class="line">]</span><br><span class="line"></span><br><span class="line">setup(name=&quot;ConfStruct&quot;,</span><br><span class="line">      version=&apos;0.5.0&apos;,</span><br><span class="line">      author=&quot;kinegratii&quot;,</span><br><span class="line">      author_email=&quot;kinegratii@gmail.com&quot;,</span><br><span class="line">      url=&quot;https://github.com/kinegratii/ConfStruct&quot;,</span><br><span class="line">      keywords=&quot;struct binary pack unpack&quot;,</span><br><span class="line">      py_modules=[&quot;conf_struct&quot;],</span><br><span class="line">      install_requires=[&apos;six&apos;],</span><br><span class="line">      description=&quot;A parser and builder between python objects and binary data for configure parameters.&quot;,</span><br><span class="line">      license=&quot;MIT&quot;,</span><br><span class="line">      classifiers=lib_classifiers</span><br><span class="line">      )</span><br></pre></td></tr></table></figure>
+
+<p><code>setuptools.setup</code> 函数，它描述了项目的一些基本信息，主要参数如下表</p>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>name</td>
+<td>名称，PyPI的唯一标识，不能与已有的冲突。</td>
+</tr>
+<tr>
+<td>version</td>
+<td>版本字符串，可以使用常量或者从库的 <code>__VERSION__</code> 导入。</td>
+</tr>
+<tr>
+<td>author</td>
+<td>作者</td>
+</tr>
+<tr>
+<td>author_email</td>
+<td>邮箱</td>
+</tr>
+<tr>
+<td>url</td>
+<td>项目主页</td>
+</tr>
+<tr>
+<td>py_modules</td>
+<td>源代码模块</td>
+</tr>
+<tr>
+<td>install_requires</td>
+<td>安装依赖，格式与requirements.txt相同</td>
+</tr>
+<tr>
+<td>license</td>
+<td>开源协议类型，如 MIT</td>
+</tr>
+<tr>
+<td>lib_classifiers</td>
+<td>分类标签，设置Python版本支持、操作系统支持、面向开发者或使用者、软件分类等信息。可用的选项在<a href="https://pypi.python.org/pypi?:action=list_classifiers" target="_blank" rel="noopener">这里</a> 可以找到</td>
+</tr>
+</tbody></table>
+<h2 id="5-生成wheel安装包"><a href="#5-生成wheel安装包" class="headerlink" title="5 生成wheel安装包"></a>5 生成wheel安装包</h2><p><a href="http://pythonwheels.com/" target="_blank" rel="noopener">wheel</a> 实际上是一个zip压缩包，是Python最新标准分发格式，用于替代eggs。和源代码编译相比，安装wheel无需经过 <em>构建</em> 这个流程，对于终端使用用户来说速度有了实质上的提升。</p>
+<p>在使用之前需要安装相关包，运行命令 <code>pip install wheel</code> 即可。</p>
+<p>wheel包按照是否纯Python包和23兼容性可分为三种，每种包所需运行的命令和生成的文件名称也有所不同。</p>
+<ul>
+<li>Universal Wheels：纯Python，无C扩展；直接(natively)支持Python2和Python3，通常会使用 <code>six</code> 、<code>futures</code>等兼容库或者 <code>__future__</code> 模块。</li>
+<li>Pure Python Wheels：纯Python，无C扩展；无法直接支持Python2和Python3，需要通过 2to3 工具转化</li>
+<li>Platform Wheels：针对特定的平台模块，通常是因为需要包含已编译的扩展。</li>
+</ul>
+<p>除了第一种Universal Wheels使用以下命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python setup.py bdist_wheel --universal</span><br></pre></td></tr></table></figure>
+
+<p>而 Pure Python Wheels 和 Platform Wheels无需添加 <code>--universal</code> 选项，该命令会检测是否是纯Python包。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python setup.py bdist_wheel</span><br></pre></td></tr></table></figure>
+
+<p>在这里要发布的是 Universal Wheels，需要添加 <code>--universal</code> 选项。</p>
+<p>运行后在dist目录下多了个 ConfStruct-0.5.0-py2.py3-none-any.whl 安装包，使用pip install 命令即可安装成功。根据 <a href="https://www.python.org/dev/peps/pep-0425/" target="_blank" rel="noopener">PEP425</a> 该安装包文件名遵守这样的规定：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;distribution&#125;-&#123;version&#125;(-&#123;build tag&#125;)?-&#123;python tag&#125;-&#123;abi tag&#125;-&#123;platform tag&#125;.whl</span><br></pre></td></tr></table></figure>
+
+<h2 id="6-发布到PyPI"><a href="#6-发布到PyPI" class="headerlink" title="6 发布到PyPI"></a>6 发布到PyPI</h2><p>PyPI目前有两个可用的网址:</p>
+<ul>
+<li>旧版 PyPI <a href="https://pypi.python.org/pypi" target="_blank" rel="noopener">https://pypi.python.org/pypi</a></li>
+<li>新版 Warehouse  <a href="https://pypi.org/" target="_blank" rel="noopener">https://pypi.org/</a>。Warehouse目前还处于开发状态(pre-production developement)，可以显示项目页面，但是页面内容简单，很多链接还是处于不可用状态。</li>
+</ul>
+<p><a href="https://pypi.python.org/pypi/twine" target="_blank" rel="noopener">twine</a> 是一个专门用于发布项目到PyPI的工具，可以使用 <code>pip install twine</code> 来安装，它的主要优点：</p>
+<ul>
+<li>安全的HTTPS传输</li>
+<li>上传过程中不要求执行setup.py脚本</li>
+<li>上传已经存在的文件，支持在发布前进行分发测试</li>
+<li>支持任意包格式，包括wheel</li>
+</ul>
+<p><strong>最新版本的twine无需注册这一步骤，可直接上传</strong>，执行命令 <code>twine register</code> 将显示 <code>HTTPError: 410 Client Error: This API is no longer supported, instead simply upload the file. for url: https://upload.pypi.org/legacy/</code>的错</p>
+<p>上传命令如下，在此过程中可能需要输入PyPI的用户名和密码，当然也可以使用 <code>.pypirc</code> 文件来避免多次输入。。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">twine upload dist/*</span><br><span class="line">Uploading distributions to https://upload.pypi.org/legacy/</span><br><span class="line">Enter your username: kinegratii</span><br><span class="line">Enter your password:</span><br><span class="line">Uploading ConfStruct-0.5.0-py2.py3-none-any.whl</span><br><span class="line">[================================] 4259/4259 - 00:00:08</span><br></pre></td></tr></table></figure>
+
+<p>当上传新版本时，最好指定新版本的安装包文件，如 <code>twine upload dist/ConfStruct-0.6.0-py2.py3-none-any.whl</code>，否则会出现文件已存在的错误。</p>
+<h2 id="7-添加徽章"><a href="#7-添加徽章" class="headerlink" title="7 添加徽章"></a>7 添加徽章</h2><p>在 <a href="https://badge.fury.io" target="_blank" rel="noopener">https://badge.fury.io</a> 中输入项目名称并查找，把markdown格式复制到README.md文件。</p>
+<p>点击Travis控制台build pass 图片并复制图片链接到README.md。如</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">![travis](https://travis-ci.org/kinegratii/ConfStruct.svg?branch=master)</span><br><span class="line">[![PyPI version](https://badge.fury.io/py/ConfStruct.svg)](https://badge.fury.io/py/ConfStruct)</span><br></pre></td></tr></table></figure>
+
+<p>效果图</p>
+<p><img src="https://travis-ci.org/kinegratii/ConfStruct.svg?branch=master" alt="travis"><br><img src="https://badge.fury.io/py/ConfStruct.svg" alt="PyPI version"></p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      
+        <div class="popular-posts-date">2016-04-23</div>
+      
+      
+      <div class="popular-posts-title"><a href="/2016/04/23/python-package/" rel="bookmark">python打包工具</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+        <div class="popular-posts-date">2017-04-07</div>
+      
+      
+      <div class="popular-posts-title"><a href="/2017/04/07/construct-python-binary-parse-build/" rel="bookmark">Construct：二进制数据解析器和构建器</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+        <div class="popular-posts-date">2018-06-10</div>
+      
+      
+      <div class="popular-posts-title"><a href="/2018/06/10/my-python-packages-and-libraries/" rel="bookmark">我的 Python 第三方库</a></div>
+      
+    </li>
+  
+  </ul>
+
+        
+      
+        <div id="reward-container">
+  <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+  <button id="reward-button" disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/wechat_reward.png" alt="程序员Barnes 微信支付">
+        <p>微信支付</p>
+      </div>
+
+  </div>
+</div>
+
+      
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>程序员Barnes</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://kinegratii.github.io/2017/04/25/python-project-ci-publish/" title="python项目持续集成与包发布">http://kinegratii.github.io/2017/04/25/python-project-ci-publish/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+</div>
+
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/Python/" rel="tag"><i class="fa fa-tag"></i> Python</a>
+            
+              <a href="/tags/构建/" rel="tag"><i class="fa fa-tag"></i> 构建</a>
+            
+              <a href="/tags/测试/" rel="tag"><i class="fa fa-tag"></i> 测试</a>
+            
+              <a href="/tags/PyPI/" rel="tag"><i class="fa fa-tag"></i> PyPI</a>
+            
+              <a href="/tags/持续集成/" rel="tag"><i class="fa fa-tag"></i> 持续集成</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2017/04/07/construct-python-binary-parse-build/" rel="next" title="Construct：二进制数据解析器和构建器">
+                  <i class="fa fa-chevron-left"></i> Construct：二进制数据解析器和构建器
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2017/04/29/amap-heatmap/" rel="prev" title="高德地图热力图和设备监测">
+                  高德地图热力图和设备监测 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="comments"></div>
+  
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-准备项目代码"><span class="nav-text">1 准备项目代码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-运行本地单元测试"><span class="nav-text">2 运行本地单元测试</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Travis持续集成"><span class="nav-text">3 Travis持续集成</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-编写setup-py文件"><span class="nav-text">4 编写setup.py文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-生成wheel安装包"><span class="nav-text">5 生成wheel安装包</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-发布到PyPI"><span class="nav-text">6 发布到PyPI</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-添加徽章"><span class="nav-text">7 添加徽章</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.jpg"
+      alt="程序员Barnes">
+  <p class="site-author-name" itemprop="name">程序员Barnes</p>
+  <div class="site-description" itemprop="description">逍遥于天地之间，而心意自得。</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">46</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/kinegratii" title="GitHub &rarr; https://github.com/kinegratii" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://my.oschina.net/kinegratii" title="oschina &rarr; https://my.oschina.net/kinegratii" rel="noopener" target="_blank"><i class="fa fa-fw fa-link"></i>oschina</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://kinegratii.github.io/borax/" title="Borax &rarr; https://kinegratii.github.io/borax/"><i class="fa fa-fw fa-link"></i>Borax</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2015 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">程序员Barnes</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  <script src="/lib/pjax/pjax.min.js?v=0.2.8"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[pjax], script#page-configurations, #pjax script').forEach(element => {
+    var id = element.id || '';
+    var src = element.src || '';
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (id !=='') {
+      script.id = element.id;
+    }
+    if (src !== '') {
+      script.src = src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+  var GUEST = ['nick', 'mail', 'link'];
+  var guest = 'nick,mail,link';
+  guest = guest.split(',').filter(item => {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#comments',
+    verify: false,
+    notify: false,
+    appId: 'YlSXBoomxn9Ws7GEb7bfJiaz-gzGzoHsz',
+    appKey: 'usgVEKYx48ugyhewgxrnLjFk',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: guest,
+    pageSize: '10' || 10,
+    visitor: true,
+    lang: '' || 'zh-cn',
+    path: location.pathname
+  });
+}, window.Valine);
+</script>
+
+    </div>
+</body>
+</html>

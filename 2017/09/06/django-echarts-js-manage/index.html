@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/logo/apple_touch_icon.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/logo/logo_16.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-corner-indicator.min.css?v=1.0.2">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="本文已收录于 《pyecharts 开发专辑》 。  django-echarts 是本人正在开发的一个开源项目，该项目旨在将 pyecharts 库整合到Django web框架中，从而形成echarts-python-django 大整合的项目。 继之前简单的一个使用示例之后，最近花了几天完成了一种的一个功能插件：js依赖文件管理。">
+<meta name="keywords" content="数据可视化">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Django-Echarts系列：js依赖文件管理">
+<meta property="og:url" content="http://kinegratii.github.io/2017/09/06/django-echarts-js-manage/index.html">
+<meta property="og:site_name" content="程序员Barnes的博客">
+<meta property="og:description" content="本文已收录于 《pyecharts 开发专辑》 。  django-echarts 是本人正在开发的一个开源项目，该项目旨在将 pyecharts 库整合到Django web框架中，从而形成echarts-python-django 大整合的项目。 继之前简单的一个使用示例之后，最近花了几天完成了一种的一个功能插件：js依赖文件管理。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2020-11-08T06:32:52.269Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Django-Echarts系列：js依赖文件管理">
+<meta name="twitter:description" content="本文已收录于 《pyecharts 开发专辑》 。  django-echarts 是本人正在开发的一个开源项目，该项目旨在将 pyecharts 库整合到Django web框架中，从而形成echarts-python-django 大整合的项目。 继之前简单的一个使用示例之后，最近花了几天完成了一种的一个功能插件：js依赖文件管理。">
+  <link rel="alternate" href="/atom.xml" title="程序员Barnes的博客" type="application/atom+xml">
+  <link rel="canonical" href="http://kinegratii.github.io/2017/09/06/django-echarts-js-manage/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Django-Echarts系列：js依赖文件管理 | 程序员Barnes的博客</title>
+  <meta name="generator" content="Hexo 3.9.0">
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">程序员Barnes的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">逍遥于天地之间，而心意自得。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档<span class="badge">46</span></a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-topics">
+      
+    
+      
+    
+
+    <a href="/topics/" rel="section"><i class="menu-item-icon fa fa-fw fa-file"></i> <br>专题</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-library">
+      
+    
+      
+    
+
+    <a href="/library/" rel="section"><i class="menu-item-icon fa fa-fw fa-book"></i> <br>图书馆</a>
+
+  </li>
+      
+      
+      
+        
+          
+          
+          
+            
+            
+    
+  
+  <li class="menu-item menu-item-about">
+      
+    
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+
+
+          
+        
+          
+          
+          
+        
+          
+          
+          
+        
+      
+      
+      
+      
+        
+        <li class="menu-item menu-item-borax">
+      
+    
+      
+    
+
+    <a href="/borax-project/" rel="section"><i class="menu-item-icon fa fa-fw fa-tasks"></i> <br>Borax</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/kinegratii" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://kinegratii.github.io/2017/09/06/django-echarts-js-manage/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="程序员Barnes">
+      <meta itemprop="description" content="逍遥于天地之间，而心意自得。">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="程序员Barnes的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">Django-Echarts系列：js依赖文件管理
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2017-09-06 11:35:47" itemprop="dateCreated datePublished" datetime="2017-09-06T11:35:47+08:00">2017-09-06</time>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/技术研究/" itemprop="url" rel="index"><span itemprop="name">技术研究</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            <span id="/2017/09/06/django-echarts-js-manage/" class="post-meta-item leancloud_visitors" data-flag-title="Django-Echarts系列：js依赖文件管理" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+        
+      
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2017/09/06/django-echarts-js-manage/#comments" itemprop="discussionUrl"><span class="post-comments-count valine-comment-count" data-xid="/2017/09/06/django-echarts-js-manage/" itemprop="commentCount"></span></a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <blockquote>
+<p>本文已收录于 <a href="/pyecharts-project/">《pyecharts 开发专辑》</a> 。</p>
+</blockquote>
+<p><a href="https://github.com/kinegratii/django-echarts" target="_blank" rel="noopener">django-echarts</a> 是本人正在开发的一个开源项目，该项目旨在将 <a href="https://github.com/chenjiandongx/pyecharts" target="_blank" rel="noopener">pyecharts</a> 库整合到Django web框架中，从而形成echarts-python-django 大整合的项目。</p>
+<p>继之前简单的一个使用示例之后，最近花了几天完成了一种的一个功能插件：js依赖文件管理。</p>
+<a id="more"></a>
+
+<h2 id="1-Django-Echarts概述"><a href="#1-Django-Echarts概述" class="headerlink" title="1 Django-Echarts概述"></a>1 Django-Echarts概述</h2><p>django-echarts这个项目的目标和pyecharts是一致的，即在目标html页面上渲染图表。要完成一个Echarts图表，从最后渲染完成的HTML结构来看，至少应当包含以下三个部分：</p>
+<ul>
+<li>图表容器控件，比如<code>&lt;div id=&quot;id_mycharts&quot;&gt;&lt;/div&gt;</code></li>
+<li>js依赖文件，比如 <code>&lt;script src=&#39;/static/echarts/echarts.min.js&#39;&gt;&lt;/script&gt;</code></li>
+<li>图表初始化代码,代码中 <code>myCharts.setOptions(Foo)</code> 所在的script标签。</li>
+</ul>
+<p>这个排序按照一般出现的顺序，将所有 script 标签放置在body标签的最后，有利于页面的加载。</p>
+<p>在这一过程中，pyecharts 项目为此做了大量的工作，使得我们能够快速地依据功能要求构建出模板渲染所需的数据，这些数据在Django模板系统中称之为 <em>Context</em>。</p>
+<p>在实际应用过程中，每个页面的结构都是各式各样的，不能一概而论，因此django-echarts的主要职责：</p>
+<ul>
+<li>如何创建上述三个标签（代码片段）。</li>
+<li>上述标签在目标html的位置和结构由用户选择。</li>
+<li>对于一些简单的页面，可以提供一些shortcut工具。</li>
+</ul>
+<h2 id="2-设计思路"><a href="#2-设计思路" class="headerlink" title="2 设计思路"></a>2 设计思路</h2><h3 id="2-1-目标"><a href="#2-1-目标" class="headerlink" title="2.1 目标"></a>2.1 目标</h3><p>三者之前没有太大的关联性，是可以单独拿出来讨论其设计思想和实现方式的。js 依赖文件管理最终的目标是<strong>构建js文件路径字符串</strong>。</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">'/static/echarts/echarts.min.js'</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">script</span> <span class="attr">src</span>=<span class="string">'/static/echarts/map/china.js'</span>&gt;</span><span class="tag">&lt;/<span class="name">script</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p> 虽然最后生成的是一个或多个script标签，但依据 Django MTV 原则，标签的构建应当由模板系统负责。</p>
+</blockquote>
+<p>核心的src属性由路径和js文件名两部分组成。路径的意义在于，对于同一个 echarts.min.js 可以由不同的地方提供，这称之为repository。而文件名是由用户输入提供的。使用代码表示如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">generte_js_link</span><span class="params">(js_name)</span>:</span></span><br><span class="line">    host = <span class="string">''</span> <span class="comment"># TODO Where to pick a host according the settings</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">'&#123;host&#125;/&#123;js_name&#125;.js'</span>.format(host=host, js_name=js_name)</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-2-问题"><a href="#2-2-问题" class="headerlink" title="2.2 问题"></a>2.2 问题</h3><p>综上所述，js 依赖文件管理解决的问题：</p>
+<ul>
+<li>需要管理哪些依赖文件</li>
+<li>哪些repository可以提供js文件，其中哪些可以实现对其的支持。</li>
+<li>如何在不同repository之间尽可能平稳的切换，即它们之间必须提供统一的API</li>
+<li>需要对外提供哪些API，即在哪些情况下可能使用到这个功能</li>
+</ul>
+<h2 id="3-仓库-repository-与文件"><a href="#3-仓库-repository-与文件" class="headerlink" title="3 仓库(repository)与文件"></a>3 仓库(repository)与文件</h2><p>按照正常逻辑，文件名由用户根据实际功能需求指定，其有效性应当交由用户确保。在实际过程不同repository可提供的文件是不一样。js文件分为核心库文件和地图数据文件两种。pyecharts能够提供本地和远程两种类型的repository，加上Django整合时，项目静态文件也可以作为一种repository存在，因此共有三种。</p>
+<p>将repository和文件类型进行交叉分析，可整理出以下的一张表格：</p>
+<table>
+<thead>
+<tr>
+<th>仓库</th>
+<th>核心库文件</th>
+<th>地图数据文件</th>
+<th>核心库版本支持</th>
+<th>远程/ 本地</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>pyecharts本地</td>
+<td>可提供</td>
+<td>可提供</td>
+<td>无，不可控</td>
+<td>本地</td>
+</tr>
+<tr>
+<td>pyecharts远程</td>
+<td>可提供</td>
+<td>可提供</td>
+<td>无，不可控</td>
+<td>远程</td>
+</tr>
+<tr>
+<td>官方CDN</td>
+<td>不提供</td>
+<td>提供</td>
+<td>-</td>
+<td>远程</td>
+</tr>
+<tr>
+<td>公共CDN</td>
+<td>可提供</td>
+<td>不提供</td>
+<td>支持</td>
+<td>远程</td>
+</tr>
+<tr>
+<td>项目静态目录</td>
+<td>可自定义</td>
+<td>可自定义</td>
+<td>可自定义</td>
+<td>本地</td>
+</tr>
+</tbody></table>
+<p>分析如下：</p>
+<ul>
+<li>首先的是pyecharts本地作为存储仓库是不太合适，同为本地文件存储，Django项目静态库显然是一个更为合适的选择。</li>
+<li>pyecharts远程库，路径为 <a href="https://chfw.github.io/jupyter-echarts/echarts，" target="_blank" rel="noopener">https://chfw.github.io/jupyter-echarts/echarts，</a> 该库的优势在于提供了一些列的自定义地图，但弱势是核心库文件没有版本管理，而且 github 仓库不建议作为静态文件托管服务。</li>
+<li>官方CDN：其实指的是地图文件数据下载的源地址。</li>
+<li>公共CDN：优势在于支持版本管理，缺点是不提供地图数据文件。公共CDN仅选择<a href="http://echarts.baidu.com/tutorial.html" target="_blank" rel="noopener">Echarts官方教程</a>提及的三个CDN，其余的已经很久没有更新了。</li>
+<li>项目静态目录：通常由 <code>setttings.STATIC_URL</code>指定。 这是开发者自己从零开始构建的，因此自由度最大。为了方便，可开发从其他远程仓库下载文件的功能。</li>
+</ul>
+<p>一个通常的使用场景如下：</p>
+<ul>
+<li>试验django-echarts，仅使用远程仓库，这样不必配置静态文件设置等。</li>
+<li>如果可用，通过下载工具下载到本地，并进行一系列开发。</li>
+<li>部署上线时，根据需要切换到CDN。</li>
+</ul>
+<h2 id="4-配置"><a href="#4-配置" class="headerlink" title="4 配置"></a>4 配置</h2><h3 id="4-1-基本配置"><a href="#4-1-基本配置" class="headerlink" title="4.1 基本配置"></a>4.1 基本配置</h3><p>配置是项目初始化需要使用的。默认的配置如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">DEFAULT_SETTINGS = &#123;</span><br><span class="line">    <span class="string">'echarts_version'</span>: <span class="string">'3.7.0'</span>,</span><br><span class="line">    <span class="string">'lib_js_host'</span>: <span class="string">'bootcdn'</span>,</span><br><span class="line">    <span class="string">'map_js_host'</span>: <span class="string">'echarts'</span>,</span><br><span class="line">    <span class="string">'local_host'</span>: <span class="literal">None</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在实际运行之前，会将用户自定义配置和默认配置进行合并，并向外提供统一的模块变量用于访问。</p>
+<blockquote>
+<p>关于这一部分可以期待之后的《django-echarts系列：配置模块》一文。</p>
+</blockquote>
+<p>由于核心库文件和地图数据文件需要分开托管，因此需要使用两个变量分别指定和设置。二者都有自己有效的可选值。</p>
+<h3 id="4-2-远程-本地切换"><a href="#4-2-远程-本地切换" class="headerlink" title="4.2 远程/本地切换"></a>4.2 远程/本地切换</h3><p> <code>local_host</code>的作用有两点：</p>
+<ul>
+<li>提供公用变量，当 <code>lib_js_host</code> 和 <code>map_js_host</code> 同时指定本地仓库时，可以借助该变量</li>
+<li>下载工具的目标目录。</li>
+</ul>
+<h2 id="5-运行分析"><a href="#5-运行分析" class="headerlink" title="5 运行分析"></a>5 运行分析</h2><h3 id="5-1-分开托管和文件识别"><a href="#5-1-分开托管和文件识别" class="headerlink" title="5.1 分开托管和文件识别"></a>5.1 分开托管和文件识别</h3><p>由于不同仓库提供的文件不同，通常分为可提供核心库文件和地图数据文件，因此需要分别两个查询表（在Python使用一个dict表示即可）。</p>
+<p>这就带来了一个问题：用户输入的是 js_name，只有这个参数，而且由于自定义地图文件，理论上可以是任何一个有效的文件名字符串，如何识别为核心库文件还是地图数据文件，即从哪个字典查询，成了一个待解决的问题。</p>
+<p>这个没有一个百分百正确的答案。目前采用一个简单办法：由于公共CDN提供的核心库文件是一定的，可提供一个核心库文件列表，判断js_name是否在其中即可。</p>
+<h3 id="5-2-输出URL"><a href="#5-2-输出URL" class="headerlink" title="5.2 输出URL"></a>5.2 输出URL</h3><p>当确定完某一个仓库后，之后的url构建就比较简单了，本质上来说是python string format的一些封装。仓库路径具体和一些因素有关，这些因素都需要在项目初始化就已经确定了，放在 settings 模块是最为合适了。目前支持以下字段：</p>
+<ul>
+<li>echarts_version：版本字符串，一些公共CDN需要指定版本号。</li>
+<li>STATIC_URL：静态文件目录，通常用于项目本地仓库，该值等于<code>settings.STATIC_URL</code>.</li>
+</ul>
+<p>在实现过程中，也有两点问题需要注意：</p>
+<ul>
+<li>字段的大小写问题，为了和<code>settings.STATIC_URL</code>一致，也采用了大写变量</li>
+<li>目录后缀<code>/</code> ,依据Django规范 STATIC_URL是带有/的，而pyecharts的远程路径没有带有/，以及自己设置的第三方CDN中，这个问题需要作统一处理。目前是按照pyecharts没有带有/，不排除之后会依照Django规范，但是对外部使用是没有任何影响的。</li>
+</ul>
+<p>基本代码</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Host</span><span class="params">(object)</span>:</span></span><br><span class="line">    HOST_LOOKUP = &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, name_or_host, context=None, host_lookup=None, **kwargs)</span>:</span></span><br><span class="line">        context = context <span class="keyword">or</span> &#123;&#125;</span><br><span class="line">        host_lookup = host_lookup <span class="keyword">or</span> self.HOST_LOOKUP</span><br><span class="line">        host = host_lookup.get(name_or_host, name_or_host)</span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            self._host = host.format(**context).rstrip(<span class="string">'/'</span>)</span><br><span class="line">        <span class="keyword">except</span> KeyError <span class="keyword">as</span> e:</span><br><span class="line">            self._host = <span class="literal">None</span></span><br><span class="line">            <span class="keyword">raise</span> KeyError(<span class="string">'The "&#123;0&#125;" value is not applied for the host.'</span>.format(*e.args))</span><br><span class="line"></span><br><span class="line"><span class="meta">    @property</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">host_url</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> self._host</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">generate_js_link</span><span class="params">(self, js_name)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">'&#123;0&#125;/&#123;1&#125;.js'</span>.format(self._host, js_name)</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-3-渲染html"><a href="#5-3-渲染html" class="headerlink" title="5.3 渲染html"></a>5.3 渲染html</h3><p>这一过程是Django模板系统负责的，为了方面可以自定义一个模板标签echarts_js_dependencies解决这个问题。</p>
+<p>以下是基本代码</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@register.simple_tag(takes_context=True)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">echarts_js_dependencies</span><span class="params">(context, *args)</span>:</span></span><br><span class="line">    links = []</span><br><span class="line">    <span class="keyword">for</span> option_or_name <span class="keyword">in</span> args:</span><br><span class="line">        <span class="keyword">if</span> isinstance(option_or_name, Base):</span><br><span class="line">            <span class="keyword">for</span> js_name <span class="keyword">in</span> option_or_name.get_js_dependencies():</span><br><span class="line">                <span class="keyword">if</span> js_name <span class="keyword">not</span> <span class="keyword">in</span> links:</span><br><span class="line">                    links.append(js_name)</span><br><span class="line">        <span class="keyword">elif</span> isinstance(option_or_name, six.text_type):</span><br><span class="line">            <span class="keyword">if</span> option_or_name <span class="keyword">not</span> <span class="keyword">in</span> links:</span><br><span class="line">                links.append(option_or_name)</span><br><span class="line">    links = map(DJANGO_ECHARTS_SETTING.host_store.generate_js_link, links)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> template.Template(<span class="string">'&lt;br/&gt;'</span>.join([<span class="string">'&lt;script src="&#123;link&#125;"&gt;&lt;/script&gt;'</span>.format(link=l) <span class="keyword">for</span> l <span class="keyword">in</span> links])).render(</span><br><span class="line">        context)</span><br></pre></td></tr></table></figure>
+
+<p>有几个注意点：</p>
+<ul>
+<li>标签是支持多个script渲染的。</li>
+<li>为了方便，列表的每一项支持 文件名或者 <code>pyecharts.base.Base</code>对象。</li>
+<li>在多个标签输出时，需要去掉那些重复的文件。</li>
+<li>因为html结构简单，所以使用<code>register.simple_tag</code> 就可以了。</li>
+</ul>
+<h2 id="6-CLI与Django命令"><a href="#6-CLI与Django命令" class="headerlink" title="6 CLI与Django命令"></a>6 CLI与Django命令</h2><p>基于 django manage command 实现一个简单的 CLI，其核心功能是js文件下载。</p>
+<p>下载工具提供将远程的js文件同步到本地静态文件目录中。该功能为manage命令，需符合其的一些用法规范。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">usage: manage.py download_echarts_js [-h] [--version] [-v &#123;0,1,2,3&#125;]</span><br><span class="line">                                     [--settings SETTINGS]</span><br><span class="line">                                     [--pythonpath PYTHONPATH] [--traceback]</span><br><span class="line">                                     [--no-color] [--js_host JS_HOST]</span><br><span class="line">                                     js_name [js_name ...]</span><br></pre></td></tr></table></figure>
+
+<p>远程仓库的选择和限制条件可以使用伪代码表示如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">host = &apos;&apos;</span><br><span class="line">if(命令提供了--js_host参数)&#123;</span><br><span class="line">    host = js_host参数值</span><br><span class="line">&#125;else&#123;</span><br><span class="line">    if(js_name是否和核心库文件)&#123;</span><br><span class="line">        host = settings.DJANGO_ECHARTS[&apos;lib_js_host&apos;]</span><br><span class="line">    &#125;else&#123;</span><br><span class="line">        host = settings.DJANGO_ECHARTS[&apos;map_js_host&apos;]</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">if(host不是本地仓库)&#123;</span><br><span class="line">    执行后续操作</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>本地仓库的选择：只有一个限制条件就是符合本地仓库的要求，即必须以 settings.STATIC_URL 开头。</p>
+<p>在配置方面（源目录、目标目录）仅支持 <code>DJANGO_ECHARTS</code> ，暂时还不支持命令行参数传入。这是下一阶段的重点内容。</p>
+<h2 id="7-和pyecharts的异同"><a href="#7-和pyecharts的异同" class="headerlink" title="7 和pyecharts的异同"></a>7 和pyecharts的异同</h2><h3 id="7-1-扩展和取舍"><a href="#7-1-扩展和取舍" class="headerlink" title="7.1 扩展和取舍"></a>7.1 扩展和取舍</h3><p>Django-Echarts是pyecharts在Django环境的适配，在此过程中难免有所扩展和舍弃。</p>
+<ul>
+<li>在本地存储（离线模式）中，使用Django项目静态目录取代pyecharts本地js存储，并提供一个下载工具将远程js文件下载到Django静态目录，以便平稳过渡。</li>
+<li>提供一些常用CDN。</li>
+<li>分析ECharts组成，提供一些模板标签渲染Echarts的每个部件。</li>
+</ul>
+<blockquote>
+<p>由于 pyecharts 尚未实现本地 js 库的完全独立，django_echarts 只是从形式上实现独立，在实际运行过程中还会引用js相关内容，期待pyecharts在这方面有所发展。</p>
+</blockquote>
+<h3 id="7-2-展望"><a href="#7-2-展望" class="headerlink" title="7.2 展望"></a>7.2 展望</h3><p> 本项目是基于 pyecharts 而发展的。<a href="https://github.com/chenjiandongx/pyecharts" target="_blank" rel="noopener">pyecharts</a>是一个非常棒的项目，解决在Python中使用echarts的问题，加强了Python在数据可视化方面的应用。</p>
+<p>另一方面pyecharts刚刚面世两三个，目前着重于Echarts实例创建这一问题上，对于外围环境的问题涉及有所不足。</p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      
+        <div class="popular-posts-date">2017-04-29</div>
+      
+      
+      <div class="popular-posts-title"><a href="/2017/04/29/amap-heatmap/" rel="bookmark">高德地图热力图和设备监测</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+        <div class="popular-posts-date">2018-02-25</div>
+      
+      
+      <div class="popular-posts-title"><a href="/2018/02/25/django-echarts-030-release-note/" rel="bookmark">django-echarts v0.3 系列发布日志</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+        <div class="popular-posts-date">2017-11-23</div>
+      
+      
+      <div class="popular-posts-title"><a href="/2017/11/23/pyecharts-development-note/" rel="bookmark">pyecharts 开发笔记</a></div>
+      
+    </li>
+  
+  </ul>
+
+        
+      
+        <div id="reward-container">
+  <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+  <button id="reward-button" disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/wechat_reward.png" alt="程序员Barnes 微信支付">
+        <p>微信支付</p>
+      </div>
+
+  </div>
+</div>
+
+      
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>程序员Barnes</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://kinegratii.github.io/2017/09/06/django-echarts-js-manage/" title="Django-Echarts系列：js依赖文件管理">http://kinegratii.github.io/2017/09/06/django-echarts-js-manage/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+</div>
+
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/数据可视化/" rel="tag"><i class="fa fa-tag"></i> 数据可视化</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2017/08/27/typescript-declaration-file/" rel="next" title="typescript声明文件">
+                  <i class="fa fa-chevron-left"></i> typescript声明文件
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2017/09/25/django2-url-path/" rel="prev" title="django2笔记:路由path语法">
+                  django2笔记:路由path语法 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="comments"></div>
+  
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Django-Echarts概述"><span class="nav-text">1 Django-Echarts概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-设计思路"><span class="nav-text">2 设计思路</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-目标"><span class="nav-text">2.1 目标</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-问题"><span class="nav-text">2.2 问题</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-仓库-repository-与文件"><span class="nav-text">3 仓库(repository)与文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-配置"><span class="nav-text">4 配置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-基本配置"><span class="nav-text">4.1 基本配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-远程-本地切换"><span class="nav-text">4.2 远程/本地切换</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-运行分析"><span class="nav-text">5 运行分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-分开托管和文件识别"><span class="nav-text">5.1 分开托管和文件识别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-输出URL"><span class="nav-text">5.2 输出URL</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-3-渲染html"><span class="nav-text">5.3 渲染html</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-CLI与Django命令"><span class="nav-text">6 CLI与Django命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-和pyecharts的异同"><span class="nav-text">7 和pyecharts的异同</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#7-1-扩展和取舍"><span class="nav-text">7.1 扩展和取舍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-2-展望"><span class="nav-text">7.2 展望</span></a></li></ol></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.jpg"
+      alt="程序员Barnes">
+  <p class="site-author-name" itemprop="name">程序员Barnes</p>
+  <div class="site-description" itemprop="description">逍遥于天地之间，而心意自得。</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">46</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/kinegratii" title="GitHub &rarr; https://github.com/kinegratii" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://my.oschina.net/kinegratii" title="oschina &rarr; https://my.oschina.net/kinegratii" rel="noopener" target="_blank"><i class="fa fa-fw fa-link"></i>oschina</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://kinegratii.github.io/borax/" title="Borax &rarr; https://kinegratii.github.io/borax/"><i class="fa fa-fw fa-link"></i>Borax</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2015 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">程序员Barnes</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  <script src="/lib/pjax/pjax.min.js?v=0.2.8"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[pjax], script#page-configurations, #pjax script').forEach(element => {
+    var id = element.id || '';
+    var src = element.src || '';
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (id !=='') {
+      script.id = element.id;
+    }
+    if (src !== '') {
+      script.src = src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+  var GUEST = ['nick', 'mail', 'link'];
+  var guest = 'nick,mail,link';
+  guest = guest.split(',').filter(item => {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#comments',
+    verify: false,
+    notify: false,
+    appId: 'YlSXBoomxn9Ws7GEb7bfJiaz-gzGzoHsz',
+    appKey: 'usgVEKYx48ugyhewgxrnLjFk',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: guest,
+    pageSize: '10' || 10,
+    visitor: true,
+    lang: '' || 'zh-cn',
+    path: location.pathname
+  });
+}, window.Valine);
+</script>
+
+    </div>
+</body>
+</html>

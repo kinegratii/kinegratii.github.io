@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/logo/apple_touch_icon.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/logo/logo_16.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-corner-indicator.min.css?v=1.0.2">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="9月23，Django 发布了2.0a1版本，这是一个 feature freeze 版本，如果没有什么意外的话，2.0正式版不会再增加新的功能了。按照以往的规律，预计正式版将在12月发布。  备注：Django 2.0 于12月2日已经正式发布。 （链接）  2.0无疑是一个里程碑版本，移除了对 Python2.7 的支持，最少需要 3.4 以上，建议使用3.5以上的版本。">
+<meta name="keywords" content="Django">
+<meta property="og:type" content="article">
+<meta property="og:title" content="django2笔记:路由path语法">
+<meta property="og:url" content="http://kinegratii.github.io/2017/09/25/django2-url-path/index.html">
+<meta property="og:site_name" content="程序员Barnes的博客">
+<meta property="og:description" content="9月23，Django 发布了2.0a1版本，这是一个 feature freeze 版本，如果没有什么意外的话，2.0正式版不会再增加新的功能了。按照以往的规律，预计正式版将在12月发布。  备注：Django 2.0 于12月2日已经正式发布。 （链接）  2.0无疑是一个里程碑版本，移除了对 Python2.7 的支持，最少需要 3.4 以上，建议使用3.5以上的版本。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://kinegratii.github.io/images/django.png">
+<meta property="og:updated_time" content="2020-11-08T06:32:52.269Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="django2笔记:路由path语法">
+<meta name="twitter:description" content="9月23，Django 发布了2.0a1版本，这是一个 feature freeze 版本，如果没有什么意外的话，2.0正式版不会再增加新的功能了。按照以往的规律，预计正式版将在12月发布。  备注：Django 2.0 于12月2日已经正式发布。 （链接）  2.0无疑是一个里程碑版本，移除了对 Python2.7 的支持，最少需要 3.4 以上，建议使用3.5以上的版本。">
+<meta name="twitter:image" content="http://kinegratii.github.io/images/django.png">
+  <link rel="alternate" href="/atom.xml" title="程序员Barnes的博客" type="application/atom+xml">
+  <link rel="canonical" href="http://kinegratii.github.io/2017/09/25/django2-url-path/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>django2笔记:路由path语法 | 程序员Barnes的博客</title>
+  <meta name="generator" content="Hexo 3.9.0">
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">程序员Barnes的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">逍遥于天地之间，而心意自得。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档<span class="badge">46</span></a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-topics">
+      
+    
+      
+    
+
+    <a href="/topics/" rel="section"><i class="menu-item-icon fa fa-fw fa-file"></i> <br>专题</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-library">
+      
+    
+      
+    
+
+    <a href="/library/" rel="section"><i class="menu-item-icon fa fa-fw fa-book"></i> <br>图书馆</a>
+
+  </li>
+      
+      
+      
+        
+          
+          
+          
+            
+            
+    
+  
+  <li class="menu-item menu-item-about">
+      
+    
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+
+
+          
+        
+          
+          
+          
+        
+          
+          
+          
+        
+      
+      
+      
+      
+        
+        <li class="menu-item menu-item-borax">
+      
+    
+      
+    
+
+    <a href="/borax-project/" rel="section"><i class="menu-item-icon fa fa-fw fa-tasks"></i> <br>Borax</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/kinegratii" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://kinegratii.github.io/2017/09/25/django2-url-path/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="程序员Barnes">
+      <meta itemprop="description" content="逍遥于天地之间，而心意自得。">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="程序员Barnes的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">django2笔记:路由path语法
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2017-09-25 18:09:15" itemprop="dateCreated datePublished" datetime="2017-09-25T18:09:15+08:00">2017-09-25</time>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/编程/" itemprop="url" rel="index"><span itemprop="name">编程</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            <span id="/2017/09/25/django2-url-path/" class="post-meta-item leancloud_visitors" data-flag-title="django2笔记:路由path语法" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+        
+      
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2017/09/25/django2-url-path/#comments" itemprop="discussionUrl"><span class="post-comments-count valine-comment-count" data-xid="/2017/09/25/django2-url-path/" itemprop="commentCount"></span></a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><img src="/images/django.png" alt="django"></p>
+<p>9月23，<a href="https://www.djangoproject.com/" target="_blank" rel="noopener">Django</a> 发布了2.0a1版本，这是一个 feature freeze 版本，如果没有什么意外的话，2.0正式版不会再增加新的功能了。按照以往的规律，预计正式版将在12月发布。</p>
+<blockquote>
+<p>备注：Django 2.0 于12月2日已经正式发布。 （<a href="https://www.djangoproject.com/weblog/2017/dec/02/django-20-released/" target="_blank" rel="noopener">链接</a>）</p>
+</blockquote>
+<p>2.0无疑是一个里程碑版本，移除了对 Python2.7 的支持，最少需要 3.4 以上，建议使用3.5以上的版本。</p>
+<a id="more"></a>
+
+
+<p> <a href="https://docs.djangoproject.com/en/2.0/releases/2.0/#what-s-new-in-django-2-0" target="_blank" rel="noopener">What’s new in Django2.0</a>  文档中一共列出了三个新的特性：</p>
+<ul>
+<li>更简单的URL路由语法 (Simplified URL routing syntax)</li>
+<li>admin应用的针对移动设备的优化改进(Mobile-friendly <code>contrib.admin</code>)</li>
+<li>支持SQL开窗表达式(Window expressions)</li>
+</ul>
+<p>第一个特性，主要用于动态路由定义上。在Django2.0代码实现中，主要的变化是新增了 <code>django.urls.path</code> 函数，它允许使用一种更加简洁、可读的路由语法。比如之前的版本的代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">url(<span class="string">r'^articles/(?P&lt;year&gt;[0-9]&#123;4&#125;)/$'</span>, views.year_archive),</span><br></pre></td></tr></table></figure>
+
+<p>在新版本中也可以写为：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">path(<span class="string">'articles/&lt;int:year&gt;/'</span>, views.year_archive),</span><br></pre></td></tr></table></figure>
+
+<p>新语法支持类型转化，在上述的例子中， year_archive 函数接收到的year参数就变成整数而不是字符串。</p>
+<p>如果你有接触过 Flask 框架，就会发现和 <a href="http://flask.pocoo.org/docs/0.12/quickstart/#variable-rules" target="_blank" rel="noopener">Variable-Rules</a> 的语法形式和功能都是相类似的。</p>
+<h2 id="一-问题引入"><a href="#一-问题引入" class="headerlink" title="一 问题引入"></a>一 问题引入</h2><p>下面是 Django1.X 的一段代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.conf.urls <span class="keyword">import</span> url</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">year_archive</span><span class="params">(request, year)</span>:</span></span><br><span class="line">    year = int(year) <span class="comment"># convert str to int</span></span><br><span class="line">    <span class="comment"># Get articles from database</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">detail_view</span><span class="params">(request, article_id)</span>:</span></span><br><span class="line">    <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">edit_view</span><span class="params">(request, article_id)</span>:</span></span><br><span class="line">    <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">delete_view</span><span class="params">(request, article_id)</span>:</span></span><br><span class="line">    <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line">urlpatterns = [</span><br><span class="line">    url(<span class="string">'articles/(?P&lt;year&gt;[0-9]&#123;4&#125;)/'</span>, year_archive),</span><br><span class="line">    url(<span class="string">'article/(?P&lt;article_id&gt;[a-zA-Z0-9]+)/detail/'</span>, detail_view),</span><br><span class="line">    url(<span class="string">'articles/(?P&lt;article_id&gt;[a-zA-Z0-9]+)/edit/'</span>, edit_view),</span><br><span class="line">    url(<span class="string">'articles/(?P&lt;article_id&gt;[a-zA-Z0-9]+)/delete/'</span>, delete_view),</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+
+<p>考虑下这样的两个问题：</p>
+<p>第一个问题，函数 <code>year_archive</code> 中year参数是字符串类型的，因此需要先转化为整数类型的变量值，当然 <code>year=int(year)</code> 不会有诸如如TypeError或者ValueError的异常。那么有没有一种方法，在url中，使得这一转化步骤可以由Django自动完成？</p>
+<p>第二个问题，三个路由中 article_id 在业务中表示同一个字段，使用同样的正则表达式，但是你需要写三遍，当之后 article_id 规则改变后，需要同时修改三处代码，那么有没有一种方法，只需修改一处即可？</p>
+<p>在 Django2.0 中，可以使用 <code>path</code> 解决以上的两个问题。</p>
+<h2 id="二-使用示例"><a href="#二-使用示例" class="headerlink" title="二 使用示例"></a>二 使用示例</h2><p>这是一个简单的例子：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.urls <span class="keyword">import</span> path</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> . <span class="keyword">import</span> views</span><br><span class="line"></span><br><span class="line">urlpatterns = [</span><br><span class="line">    path(<span class="string">'articles/2003/'</span>, views.special_case_2003),</span><br><span class="line">    path(<span class="string">'articles/&lt;int:year&gt;/'</span>, views.year_archive),</span><br><span class="line">    path(<span class="string">'articles/&lt;int:year&gt;/&lt;int:month&gt;/'</span>, views.month_archive),</span><br><span class="line">    path(<span class="string">'articles/&lt;int:year&gt;/&lt;int:month&gt;/&lt;slug&gt;/'</span>, views.article_detail),</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+
+<p>基本规则：</p>
+<ul>
+<li>使用尖括号(<code>&lt;&gt;</code>)从url中捕获值。</li>
+<li>捕获值中可以包含一个转化器类型（converter type），比如使用 <code>&lt;int:name&gt;</code> 捕获一个整数变量。若果没有转化器，将匹配任何字符串，当然也包括了 <code>/</code> 字符。</li>
+<li>无需添加前导斜杠。</li>
+</ul>
+<p>以下是根据 <a href="https://docs.djangoproject.com/en/2.0/topics/http/urls/#example" target="_blank" rel="noopener">2.0官方文档</a> 而整理的示例分析表：</p>
+<table>
+<thead>
+<tr>
+<th>请求URL</th>
+<th>匹配项</th>
+<th>视图函数调用形式</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>/articles/2005/03/</td>
+<td>第3个</td>
+<td>views.month_archive(request, year=2005, month=3)</td>
+</tr>
+<tr>
+<td>/articles/2003/</td>
+<td>第1个</td>
+<td>views.special_case_2003(request)</td>
+</tr>
+<tr>
+<td>/articles/2003</td>
+<td>无</td>
+<td>-</td>
+</tr>
+<tr>
+<td>/articles/2003/03/building-a-django-site/</td>
+<td>第4个</td>
+<td>views.article_detail(request, year=2003, month=3, slug=”building-a-django-site”)</td>
+</tr>
+</tbody></table>
+<h2 id="三-path转化器"><a href="#三-path转化器" class="headerlink" title="三 path转化器"></a>三 path转化器</h2><blockquote>
+<p>文档原文是Path converters，暂且翻译为转化器。</p>
+</blockquote>
+<p>Django默认支持以下5个转化器：</p>
+<ul>
+<li>str,匹配除了路径分隔符（<code>/</code>）之外的非空字符串，这是默认的形式</li>
+<li>int,匹配正整数，包含0。</li>
+<li>slug,匹配字母、数字以及横杠、下划线组成的字符串。</li>
+<li>uuid,匹配格式化的uuid，如 075194d3-6885-417e-a8a8-6c931e272f00。</li>
+<li>path,匹配任何非空字符串，包含了路径分隔符</li>
+</ul>
+<h2 id="四-自定义转化器"><a href="#四-自定义转化器" class="headerlink" title="四 自定义转化器"></a>四 自定义转化器</h2><h3 id="4-1-定义"><a href="#4-1-定义" class="headerlink" title="4.1 定义"></a>4.1 定义</h3><p>对于一些复杂或者复用的需要，可以定义自己的转化器。转化器是一个类或接口，它的要求有三点：</p>
+<ul>
+<li><p><code>regex</code> 类属性，字符串类型</p>
+</li>
+<li><p><code>to_python(self, value)</code> 方法，value是由类属性 <code>regex</code> 所匹配到的字符串，返回具体的Python变量值，以供Django传递到对应的视图函数中。</p>
+</li>
+<li><p><code>to_url(self, value)</code> 方法，和 <code>to_python</code> 相反，value是一个具体的Python变量值，返回其字符串，通常用于url反向引用。</p>
+</li>
+</ul>
+<p>先看看默认的 <code>IntConverter</code> 和 <code>StringConverter</code> 是怎么实现的：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">IntConverter</span>:</span></span><br><span class="line">    regex = <span class="string">'[0-9]+'</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">to_python</span><span class="params">(self, value)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> int(value)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">to_url</span><span class="params">(self, value)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> str(value)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">StringConverter</span>:</span></span><br><span class="line">    regex = <span class="string">'[^/]+'</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">to_python</span><span class="params">(self, value)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> value</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">to_url</span><span class="params">(self, value)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> value</span><br></pre></td></tr></table></figure>
+
+<p>第二个例子，是自己实现的4位年份的转化器。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">FourDigitYearConverter</span>:</span></span><br><span class="line">    regex = <span class="string">'[0-9]&#123;4&#125;'</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">to_python</span><span class="params">(self, value)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> int(value)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">to_url</span><span class="params">(self, value)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">'%04d'</span> % value</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-2-注册"><a href="#4-2-注册" class="headerlink" title="4.2 注册"></a>4.2 注册</h3><p>使用<code>register_converter</code> 将其注册到URL配置中：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.urls <span class="keyword">import</span> register_converter, path</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> . <span class="keyword">import</span> converters, views</span><br><span class="line"></span><br><span class="line">register_converter(converters.FourDigitYearConverter, <span class="string">'yyyy'</span>)</span><br><span class="line"></span><br><span class="line">urlpatterns = [</span><br><span class="line">    path(<span class="string">'articles/2003/'</span>, views.special_case_2003),</span><br><span class="line">    path(<span class="string">'articles/&lt;yyyy:year&gt;/'</span>, views.year_archive),</span><br><span class="line">    ...</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+
+<h2 id="五-使用正则表达式"><a href="#五-使用正则表达式" class="headerlink" title="五 使用正则表达式"></a>五 使用正则表达式</h2><p>如果上述的paths和converters还是无法满足需求，也可以使用正则表达式，这时应当使用 <code>django.urls.re_path</code> 函数。</p>
+<p>在Python正则表达式中，命名式分组语法为 <code>(?P&lt;name&gt;pattern)</code> ，其中name为名称， pattern为待匹配的模式。</p>
+<p>之前的示例代码也可以写为：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.urls <span class="keyword">import</span> path, re_path</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> . <span class="keyword">import</span> views</span><br><span class="line"></span><br><span class="line">urlpatterns = [</span><br><span class="line">    path(<span class="string">'articles/2003/'</span>, views.special_case_2003),</span><br><span class="line">    re_path(<span class="string">'articles/(?P&lt;year&gt;[0-9]&#123;4&#125;)/'</span>, views.year_archive),</span><br><span class="line">    re_path(<span class="string">'articles/(?P&lt;year&gt;[0-9]&#123;4&#125;)/(?P&lt;month&gt;[0-9]&#123;2&#125;)/'</span>, views.month_archive),</span><br><span class="line">    re_path(<span class="string">'articles/(?P&lt;year&gt;[0-9]&#123;4&#125;)/(?P&lt;month&gt;[0-9]&#123;2&#125;)/(?P&lt;slug&gt;[^/]+)/'</span>, views.article_detail),</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+
+<p>这段代码和之前的代码实现了基本的功能，但是还是有一些区别：</p>
+<ul>
+<li>这里的代码匹配更加严格，比如year=10000在这里就无法匹配。</li>
+<li>传递给视图函数的变量都是字符串类型，这点和 <code>url</code> 是一致的。</li>
+</ul>
+<p><strong>无命名分组</strong></p>
+<p>一般来说，不建议使用这种方式，因为有可能引入歧义，甚至错误。</p>
+<h2 id="六-Import变动"><a href="#六-Import变动" class="headerlink" title="六 Import变动"></a>六 Import变动</h2><p><code>django.urls.path</code> 可以看成是 <code>django.conf.urls.url</code> 的增强形式。</p>
+<p>为了方便，其引用路径也有所变化，请注意下 <code>urls</code> 包路径的变更，不再是 <code>conf</code> 的子包了，目前和 <code>views</code> 、<code>conf</code> 一样，被认为是 Django 的核心组件。</p>
+<table>
+<thead>
+<tr>
+<th>1.X</th>
+<th>2.0</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>-</td>
+<td>django.urls.path</td>
+<td>新增，url的增强版</td>
+</tr>
+<tr>
+<td>django.conf.urls.include</td>
+<td>django.urls.include</td>
+<td>路径变更</td>
+</tr>
+<tr>
+<td>django.conf.urls.url</td>
+<td>django.urls.re_path</td>
+<td>异名同功能，url不会立即废弃</td>
+</tr>
+</tbody></table>
+<h2 id="七-代码改写"><a href="#七-代码改写" class="headerlink" title="七 代码改写"></a>七 代码改写</h2><p>将“问题引入”一节的代码使用新的path函数可以改写如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.urls <span class="keyword">import</span> path, register_converter</span><br><span class="line"><span class="keyword">from</span> django.urls.converters <span class="keyword">import</span> SlugConverter</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">FourDigitYearConverter</span>:</span></span><br><span class="line">    regex = <span class="string">'[0-9]&#123;4&#125;'</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">to_python</span><span class="params">(self, value)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> int(value)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">to_url</span><span class="params">(self, value)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">'%04d'</span> % value</span><br><span class="line"></span><br><span class="line">register_converter(SlugConverter, <span class="string">'article_id'</span>)</span><br><span class="line">register_converter(FourDigitYearConverter, <span class="string">'year'</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">year_archive</span><span class="params">(request, year)</span>:</span></span><br><span class="line">    print(type(year)) <span class="comment"># &lt;class 'int'&gt;</span></span><br><span class="line">    <span class="comment"># Get articles from database</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">detail_view</span><span class="params">(request, article_id)</span>:</span></span><br><span class="line">    <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">edit_view</span><span class="params">(request, article_id)</span>:</span></span><br><span class="line">    <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">delete_view</span><span class="params">(request, article_id)</span>:</span></span><br><span class="line">    <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line">urlpatterns = [</span><br><span class="line">    path(<span class="string">'articles/&lt;year:year&gt;/'</span>, year_archive),</span><br><span class="line">    path(<span class="string">'article/&lt;article_id:article_id&gt;/detail/'</span>, detail_view),</span><br><span class="line">    path(<span class="string">'articles/&lt;article_id:article_id&gt;/edit/'</span>, edit_view),</span><br><span class="line">    path(<span class="string">'articles/&lt;article_id:article_id&gt;/delete/'</span>, delete_view),</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+
+<h2 id="八-总结"><a href="#八-总结" class="headerlink" title="八 总结"></a>八 总结</h2><p>第一，目前 路由（url）到视图（View）的流程可以概括为四个步骤：</p>
+<ol>
+<li>url匹配</li>
+<li>正则捕获</li>
+<li>变量类型转化</li>
+<li>视图调用</li>
+</ol>
+<p>Django2.0 和之前相比多了 <em>变量类型转化</em> 这一步骤。</p>
+<p>第二，新的path语法可以解决一下以下几个场景：</p>
+<ul>
+<li>类型自动转化</li>
+<li>公用正则表达式</li>
+</ul>
+<p>问题描述可参考 “问题引入” 一节。</p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      
+        <div class="popular-posts-date">2016-07-23</div>
+      
+      
+      <div class="popular-posts-title"><a href="/2016/07/23/daocloud-django-deploy/" rel="bookmark">使用DaoCloud部署Django项目</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+        <div class="popular-posts-date">2018-06-27</div>
+      
+      
+      <div class="popular-posts-title"><a href="/2018/06/27/dealing-with-legacy-code/" rel="bookmark">处理和迁移遗留的代码</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+        <div class="popular-posts-date">2017-07-31</div>
+      
+      
+      <div class="popular-posts-title"><a href="/2017/07/31/django-full-stack-note/" rel="bookmark">Django项目全栈笔记</a></div>
+      
+    </li>
+  
+  </ul>
+
+        
+      
+        <div id="reward-container">
+  <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+  <button id="reward-button" disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/wechat_reward.png" alt="程序员Barnes 微信支付">
+        <p>微信支付</p>
+      </div>
+
+  </div>
+</div>
+
+      
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>程序员Barnes</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://kinegratii.github.io/2017/09/25/django2-url-path/" title="django2笔记:路由path语法">http://kinegratii.github.io/2017/09/25/django2-url-path/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+</div>
+
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/Django/" rel="tag"><i class="fa fa-tag"></i> Django</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2017/09/06/django-echarts-js-manage/" rel="next" title="Django-Echarts系列：js依赖文件管理">
+                  <i class="fa fa-chevron-left"></i> Django-Echarts系列：js依赖文件管理
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2017/10/09/pc-software-checklist/" rel="prev" title="电脑开发软件的5个清单">
+                  电脑开发软件的5个清单 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="comments"></div>
+  
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#一-问题引入"><span class="nav-text">一 问题引入</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二-使用示例"><span class="nav-text">二 使用示例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三-path转化器"><span class="nav-text">三 path转化器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#四-自定义转化器"><span class="nav-text">四 自定义转化器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-定义"><span class="nav-text">4.1 定义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-注册"><span class="nav-text">4.2 注册</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#五-使用正则表达式"><span class="nav-text">五 使用正则表达式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#六-Import变动"><span class="nav-text">六 Import变动</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#七-代码改写"><span class="nav-text">七 代码改写</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#八-总结"><span class="nav-text">八 总结</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.jpg"
+      alt="程序员Barnes">
+  <p class="site-author-name" itemprop="name">程序员Barnes</p>
+  <div class="site-description" itemprop="description">逍遥于天地之间，而心意自得。</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">46</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/kinegratii" title="GitHub &rarr; https://github.com/kinegratii" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://my.oschina.net/kinegratii" title="oschina &rarr; https://my.oschina.net/kinegratii" rel="noopener" target="_blank"><i class="fa fa-fw fa-link"></i>oschina</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://kinegratii.github.io/borax/" title="Borax &rarr; https://kinegratii.github.io/borax/"><i class="fa fa-fw fa-link"></i>Borax</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2015 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">程序员Barnes</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  <script src="/lib/pjax/pjax.min.js?v=0.2.8"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[pjax], script#page-configurations, #pjax script').forEach(element => {
+    var id = element.id || '';
+    var src = element.src || '';
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (id !=='') {
+      script.id = element.id;
+    }
+    if (src !== '') {
+      script.src = src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+  var GUEST = ['nick', 'mail', 'link'];
+  var guest = 'nick,mail,link';
+  guest = guest.split(',').filter(item => {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#comments',
+    verify: false,
+    notify: false,
+    appId: 'YlSXBoomxn9Ws7GEb7bfJiaz-gzGzoHsz',
+    appKey: 'usgVEKYx48ugyhewgxrnLjFk',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: guest,
+    pageSize: '10' || 10,
+    visitor: true,
+    lang: '' || 'zh-cn',
+    path: location.pathname
+  });
+}, window.Valine);
+</script>
+
+    </div>
+</body>
+</html>

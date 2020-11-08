@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/logo/apple_touch_icon.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/logo/logo_16.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-corner-indicator.min.css?v=1.0.2">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="OSC乱弹歌曲列表，爬虫源码：https://git.oschina.net/kinegratii/codes/hjug0mlicztve9yd18xn553">
+<meta name="keywords" content="开源中国,爬虫,音乐">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OSC乱弹歌曲列表">
+<meta property="og:url" content="http://kinegratii.github.io/2017/02/13/osc-daily-blog-music/index.html">
+<meta property="og:site_name" content="程序员Barnes的博客">
+<meta property="og:description" content="OSC乱弹歌曲列表，爬虫源码：https://git.oschina.net/kinegratii/codes/hjug0mlicztve9yd18xn553">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2020-11-08T06:32:52.269Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="OSC乱弹歌曲列表">
+<meta name="twitter:description" content="OSC乱弹歌曲列表，爬虫源码：https://git.oschina.net/kinegratii/codes/hjug0mlicztve9yd18xn553">
+  <link rel="alternate" href="/atom.xml" title="程序员Barnes的博客" type="application/atom+xml">
+  <link rel="canonical" href="http://kinegratii.github.io/2017/02/13/osc-daily-blog-music/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>OSC乱弹歌曲列表 | 程序员Barnes的博客</title>
+  <meta name="generator" content="Hexo 3.9.0">
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">程序员Barnes的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">逍遥于天地之间，而心意自得。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档<span class="badge">46</span></a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-topics">
+      
+    
+      
+    
+
+    <a href="/topics/" rel="section"><i class="menu-item-icon fa fa-fw fa-file"></i> <br>专题</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-library">
+      
+    
+      
+    
+
+    <a href="/library/" rel="section"><i class="menu-item-icon fa fa-fw fa-book"></i> <br>图书馆</a>
+
+  </li>
+      
+      
+      
+        
+          
+          
+          
+            
+            
+    
+  
+  <li class="menu-item menu-item-about">
+      
+    
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+
+
+          
+        
+          
+          
+          
+        
+          
+          
+          
+        
+      
+      
+      
+      
+        
+        <li class="menu-item menu-item-borax">
+      
+    
+      
+    
+
+    <a href="/borax-project/" rel="section"><i class="menu-item-icon fa fa-fw fa-tasks"></i> <br>Borax</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/kinegratii" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://kinegratii.github.io/2017/02/13/osc-daily-blog-music/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="程序员Barnes">
+      <meta itemprop="description" content="逍遥于天地之间，而心意自得。">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="程序员Barnes的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">OSC乱弹歌曲列表
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2017-02-13 10:31:50" itemprop="dateCreated datePublished" datetime="2017-02-13T10:31:50+08:00">2017-02-13</time>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/生活/" itemprop="url" rel="index"><span itemprop="name">生活</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            <span id="/2017/02/13/osc-daily-blog-music/" class="post-meta-item leancloud_visitors" data-flag-title="OSC乱弹歌曲列表" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+          
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>OSC乱弹歌曲列表，爬虫源码：<a href="https://git.oschina.net/kinegratii/codes/hjug0mlicztve9yd18xn553" target="_blank" rel="noopener">https://git.oschina.net/kinegratii/codes/hjug0mlicztve9yd18xn553</a></p>
+<a id="more"></a>
+
+<ul>
+<li><a href="http://music.163.com/#/song?id=26128872" target="_blank" rel="noopener">보여줄게（给你看） - Ailee</a></li>
+<li><a href="http://music.163.com/#/song?id=186760" target="_blank" rel="noopener">风再起时 - 张国荣</a></li>
+<li><a href="http://music.163.com/#/song?id=482172" target="_blank" rel="noopener">風になる - つじあやの</a></li>
+<li><a href="http://music.163.com/#/song?id=483618" target="_blank" rel="noopener">青春贵族 - 中村雅俊</a></li>
+<li><a href="http://music.163.com/#/song/28935306/?userid=98374908" target="_blank" rel="noopener">难得 - 安来宁</a></li>
+<li><a href="http://music.163.com/#/song?id=300058" target="_blank" rel="noopener">闷 - 王菲</a></li>
+<li><a href="http://music.163.com/#/song?id=33668823" target="_blank" rel="noopener">锤子之歌 - 菠萝橙</a></li>
+<li><a href="http://music.163.com/#/song?id=355992" target="_blank" rel="noopener">追梦赤子心 - GALA</a></li>
+<li><a href="http://music.163.com/#/song?id=94743&userid=35816087" target="_blank" rel="noopener">这么近那么远 - 张学友</a></li>
+<li><a href="http://music.163.com/#/song?id=306664" target="_blank" rel="noopener">身骑白马 - 徐佳莹</a></li>
+<li><a href="http://music.163.com/#/song?id=108631" target="_blank" rel="noopener">被风吹过的夏天 (Live) - live林俊杰/金莎</a></li>
+<li><a href="http://music.163.com/#/song?id=524331" target="_blank" rel="noopener">行かないで - 玉置浩二</a></li>
+<li><a href="http://music.163.com/#/song?id=299604" target="_blank" rel="noopener">给自己的情书 - 王菲</a></li>
+<li><a href="http://music.163.com/#/song?id=27836179" target="_blank" rel="noopener">终于等到你 - 张靓颖</a></li>
+<li><a href="http://music.163.com/#/song?id=28258197" target="_blank" rel="noopener">纷飞(live版) - 徐怀钰</a></li>
+<li><a href="http://music.163.com/#/song/432506345/" target="_blank" rel="noopener">童话镇 - 陈一发儿</a></li>
+<li><a href="http://music.163.com/#/song?id=658737" target="_blank" rel="noopener">百恋歌 - 高杉さと美</a></li>
+<li><a href="http://music.163.com/#/song?id=65546" target="_blank" rel="noopener">白色球鞋 - 陈奕迅</a></li>
+<li><a href="http://music.163.com/#/song?id=27646687" target="_blank" rel="noopener">玫瑰花的葬礼 - 许嵩</a></li>
+<li><a href="http://music.163.com/#/song?id=28461702&autoplay=true" target="_blank" rel="noopener">猫になりたい - つじあやの</a></li>
+<li><a href="http://music.163.com/#/song?id=86864" target="_blank" rel="noopener">爱情 - 郭富城</a></li>
+<li><a href="http://music.163.com/#/song?id=28181131" target="_blank" rel="noopener">温柔 (2013混音版) - 五月天</a></li>
+<li><a href="http://music.163.com/#/song?id=28828498" target="_blank" rel="noopener">深海少女 - nero/ゆう十</a></li>
+<li><a href="http://music.163.com/#/song?id=540928" target="_blank" rel="noopener">深い森（TV动画《犬夜叉》片尾曲 第二弹） - Do As Infinity</a></li>
+<li><a href="http://music.163.com/#/song?id=357312" target="_blank" rel="noopener">流川枫与苍井空 - 黑撒</a></li>
+<li><a href="http://music.163.com/#/song?id=411907567" target="_blank" rel="noopener">流れ星（小幸运 (日语版)） - 荒木毬菜</a></li>
+<li><a href="http://music.163.com/#/song?id=474556" target="_blank" rel="noopener">泣けない君へのラブソング - 前田亘辉</a></li>
+<li><a href="http://music.163.com/#/song/187747/?userid=303063757" target="_blank" rel="noopener">河 - 张雨生</a></li>
+<li><a href="http://music.163.com/#/song?id=411907897" target="_blank" rel="noopener">極楽浄土 - GARNiDELiA</a></li>
+<li><a href="http://music.163.com/#/song?id=5282205" target="_blank" rel="noopener">梦回唐朝 - 唐朝</a></li>
+<li><a href="http://music.163.com/#/song?id=5269624" target="_blank" rel="noopener">月光下的凤尾竹 - 葫芦丝</a></li>
+<li><a href="http://music.163.com/#/song?id=300136" target="_blank" rel="noopener">暗涌 - 王菲</a></li>
+<li><a href="http://music.163.com/#/song?id=38576323" target="_blank" rel="noopener">春风十里 - 鹿先森乐队</a></li>
+<li><a href="http://music.163.com/#/song?id=38576323" target="_blank" rel="noopener">春风十里 - 鹿先森乐队</a></li>
+<li><a href="http://music.163.com/#/song/110274?userid=69880174" target="_blank" rel="noopener">散了吧 - 林志炫</a></li>
+<li><a href="http://music.163.com/#/song?id=415792563" target="_blank" rel="noopener">摄影艺术 - 许嵩</a></li>
+<li><a href="http://music.163.com/#/song?id=25642952" target="_blank" rel="noopener">我们的歌 - 王力宏</a></li>
+<li><a href="http://music.163.com/#/song?id=168151" target="_blank" rel="noopener">情人 - 许巍</a></li>
+<li><a href="http://music.163.com/#/song?id=22754969" target="_blank" rel="noopener">思ひで（深夜食堂 片头曲） - 鈴木常吉</a></li>
+<li><a href="http://music.163.com/#/song?id=167655" target="_blank" rel="noopener">幻听 - 许嵩</a></li>
+<li><a href="http://music.163.com/#/song?id=357428" target="_blank" rel="noopener">幸福的旁边 - 花儿</a></li>
+<li><a href="http://music.163.com/#/song?id=9442015" target="_blank" rel="noopener">娃娃脸 - 后弦</a></li>
+<li><a href="http://music.163.com/#/song?id=187661" target="_blank" rel="noopener">好久不见 - 张学友</a></li>
+<li><a href="http://music.163.com/#/song?id=26508186" target="_blank" rel="noopener">天空之城 - 李志</a></li>
+<li><a href="http://music.163.com/#/song?id=413812448" target="_blank" rel="noopener">大鱼（动画电影《大鱼海棠》印象曲） - 周深</a></li>
+<li><a href="http://music.163.com/#/song/5250048?userid=69880174" target="_blank" rel="noopener">吻得太逼真 - 张敬轩</a></li>
+<li><a href="http://music.163.com/#/song?id=202373" target="_blank" rel="noopener">南方姑娘 - 赵雷</a></li>
+<li><a href="http://music.163.com/#/song?id=28285557" target="_blank" rel="noopener">十二楼 - 杨宗纬</a></li>
+<li><a href="http://music.163.com/#/song?id=29750519" target="_blank" rel="noopener">初恋 - 玉置浩二</a></li>
+<li><a href="http://music.163.com/#/song?id=415792881" target="_blank" rel="noopener">刚刚好 - 薛之谦</a></li>
+<li><a href="http://music.163.com/#/song?id=208063" target="_blank" rel="noopener">分手快乐 - 冰淇</a></li>
+<li><a href="http://music.163.com/#/song?id=346576" target="_blank" rel="noopener">光辉岁月 - Beyond</a></li>
+<li><a href="http://music.163.com/#/song?id=27955653" target="_blank" rel="noopener">你还要我怎样 - 薛之谦</a></li>
+<li><a href="http://music.163.com/#/song?id=29450931" target="_blank" rel="noopener">为爱痴狂 (Live) - 刘若英</a></li>
+<li><a href="http://music.163.com/#/song?id=25949863" target="_blank" rel="noopener">一辈子的孤单 (Live)（电视剧《涩女郎》片尾曲） - 刘若英</a></li>
+<li><a href="http://music.163.com/#/song?id=29723028" target="_blank" rel="noopener">一起走过的日子 (粤)（电影《至尊无上Ⅱ之永霸天下》主题曲） - 刘德华</a></li>
+<li><a href="http://music.163.com/#/song?id=34899758" target="_blank" rel="noopener">一剪梅（电影《夏洛特烦恼》主题曲） - 黄渤/左小祖咒</a></li>
+<li><a href="http://music.163.com/#/song?id=25893916" target="_blank" rel="noopener">ムーンライト伝説（テレビアニメ『美少女戦士セーラームーン』オープニングテーマ主題歌） - Dali</a></li>
+<li><a href="http://music.163.com/#/song/28762402/" target="_blank" rel="noopener">ポケットにファンタジー - じゅり</a></li>
+<li><a href="http://music.163.com/#/song?id=22697895" target="_blank" rel="noopener">ハーフムーン・セレナーデ（月半小夜曲） - 河合奈保子</a></li>
+<li><a href="http://music.163.com/#/song?id=854729" target="_blank" rel="noopener">ニッポン笑顔百景（TV动画《女子落语》ED / TVアニメ『じょしらく』EDテーマ） - 桃黒亭一門</a></li>
+<li><a href="http://music.163.com/#/song?id=567602" target="_blank" rel="noopener">スカイクラッドの観测者 - いとうかなこ</a></li>
+<li><a href="http://music.163.com/#/song?id=454834" target="_blank" rel="noopener">グッバイ・デイ - 来生たかお</a></li>
+<li><a href="http://music.163.com/#/song?id=441347" target="_blank" rel="noopener">おくりびと<del>on record</del> - 久石譲</a></li>
+<li><a href="http://music.163.com/#/song?id=605740" target="_blank" rel="noopener">いつも何度でも(主题歌) - 木村弓</a></li>
+<li><a href="http://music.163.com/#/song?id=633606" target="_blank" rel="noopener">あなただけ见つめてる - 大黒摩季</a></li>
+<li><a href="http://music.163.com/#/song/28850660" target="_blank" rel="noopener">《어디부터 어디까지》- 泫雅/梁耀燮</a></li>
+<li><a href="http://music.163.com/#/song/27908177/" target="_blank" rel="noopener">《너에게》- 成时京</a></li>
+<li><a href="http://music.163.com/#/song?id=28884234" target="_blank" rel="noopener">《閃光の行方》- 小寺可南子</a></li>
+<li><a href="http://music.163.com/#/song?id=112678" target="_blank" rel="noopener">《铁血丹心》- 罗文/甄妮</a></li>
+<li><a href="http://music.163.com/#/song/247864/?userid=111583662" target="_blank" rel="noopener">《那么骄傲》- 金海心</a></li>
+<li><a href="http://music.163.com/#/song?id=28971284" target="_blank" rel="noopener">《遇见》- 言叶之庭</a></li>
+<li><a href="http://music.163.com/#/song?id=355992" target="_blank" rel="noopener">《追梦赤子心》- GALA</a></li>
+<li><a href="http://music.163.com/#/outchain/2/186311/" target="_blank" rel="noopener">《路过蜻蜓》- 林忆莲</a></li>
+<li><a href="http://music.163.com/#/song/109998/" target="_blank" rel="noopener">《贝加尔湖畔》- 李健</a></li>
+<li><a href="http://music.163.com/#/song/22854166?userid=293336750" target="_blank" rel="noopener">《请不要对我说sorry》- 何洁</a></li>
+<li><a href="http://music.163.com/#/song/165364/?userid=61620391" target="_blank" rel="noopener">《苦笑》 - 汪苏泷</a></li>
+<li><a href="http://music.163.com/#/song?id=109678" target="_blank" rel="noopener">《花香》- 林志炫</a></li>
+<li><a href="http://music.163.com/#/song/328169/?userid=111583662" target="_blank" rel="noopener">《终身美丽》- 郑秀文</a></li>
+<li><a href="http://music.163.com/#/song?id=387592" target="_blank" rel="noopener">《离歌》- 信</a></li>
+<li><a href="http://music.163.com/#/song?id=64752" target="_blank" rel="noopener">《神啊，救救我》- 陈小春</a></li>
+<li><a href="http://music.163.com/#/song?id=409650012" target="_blank" rel="noopener">《相守》- 栗先达</a></li>
+<li><a href="http://music.163.com/#/song/139357/?userid=355538177" target="_blank" rel="noopener">《生如夏花》- 朴树</a></li>
+<li><a href="http://music.163.com/#/song?id=31445772" target="_blank" rel="noopener">《理想三旬》- 陈鸿宇</a></li>
+<li><a href="http://music.163.com/#/song?id=368935" target="_blank" rel="noopener">《牡丹江》- 南拳妈妈</a></li>
+<li><a href="http://music.163.com/#/song?id=284125" target="_blank" rel="noopener">《爱你十分泪七分》 - 裘海正</a></li>
+<li><a href="http://music.163.com/#/song/25643306?userid=76530519" target="_blank" rel="noopener">《烟花三月(烟花三月XRCD)》- 童丽</a></li>
+<li><a href="http://music.163.com/#/song?id=4988618" target="_blank" rel="noopener">《海の见える街》- 久石让</a></li>
+<li><a href="http://music.163.com/#/song?id=307594" target="_blank" rel="noopener">《泪海》- 徐茹芸</a></li>
+<li><a href="http://music.163.com/#/song/27543037" target="_blank" rel="noopener">《没有舍不得》- 花漾年华</a></li>
+<li><a href="http://music.163.com/#/song/128082/?userid=55571814" target="_blank" rel="noopener">《朋友的酒》 - 李晓杰</a></li>
+<li><a href="http://music.163.com/#/song?id=190241" target="_blank" rel="noopener">《曲终人散》- 张宇</a></li>
+<li><a href="http://music.163.com/#/song?id=454216034" target="_blank" rel="noopener">《春季自救指南》 - 上海彩虹室内合唱团</a></li>
+<li><a href="http://music.163.com/#/song?id=27514089" target="_blank" rel="noopener">《星降る夜のリストランテ》- コーコーヤ</a></li>
+<li><a href="http://music.163.com/#/song?id=29437587" target="_blank" rel="noopener">《明日への鼓動》- 小寺可南子</a></li>
+<li><a href="http://music.163.com/#/song?id=22714576" target="_blank" rel="noopener">《无までの30分》- andymori</a></li>
+<li><a href="http://music.163.com/#/song?id=401646" target="_blank" rel="noopener">《文学少女で“文学少女”》 - Audio Highs</a></li>
+<li><a href="http://music.163.com/#/song/25642456?userid=293336750" target="_blank" rel="noopener">《我知道你很难过》- 蔡依林</a></li>
+<li><a href="http://music.163.com/#/song/449577189/?userid=61620391" target="_blank" rel="noopener">《我梦见我梦见我》- 本兮</a></li>
+<li><a href="http://music.163.com/#/song/191510" target="_blank" rel="noopener">《我不要被你记住》- 周柏豪</a></li>
+<li><a href="http://music.163.com/#/song/277733/?userid=111583662" target="_blank" rel="noopener">《愿(Live) - live》- 莫文蔚</a></li>
+<li><a href="http://music.163.com/#/song?id=167751" target="_blank" rel="noopener">《家》- 许巍</a></li>
+<li><a href="http://music.163.com/#/song?id=65538" target="_blank" rel="noopener">《好久不见》- 陈奕迅</a></li>
+<li><a href="http://music.163.com/#/song?id=69827" target="_blank" rel="noopener">《太多》- 陈冠蒲</a></li>
+<li><a href="http://music.163.com/#/song?id=523567" target="_blank" rel="noopener">《夢のつづき》- 玉置浩二</a></li>
+<li><a href="http://music.163.com/#/song?id=40140659" target="_blank" rel="noopener">《啜泣》- 李克勤</a></li>
+<li><a href="http://music.163.com/#/song?id=29436904" target="_blank" rel="noopener">《南山南》- 马頔</a></li>
+<li><a href="http://music.163.com/#/song?id=415793076" target="_blank" rel="noopener">《勇敢一点》- 薛之谦</a></li>
+<li><a href="http://music.163.com/#/song/186051" target="_blank" rel="noopener">《分裂(离开)》- 周杰伦</a></li>
+<li><a href="http://music.163.com/#/song?id=431791827" target="_blank" rel="noopener">《冬天不会再冷》- 徐盼.</a></li>
+<li><a href="http://music.163.com/#/song/32288142" target="_blank" rel="noopener">《再等几天 (Live)》- 陈奕迅</a></li>
+<li><a href="http://music.163.com/#/song/442869196" target="_blank" rel="noopener">《其实我不快乐》- 钟嘉欣</a></li>
+<li><a href="http://music.163.com/#/song/26075547?userid=293336750" target="_blank" rel="noopener">《低回》- 杨宗纬</a></li>
+<li><a href="http://music.163.com/#/song?id=421934371" target="_blank" rel="noopener">《东京不太热》- 洛天依</a></li>
+<li><a href="http://music.163.com/#/song?id=25727660" target="_blank" rel="noopener">《一生所爱 》- 舒淇</a></li>
+<li><a href="http://music.163.com/#/song/25698049?userid=293336750" target="_blank" rel="noopener">《一生守候》 - 王若琳</a></li>
+<li><a href="http://music.163.com/#/song?id=29750440" target="_blank" rel="noopener">《ただひたすらに、前へ》 - Falcom Sound Team jdk</a></li>
+<li><a href="http://music.163.com/#/song?id=29401226" target="_blank" rel="noopener">《warriors》- Imagine Dragons</a></li>
+<li><a href="http://music.163.com/#/song?id=33911781" target="_blank" rel="noopener">《secret base》- 茅野愛衣 / 戸松遥 / 早見沙織</a></li>
+<li><a href="http://music.163.com/#/song?id=38592976" target="_blank" rel="noopener">《dream it possible》- Delacey</a></li>
+<li><a href="http://music.163.com/#/song/26243686?userid=267995642" target="_blank" rel="noopener">《Young And Beautiful》 - Lana Del Rey</a></li>
+<li><a href="http://music.163.com/#/song/1210496" target="_blank" rel="noopener">《What Are Words》- Chris Medina</a></li>
+<li><a href="http://music.163.com/#/song/441489798" target="_blank" rel="noopener">《We Don’t Talk Anymore (原唱：Charlie Puth)》- 莫文蔚</a></li>
+<li><a href="http://music.163.com/#/song?id=31654455" target="_blank" rel="noopener">《Victory》- Two Steps From Hell</a></li>
+<li><a href="http://music.163.com/#/song?id=28859948" target="_blank" rel="noopener">《Turnin’》- Young Rising Sons</a></li>
+<li><a href="http://music.163.com/#/song/27511380" target="_blank" rel="noopener">《Today My Life Begins》 - Bruno Mars</a></li>
+<li><a href="http://music.163.com/#/song/422463501/?userid=355538177" target="_blank" rel="noopener">《To Be Free》 - 华晨宇</a></li>
+<li><a href="http://music.163.com/#/song?id=29785409" target="_blank" rel="noopener">《Stay Gold》- 大橋トリオ</a></li>
+<li><a href="http://music.163.com/#/song?id=986444" target="_blank" rel="noopener">《Some Dreams》- Allan Taylor</a></li>
+<li><a href="http://music.163.com/#/song/32648335" target="_blank" rel="noopener">《Ring Off The Hook》- w-inds</a></li>
+<li><a href="http://music.163.com/#/song/27903692?userid=47077785" target="_blank" rel="noopener">《Radioactive》- William Joseph</a></li>
+<li><a href="http://music.163.com/#/song/29843582" target="_blank" rel="noopener">《Por Una Cabeza (一步之遥)》- Elvins.J</a></li>
+<li><a href="http://music.163.com/#/song/22551663" target="_blank" rel="noopener">《Parachute》- Sean Lennon</a></li>
+<li><a href="http://music.163.com/#/song/64540/?userid=355538177" target="_blank" rel="noopener">《PG家长指引(Live) - live》- 陈奕迅</a></li>
+<li><a href="http://music.163.com/#/song?id=540968" target="_blank" rel="noopener">《One more time, One more chance》- 山崎まさよし</a></li>
+<li><a href="http://music.163.com/#/song?id=28639983" target="_blank" rel="noopener">《No ones saves us but ourselves》- Kraddy</a></li>
+<li><a href="http://music.163.com/#/song?id=29755359" target="_blank" rel="noopener">《Love Is A Waste Of Time》- Sonu Nigam / Shreya Ghoshal</a></li>
+<li><a href="http://music.163.com/#/song/64377?userid=124523931" target="_blank" rel="noopener">《Kong》- 侧田</a></li>
+<li><a href="http://music.163.com/#/song?id=411236745" target="_blank" rel="noopener">《Jenny》- Robert de Boron / Daichi Diez / Shaira</a></li>
+<li><a href="http://music.163.com/#/song?id=4132379" target="_blank" rel="noopener">《I Hate myself for loving you》- Joan Jett</a></li>
+<li><a href="http://music.163.com/#/song/2919622/?userid=61620391" target="_blank" rel="noopener">《I Am You》- Kim Taylor</a></li>
+<li><a href="http://music.163.com/#/song?id=4049399" target="_blank" rel="noopener">《Hotel California》- Eagles</a></li>
+<li><a href="http://music.163.com/#/song/408250340?userid=47077785" target="_blank" rel="noopener">《Fade(钢琴版)》- 马里奥赛德 / Alan Walker</a></li>
+<li><a href="http://music.163.com/#/song?id=299754" target="_blank" rel="noopener">《Eyes On Me》- 王菲</a></li>
+<li><a href="http://music.163.com/#/song/423228325" target="_blank" rel="noopener">《Closer》- The Chainsmokers/Halsey</a></li>
+<li><a href="http://music.163.com/#/song?id=20705861" target="_blank" rel="noopener">《Christmas Lights》- Coldplay</a></li>
+<li><a href="http://music.163.com/#/song/4875911" target="_blank" rel="noopener">《California Dreaming (重庆森林)》- The Papas / The Mamas</a></li>
+<li><a href="http://music.163.com/#/song?id=30148802" target="_blank" rel="noopener">《&nbsp;神经病之歌 》- 洛天依 / 言和</a></li>
+<li><a href="http://music.163.com/#/song?id=22638958" target="_blank" rel="noopener">《 <em>時の過ぎゆくままに</em> 》- 沢田研二</a></li>
+<li><a href="http://music.163.com/#/song?id=670464" target="_blank" rel="noopener">《 <em>みちゆき</em> 》- 引田香織</a></li>
+<li><a href="http://music.163.com/#/song?id=29019227" target="_blank" rel="noopener">sugar - Maroon 5</a></li>
+<li><a href="http://music.163.com/#/song?id=356034" target="_blank" rel="noopener">Young For You - GALA</a></li>
+<li><a href="http://music.163.com/#/song/17177324?userid=47077785" target="_blank" rel="noopener">Yellow - Coldplay</a></li>
+<li><a href="http://music.163.com/#/song?id=17753288" target="_blank" rel="noopener">What Makes You Beautiful - One Direction</a></li>
+<li><a href="http://music.163.com/#/song?id=3986017" target="_blank" rel="noopener">Viva La Vida - Coldplay</a></li>
+<li><a href="http://music.163.com/#/song?id=17843117" target="_blank" rel="noopener">There You’ll Be (Album Version)（电影《珍珠港》片尾曲） - Faith Hill</a></li>
+<li><a href="http://music.163.com/#/song?id=22737887" target="_blank" rel="noopener">TO BE - 浜崎あゆみ</a></li>
+<li><a href="http://music.163.com/#/song?id=17939827" target="_blank" rel="noopener">Somebody That I Used To Know - Gotye/Kimbra</a></li>
+<li><a href="http://music.163.com/#/song?id=418708940" target="_blank" rel="noopener">Sledgehammer (From The Motion Picture “Star Trek Beyond”)（ 电影《星际迷航3：超越星辰》主题曲） - Rihanna</a></li>
+<li><a href="http://music.163.com/#/song?id=436501918" target="_blank" rel="noopener">Simple Life - Young Rising Sons</a></li>
+<li><a href="http://music.163.com/#/song?id=31789010" target="_blank" rel="noopener">Shots (feat. Broiler) [Broiler Remix] - Imagine Dragons / Broiler</a></li>
+<li><a href="http://music.163.com/#/song?id=31789010" target="_blank" rel="noopener">Shots (feat. Broiler) [Broiler Remix] - Imagine Dragons / Broiler</a></li>
+<li><a href="http://music.163.com/#/song?id=4235530" target="_blank" rel="noopener">Roads - Portishead</a></li>
+<li><a href="http://music.163.com/#/song/64540/?userid=355538177" target="_blank" rel="noopener">PG家长指引(Live) - live - 陈奕迅</a></li>
+<li><a href="http://music.163.com/#/song?id=393674" target="_blank" rel="noopener">Opening - 黄英华</a></li>
+<li><a href="http://music.163.com/#/song?id=387588" target="_blank" rel="noopener">One Night In 北京 - 信乐团</a></li>
+<li><a href="http://music.163.com/#/song?id=4153366" target="_blank" rel="noopener">Numb - Linkin Park</a></li>
+<li><a href="http://music.163.com/#/song?id=5038302" target="_blank" rel="noopener">Mariage d’amour（梦中的婚礼） - 理查德.克莱德曼</a></li>
+<li><a href="http://music.163.com/#/song?id=28661564" target="_blank" rel="noopener">Maps - Maroon 5</a></li>
+<li><a href="http://music.163.com/#/song?id=28747428" target="_blank" rel="noopener">Lost stars - Keira knightley</a></li>
+<li><a href="http://music.163.com/#/song?id=2700056" target="_blank" rel="noopener">Je m’appelle Hélène（我的名字叫伊莲） - Hélène Rolles</a></li>
+<li><a href="http://music.163.com/#/song?id=26506591" target="_blank" rel="noopener">It’s only the fairy tale - 宮村優子</a></li>
+<li><a href="http://music.163.com/#/song?id=2919622" target="_blank" rel="noopener">I Am You - Kim Taylor</a></li>
+<li><a href="http://music.163.com/#/song?id=419594258" target="_blank" rel="noopener">Hymn For The Weekend [Remix] - Alan Walker/Coldplay</a></li>
+<li><a href="http://music.163.com/#/song?id=21803920" target="_blank" rel="noopener">Hey, Soul Sister - Train</a></li>
+<li><a href="http://music.163.com/#/song?id=420125810" target="_blank" rel="noopener">Here We Are （电影《使徒行者》主题曲） - 华晨宇</a></li>
+<li><a href="http://music.163.com/#/song?id=22355472" target="_blank" rel="noopener">Hello World - Lady Antebellum</a></li>
+<li><a href="http://music.163.com/#/song?id=21858699" target="_blank" rel="noopener">HTML - The Hot Toddies</a></li>
+<li><a href="http://music.163.com/#/song?id=21858699" target="_blank" rel="noopener">HTML - The Hot Toddies</a></li>
+<li><a href="http://music.163.com/#/song?id=22722803" target="_blank" rel="noopener">Gate of steiner -piano- 阿保剛</a></li>
+<li><a href="http://music.163.com/#/song?id=22781714" target="_blank" rel="noopener">GRACE KELLY - 大橋トリオ</a></li>
+<li><a href="http://music.163.com/#/song?id=27752645" target="_blank" rel="noopener">Dearest - 浜崎あゆみ</a></li>
+<li><a href="http://music.163.com/#/song?id=26060065" target="_blank" rel="noopener">Counting Stars - OneRepublic</a></li>
+<li><a href="http://music.163.com/#/song?id=409646844" target="_blank" rel="noopener">Cheapest Flight - PREP</a></li>
+<li><a href="http://music.163.com/#/song?id=1696822" target="_blank" rel="noopener">Bressanone（布列瑟农） - Matthew Lien</a></li>
+<li><a href="http://music.163.com/#/song?id=5343736" target="_blank" rel="noopener"></a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      
+        <div class="popular-posts-date">2017-02-13</div>
+      
+      
+      <div class="popular-posts-title"><a href="/2017/02/13/fetch-music-of-daily-blog-in-oschina/" rel="bookmark">爬取OSC每日乱弹的音乐</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+        <div class="popular-posts-date">2016-05-17</div>
+      
+      
+      <div class="popular-posts-title"><a href="/2016/05/17/osc-tweet-publish/" rel="bookmark">自动发送动弹到开源中国</a></div>
+      
+    </li>
+  
+  </ul>
+
+        
+      
+        <div id="reward-container">
+  <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+  <button id="reward-button" disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/wechat_reward.png" alt="程序员Barnes 微信支付">
+        <p>微信支付</p>
+      </div>
+
+  </div>
+</div>
+
+      
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>程序员Barnes</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://kinegratii.github.io/2017/02/13/osc-daily-blog-music/" title="OSC乱弹歌曲列表">http://kinegratii.github.io/2017/02/13/osc-daily-blog-music/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+</div>
+
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/开源中国/" rel="tag"><i class="fa fa-tag"></i> 开源中国</a>
+            
+              <a href="/tags/爬虫/" rel="tag"><i class="fa fa-tag"></i> 爬虫</a>
+            
+              <a href="/tags/音乐/" rel="tag"><i class="fa fa-tag"></i> 音乐</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2017/02/13/fetch-music-of-daily-blog-in-oschina/" rel="next" title="爬取OSC每日乱弹的音乐">
+                  <i class="fa fa-chevron-left"></i> 爬取OSC每日乱弹的音乐
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2017/03/29/start-machine-learning/" rel="prev" title="机器学习（一） —— 准备工作">
+                  机器学习（一） —— 准备工作 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.jpg"
+      alt="程序员Barnes">
+  <p class="site-author-name" itemprop="name">程序员Barnes</p>
+  <div class="site-description" itemprop="description">逍遥于天地之间，而心意自得。</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">46</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/kinegratii" title="GitHub &rarr; https://github.com/kinegratii" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://my.oschina.net/kinegratii" title="oschina &rarr; https://my.oschina.net/kinegratii" rel="noopener" target="_blank"><i class="fa fa-fw fa-link"></i>oschina</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://kinegratii.github.io/borax/" title="Borax &rarr; https://kinegratii.github.io/borax/"><i class="fa fa-fw fa-link"></i>Borax</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2015 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">程序员Barnes</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  <script src="/lib/pjax/pjax.min.js?v=0.2.8"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[pjax], script#page-configurations, #pjax script').forEach(element => {
+    var id = element.id || '';
+    var src = element.src || '';
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (id !=='') {
+      script.id = element.id;
+    }
+    if (src !== '') {
+      script.src = src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+  var GUEST = ['nick', 'mail', 'link'];
+  var guest = 'nick,mail,link';
+  guest = guest.split(',').filter(item => {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#comments',
+    verify: false,
+    notify: false,
+    appId: 'YlSXBoomxn9Ws7GEb7bfJiaz-gzGzoHsz',
+    appKey: 'usgVEKYx48ugyhewgxrnLjFk',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: guest,
+    pageSize: '10' || 10,
+    visitor: true,
+    lang: '' || 'zh-cn',
+    path: location.pathname
+  });
+}, window.Valine);
+</script>
+
+    </div>
+</body>
+</html>

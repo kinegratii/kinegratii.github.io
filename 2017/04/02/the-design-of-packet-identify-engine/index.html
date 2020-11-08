@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/logo/apple_touch_icon.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/logo/logo_16.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-corner-indicator.min.css?v=1.0.2">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="基于工厂模式的包识别引擎设计，和一般工厂模式不同是：  匹配规则查询表中是一个树形结构，既有精确规则，又有模糊规则，匹配的过程需要多次查询的操作，从精确到模糊直至无法匹配。 匹配规则查询表能够支持添加新规则操作  1 问题描述A NMS基础协议 NMS是服务器与硬件设备(具体为RTU或者网关)工作的通信协议，协议格式描述如下：    网关地址 节点地址 源类型 包序号 包类型 负载长度 负载">
+<meta name="keywords" content="Python,设计模式">
+<meta property="og:type" content="article">
+<meta property="og:title" content="NMS协议包识别引擎">
+<meta property="og:url" content="http://kinegratii.github.io/2017/04/02/the-design-of-packet-identify-engine/index.html">
+<meta property="og:site_name" content="程序员Barnes的博客">
+<meta property="og:description" content="基于工厂模式的包识别引擎设计，和一般工厂模式不同是：  匹配规则查询表中是一个树形结构，既有精确规则，又有模糊规则，匹配的过程需要多次查询的操作，从精确到模糊直至无法匹配。 匹配规则查询表能够支持添加新规则操作  1 问题描述A NMS基础协议 NMS是服务器与硬件设备(具体为RTU或者网关)工作的通信协议，协议格式描述如下：    网关地址 节点地址 源类型 包序号 包类型 负载长度 负载">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2020-11-08T06:32:52.269Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="NMS协议包识别引擎">
+<meta name="twitter:description" content="基于工厂模式的包识别引擎设计，和一般工厂模式不同是：  匹配规则查询表中是一个树形结构，既有精确规则，又有模糊规则，匹配的过程需要多次查询的操作，从精确到模糊直至无法匹配。 匹配规则查询表能够支持添加新规则操作  1 问题描述A NMS基础协议 NMS是服务器与硬件设备(具体为RTU或者网关)工作的通信协议，协议格式描述如下：    网关地址 节点地址 源类型 包序号 包类型 负载长度 负载">
+  <link rel="alternate" href="/atom.xml" title="程序员Barnes的博客" type="application/atom+xml">
+  <link rel="canonical" href="http://kinegratii.github.io/2017/04/02/the-design-of-packet-identify-engine/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>NMS协议包识别引擎 | 程序员Barnes的博客</title>
+  <meta name="generator" content="Hexo 3.9.0">
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">程序员Barnes的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">逍遥于天地之间，而心意自得。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档<span class="badge">46</span></a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-topics">
+      
+    
+      
+    
+
+    <a href="/topics/" rel="section"><i class="menu-item-icon fa fa-fw fa-file"></i> <br>专题</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-library">
+      
+    
+      
+    
+
+    <a href="/library/" rel="section"><i class="menu-item-icon fa fa-fw fa-book"></i> <br>图书馆</a>
+
+  </li>
+      
+      
+      
+        
+          
+          
+          
+            
+            
+    
+  
+  <li class="menu-item menu-item-about">
+      
+    
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+
+
+          
+        
+          
+          
+          
+        
+          
+          
+          
+        
+      
+      
+      
+      
+        
+        <li class="menu-item menu-item-borax">
+      
+    
+      
+    
+
+    <a href="/borax-project/" rel="section"><i class="menu-item-icon fa fa-fw fa-tasks"></i> <br>Borax</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/kinegratii" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://kinegratii.github.io/2017/04/02/the-design-of-packet-identify-engine/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="程序员Barnes">
+      <meta itemprop="description" content="逍遥于天地之间，而心意自得。">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="程序员Barnes的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">NMS协议包识别引擎
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2017-04-02 15:33:14" itemprop="dateCreated datePublished" datetime="2017-04-02T15:33:14+08:00">2017-04-02</time>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/技术研究/" itemprop="url" rel="index"><span itemprop="name">技术研究</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            <span id="/2017/04/02/the-design-of-packet-identify-engine/" class="post-meta-item leancloud_visitors" data-flag-title="NMS协议包识别引擎" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+        
+      
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2017/04/02/the-design-of-packet-identify-engine/#comments" itemprop="discussionUrl"><span class="post-comments-count valine-comment-count" data-xid="/2017/04/02/the-design-of-packet-identify-engine/" itemprop="commentCount"></span></a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>基于工厂模式的包识别引擎设计，和一般工厂模式不同是：</p>
+<ul>
+<li>匹配规则查询表中是一个树形结构，既有精确规则，又有模糊规则，匹配的过程需要多次查询的操作，从精确到模糊直至无法匹配。</li>
+<li>匹配规则查询表能够支持添加新规则操作</li>
+</ul>
+<h2 id="1-问题描述"><a href="#1-问题描述" class="headerlink" title="1 问题描述"></a>1 问题描述</h2><p><strong>A NMS基础协议</strong></p>
+<p>NMS是服务器与硬件设备(具体为RTU或者网关)工作的通信协议，协议格式描述如下：</p>
+<table>
+<thead>
+<tr>
+<th>网关地址</th>
+<th>节点地址</th>
+<th>源类型</th>
+<th>包序号</th>
+<th>包类型</th>
+<th>负载长度</th>
+<th>负载</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>gateway_mac</td>
+<td>rtu_mac</td>
+<td>source_type</td>
+<td>packet_id</td>
+<td>packet_type</td>
+<td>payload_length</td>
+<td>payload</td>
+</tr>
+<tr>
+<td>8</td>
+<td>8</td>
+<td>1</td>
+<td>4</td>
+<td>1</td>
+<td>1</td>
+<td>-</td>
+</tr>
+</tbody></table>
+<p>前23字节为包头部，各个字段描述如下：</p>
+<ul>
+<li>网关地址：64位长整型，显示为十六进制形式。</li>
+<li>节点地址：64位长整型，显示为十六进制形式。</li>
+<li>源类型：表示哪一种设备，主要有 Gateway/GPRS-RTU/Mesh-RTU 三种类型的设备。</li>
+<li>包序号：32位整数，0 - 4294967295 。</li>
+<li>包类型：该包的类型。</li>
+<li>负载长度：整数0-255，表示后面的负载长度，实际中负载长度小于255。</li>
+</ul>
+<a id="more"></a>
+
+<p>源类型取值定义如下：</p>
+<table>
+<thead>
+<tr>
+<th>设备分类</th>
+<th>设备类型取值</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>网关</td>
+<td>0x03</td>
+<td>自组网网关</td>
+</tr>
+<tr>
+<td></td>
+<td>0x06</td>
+<td>以太网网关</td>
+</tr>
+<tr>
+<td>Mesh-RTU</td>
+<td>0x01</td>
+<td>自组网RTU，通过自组网关与服务器相连</td>
+</tr>
+<tr>
+<td>GPRS-RTU</td>
+<td>0x02</td>
+<td>GPRS-RTU，与服务器直连</td>
+</tr>
+<tr>
+<td>web服务器</td>
+<td>0x04</td>
+<td>由服务器或者上层应用发起</td>
+</tr>
+</tbody></table>
+<p><strong>B 应用协议</strong></p>
+<p>NMS可承载多种设备应用协议，比如Modbus协议、DTU低功耗设备协议、远程抄表协议等，每个应用协议使用1字节的整数标识，称之为应用类型(app_id)。<strong>由于一些类型的包与上层应用无关，所以在设计中，NMS协议头部没有专门的应用类型字段。</strong> 它的规则如下：</p>
+<ul>
+<li>应用类型存储在payload中，并且位置不一定相同，但由包类型决定，即由packet_type和payload两个参数可计算出具体应用类型数值</li>
+<li>在应用协议扩展过程中，属于统一应用协议的设备（网关或节点）既可以使用现有的设备类型取值，也可申请新的设备类型取值。这取决于具体应用场景，比如Modbus协议中，网关设备只起数据转化的功能，可以部署通用网关，设备类型取值为0x03，远程抄表协议中，网关也能响应服务器的动作，申请新的设备类型取值。</li>
+</ul>
+<p>在上述描述中，设备类型(source_type)和设备分类(source_catalog)的概念是不一样的。加入上层应用协议后，它们的关系，</p>
+<table>
+<thead>
+<tr>
+<th>设备分类</th>
+<th>设备分类取值</th>
+<th>设备类型取值</th>
+<th>应用协议</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>网关</td>
+<td>gateway</td>
+<td>0x03</td>
+<td>通用</td>
+<td>自组网网关</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>0x06</td>
+<td>通用</td>
+<td>以太网网关</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>0x07</td>
+<td>抄表应用(0x01)</td>
+<td>网关</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+</tr>
+<tr>
+<td>Mesh-RTU</td>
+<td>mesh_rtu</td>
+<td>0x01</td>
+<td>通用</td>
+<td>自组网RTU，通过自组网关与服务器相连</td>
+</tr>
+<tr>
+<td>GPRS-RTU</td>
+<td>gprs_rtu</td>
+<td>0x02</td>
+<td>通用</td>
+<td>GPRS-RTU，与服务器直连</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>0x08</td>
+<td>报警(0x0A)</td>
+<td></td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+</tr>
+<tr>
+<td>web服务器</td>
+<td>-</td>
+<td>0x04</td>
+<td>-</td>
+<td>由服务器或者上层应用发起</td>
+</tr>
+</tbody></table>
+<p>以具体到NMS协议， 包类型与应用类型的对应关系（部分）如下：</p>
+<p>| 包类型 | 取值 | 是否应用协议相关 | 是否设备相关 | 描述 |<br>| —— | —— | —— | —— |<br>| 数据包 | 0x01 | 是 | 无 | 设备自动上报的数据 |<br>| 心跳包 | 0x04 | 否 | 设备分类相关 | 维持在线状态 |<br>| 时间同步包 | 0x06 | 否 | 否 | 由服务器发送 |</p>
+<p>问题：</p>
+<ol>
+<li>设计基于树结构的包结构体系。</li>
+<li>实现给定一段符合格式NMS的包二进制字节数组，识别所对应的包种类，返回实例化的包对象。</li>
+<li>支持扩展已有的应用协议。</li>
+</ol>
+<h2 id="2-基本识别过程"><a href="#2-基本识别过程" class="headerlink" title="2 基本识别过程"></a>2 基本识别过程</h2><p>基于(packet_type, source_type, app_id)的识别引擎主框架代码如下。</p>
+<p>packet.py</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">PacketBase</span><span class="params">(object)</span>:</span></span><br><span class="line">    packet_type = <span class="literal">None</span></span><br><span class="line">    source_catalog = <span class="literal">None</span></span><br><span class="line">    source_type = <span class="literal">None</span></span><br><span class="line">    app_related = <span class="literal">False</span></span><br><span class="line">    app_id = <span class="literal">None</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, gateway_mac, rtu_mac, source_type, packet_id, packet_type, payload_length, payload, **kwargs)</span>:</span></span><br><span class="line">        self.gateway_mac = gateway_mac</span><br><span class="line">        self.rtu_mac = rtu_mac</span><br><span class="line">        self.source_type = source_type <span class="keyword">or</span> self.source_type</span><br><span class="line">        self.packet_id = packet_id</span><br><span class="line">        self.packet_type = packet_type <span class="keyword">or</span> self.packet_type</span><br><span class="line">        self.payload_length = payload_length</span><br><span class="line">        self.payload = payload</span><br></pre></td></tr></table></figure>
+
+<p>engine.py</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> struct</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AppProtocolBase</span><span class="params">(object)</span>:</span></span><br><span class="line">    app_id = <span class="literal">None</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Engine</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></span><br><span class="line">        self._packet_lookup = &#123;&#125; <span class="comment"># 包类对象查询表，为(packet_type, source_type, app_id)到包类对象的映射</span></span><br><span class="line">        self._protocol_lookup = &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">register_protocol</span><span class="params">(self, protocol_class)</span>:</span></span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">add_lookup_item</span><span class="params">(self, packet_type, source_catalog, source_type, app_id, packet_class)</span>:</span></span><br><span class="line">        <span class="comment"># 添加匹配规则</span></span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">identify</span><span class="params">(self, packet_binary)</span>:</span></span><br><span class="line">        header, payload = packet_binary[:<span class="number">23</span>], packet_binary[<span class="number">23</span>:]</span><br><span class="line">        gateway_mac, rtu_mac, source_type, packet_id, packet_type, payload_length = struct.unpack(<span class="string">'&gt;QQBIBB'</span>, header)</span><br><span class="line"></span><br><span class="line">        cls = self._identify_class(packet_type, source_type, payload)</span><br><span class="line">        <span class="keyword">if</span> cls:</span><br><span class="line">            <span class="keyword">return</span> cls(gateway_mac, rtu_mac, source_type, packet_id, packet_type, payload_length, payload)</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">identify_class</span><span class="params">(self, packet_type, source_type, payload)</span>:</span></span><br><span class="line">        <span class="comment"># 输入为包索引(packet_type, source_type, app_id)</span></span><br><span class="line">        <span class="comment"># 在查询过程中，可能需要经过精确到模糊的查找过程，并不是简单的 dict.get 调用</span></span><br><span class="line">        <span class="keyword">pass</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="3-查询表-lookup"><a href="#3-查询表-lookup" class="headerlink" title="3 查询表(lookup)"></a>3 查询表(lookup)</h2><h3 id="3-1-构建基本查询表"><a href="#3-1-构建基本查询表" class="headerlink" title="3.1 构建基本查询表"></a>3.1 构建基本查询表</h3><p>包索引即为查询表中的键</p>
+<p>packet.py</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 构建</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DataPacket</span><span class="params">(PacketBase)</span>:</span></span><br><span class="line">    packet_type = <span class="number">0x01</span></span><br><span class="line">    app_related = <span class="literal">True</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">GatewayHeartbeatPacket</span><span class="params">(PacketBase)</span>:</span></span><br><span class="line">    packet_type = <span class="number">0x04</span></span><br><span class="line">    source_catalog = <span class="string">'gateway'</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MeshRTUHeartbeatPacket</span><span class="params">(PacketBase)</span>:</span></span><br><span class="line">    packet_type = <span class="number">0x04</span></span><br><span class="line">    source_catalog = <span class="string">'mesh_rtu'</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">GPRSHeartbeatPacket</span><span class="params">(PacketBase)</span>:</span></span><br><span class="line">    packet_type = <span class="number">0x04</span></span><br><span class="line">    source_catalog = <span class="string">'gprs_rtu'</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TimeSyncPacket</span><span class="params">(PacketBase)</span>:</span></span><br><span class="line">    packet_type = <span class="number">0x06</span></span><br><span class="line">    source_catalog = <span class="number">0x04</span>  </span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">build_lookup</span><span class="params">(*args)</span>:</span></span><br><span class="line">    packet_lookup = &#123;&#125;</span><br><span class="line">    app_related_packet_type_set = &#123;&#125;</span><br><span class="line">    <span class="keyword">for</span> packet_class <span class="keyword">in</span> args:</span><br><span class="line">        packet_lookup[(packet_class.packet_type, packet_class.source_type <span class="keyword">or</span> packet_class.source_type, <span class="literal">None</span>)] = packet_class</span><br><span class="line">        <span class="keyword">if</span> packet_class.app_related:</span><br><span class="line">            app_related_packet_type_set.add(packet_class.packet_type)</span><br><span class="line">    <span class="keyword">return</span> packet_lookup, app_related_packet_type_set</span><br><span class="line"></span><br><span class="line"><span class="comment"># 两个查询表计算过程</span></span><br><span class="line"><span class="comment"># PACKET_LOOKUP, APP_RELATED_PACKET_TYPE_SET = build_lookup(</span></span><br><span class="line"><span class="comment">#    DataPacket,</span></span><br><span class="line"><span class="comment">#    GatewayHeartbeatPacket,</span></span><br><span class="line"><span class="comment">#    GPRSHeartbeatPacket,</span></span><br><span class="line"><span class="comment">#    MeshRTUHeartbeatPacket,</span></span><br><span class="line"><span class="comment">#    TimeSyncPacket</span></span><br><span class="line"><span class="comment"># )</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 为了下面示例方面，直接给出最后结果</span></span><br><span class="line">PACKET_LOOKUP =  &#123;</span><br><span class="line">  (<span class="number">0x01</span>, <span class="literal">None</span>, <span class="literal">None</span>): DataPacket,</span><br><span class="line">  (<span class="number">0x04</span>, <span class="string">'gateway'</span>, <span class="literal">None</span>): GatewayHeartbeatPacket,</span><br><span class="line">  (<span class="number">0x04</span>, <span class="string">'gprs_rtu'</span>, <span class="literal">None</span>): GPRSHeartbeatPacket,</span><br><span class="line">  (<span class="number">0x04</span>, <span class="string">'mesh_rtu'</span>, <span class="literal">None</span>): MeshRTUHeartbeatPacket,</span><br><span class="line">  (<span class="number">0x06</span>, <span class="number">0x04</span>, <span class="literal">None</span>): TimeSyncPacket</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 所有与应用相关的包类型集合</span></span><br><span class="line">APP_RELATED_PACKET_TYPE_SET = &#123; <span class="number">0x01</span> &#125;</span><br><span class="line"></span><br><span class="line">SOURCE_TYPE_CATALOG_LOOKUP = &#123;</span><br><span class="line">    <span class="number">0x01</span>: <span class="string">'mesh_rtu'</span>,</span><br><span class="line">    <span class="number">0x02</span>: <span class="string">'gprs_rtu'</span>,</span><br><span class="line">    <span class="number">0x03</span>: <span class="string">'gateway'</span>,</span><br><span class="line">    <span class="number">0x04</span>: <span class="string">'gateway'</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">SOURCE_CATALOG_SET = &#123;<span class="string">'gateway'</span>, <span class="string">'mesh_rtu'</span>, <span class="string">'gprs_rtu'</span>&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-2-基于应用协议扩展识别规则查询表"><a href="#3-2-基于应用协议扩展识别规则查询表" class="headerlink" title="3.2 基于应用协议扩展识别规则查询表"></a>3.2 基于应用协议扩展识别规则查询表</h3><p>注册应用协议实际为上述查询表增加了更加精确的匹配规则，当本应用协议的包类对象无法使用才会使用基本的包类对象。在添加匹配规则时：</p>
+<ul>
+<li>应用类型：应用类型不能与已有的冲突</li>
+<li>包类型：只能注册那些与应用相关的类型的包(类型存储在 <code>APP_RELATED_PACKET_TYPE_SET</code>)，因为与应用无关的包没有存储应用类型字段，识别时无法分发。</li>
+<li>源类型和源分类<ul>
+<li>使用已有的设备分类，对应于若干种设备</li>
+<li>使用已有的设备类型</li>
+<li>使用新的设备类型，不能和已有的相冲突，同时必须指定设备分类</li>
+</ul>
+</li>
+</ul>
+<p>实现过程如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">import</span> copy</span><br><span class="line"><span class="keyword">from</span> .packet <span class="keyword">import</span> PACKET_LOOKUP, APP_RELATED_PACKET_TYPE_SET, SOURCE_CATALOG_SET, SOURCE_TYPE_CATALOG_LOOKUP</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Engine</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></span><br><span class="line">        self._packet_lookup = copy.copy(PACKET_LOOKUP) <span class="comment"># 包类对象查询表，为(packet_type, source_type, app_id)到包类对象的映射</span></span><br><span class="line">        self._source_type_catalog_lookup = copy.copy(SOURCE_TYPE_CATALOG_LOOKUP)</span><br><span class="line">        self._protocol_lookup = &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">register_protocol</span><span class="params">(self, protocol_class)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> protocol_class.app_id <span class="keyword">in</span> self._protocol_lookup:</span><br><span class="line">            <span class="keyword">raise</span> ValueError(<span class="string">'The app_id value &#123;&#125; in the &#123;&#125; has conflicted!'</span>.format(protocol_class.app_id, protocol_class.__name__))</span><br><span class="line">        self._protocol_lookup[protocol_class.app_id] = protocol_class</span><br><span class="line">        <span class="keyword">for</span> packet_class <span class="keyword">in</span> protocol_class.packet_lookup:</span><br><span class="line">            self.add_lookup_item(packet_class.packet_type, protocol_class.source_catalog, protocol_class.source_type, protocol_class.app_id, protocol_class)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">add_lookup_item</span><span class="params">(self, packet_type, source_catalog, source_type, app_id, packet_class)</span>:</span></span><br><span class="line">        <span class="keyword">if</span> packet_type <span class="keyword">not</span> <span class="keyword">in</span> APP_RELATED_PACKET_TYPE_SET:</span><br><span class="line">            <span class="keyword">raise</span> ValueError(<span class="string">'Protocol Register with packet_type &#123;&#125; is not supported!'</span>.format(packet_type))</span><br><span class="line">        <span class="keyword">if</span> source_type <span class="keyword">in</span> self._source_type_catalog_lookup:</span><br><span class="line">            self._packet_lookup[(packet_type, source_type, protocol_class.app_id)] = packet_class</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">if</span> source_catalog <span class="keyword">in</span> SOURCE_CATALOG_SET:</span><br><span class="line">                self._packet_lookup[(packet_type, source_catalog, protocol_class.app_id)] = packet_class</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                <span class="keyword">raise</span> ValueError(<span class="string">'Invalid source_catalog'</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-3-使用方法和测试案例"><a href="#3-3-使用方法和测试案例" class="headerlink" title="3.3 使用方法和测试案例"></a>3.3 使用方法和测试案例</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">HydrantDataPacket</span><span class="params">(DataPacket)</span>:</span></span><br><span class="line">    <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">HydrantProtocol</span><span class="params">(AppProtocolBase)</span>:</span></span><br><span class="line">    app_id = <span class="number">0x0A</span></span><br><span class="line">    packet_lookup = &#123; HydrantDataPacket &#125;</span><br><span class="line"></span><br><span class="line">engine = Engine()</span><br><span class="line"></span><br><span class="line">engine.register_protocol(HydrantProtocol)</span><br><span class="line"></span><br><span class="line">payload = struct.pack(<span class="string">'&gt;BBBBB'</span>, <span class="number">0x0A</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>)</span><br><span class="line">test_binary = struct.pack(<span class="string">'&gt;QQBIBB'</span>, <span class="number">70971071088567232</span>, <span class="number">70971071088567240</span>, <span class="number">13</span>, <span class="number">0x01</span>, <span class="number">5</span>) + payload</span><br><span class="line"></span><br><span class="line">packet = engine.indentfity(test_binary)</span><br><span class="line"></span><br><span class="line"><span class="keyword">assert</span> isinstance(packet, HydrantProtocol) == <span class="literal">True</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="4-识别匹配"><a href="#4-识别匹配" class="headerlink" title="4 识别匹配"></a>4 识别匹配</h2><ul>
+<li>查询 (packet_tpye, source_type, None)<ul>
+<li>是：计算app_id，查询(packet_tpye, source_catalog, app_id)<ul>
+<li>是：使用(packet_tpye, source_catalog, app_id)</li>
+<li>否：使用(packet_tpye, source_type, None)</li>
+</ul>
+</li>
+<li>否：当前packet_tpye是否有app_id<ul>
+<li>是：计算app_id，查询 (packet_tpye, source_catalog, app_id)<ul>
+<li>是：使用 (packet_tpye, source_catalog, app_id)</li>
+<li>否：无法识别</li>
+</ul>
+</li>
+<li>否：查询 (packet_tpye, source_catalog, None)<ul>
+<li>是：使用(packet_tpye, source_catalog, None)</li>
+<li>否：无法识别</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Engine</span><span class="params">(object)</span>:</span></span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">identify_class</span><span class="params">(self, packet_type, source_type, payload)</span></span></span><br><span class="line">      cls = self._packet_lookup.get((packet_type, source_type, None))</span><br><span class="line">         <span class="keyword">if</span> cls:</span><br><span class="line">             source_type_or_catalog = source_type</span><br><span class="line">         <span class="keyword">else</span>:</span><br><span class="line">             source_catalog = self._source_type_catalog_lookup.get(source_type)</span><br><span class="line">             cls = self._packet_lookup.get((packet_type, source_catalog, <span class="literal">None</span>))</span><br><span class="line">             <span class="keyword">if</span> cls:</span><br><span class="line">                 source_type_or_catalog = source_catalog</span><br><span class="line">             <span class="keyword">else</span>:</span><br><span class="line">                 source_type_or_catalog = <span class="literal">None</span></span><br><span class="line">         <span class="keyword">if</span> packet_type <span class="keyword">in</span> APP_PACKET_TYPE_LOOKUP <span class="keyword">and</span> cls:</span><br><span class="line">             app_id = cls.parse_app_id()</span><br><span class="line">             t_cls = self._packet_lookup.get((packet_type, source_type_or_catalog, app_id))</span><br><span class="line">             <span class="keyword">if</span> t_cls:</span><br><span class="line">                 cls = t_cls</span><br><span class="line">         <span class="keyword">return</span> cls</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      
+        <div class="popular-posts-date">2017-04-07</div>
+      
+      
+      <div class="popular-posts-title"><a href="/2017/04/07/construct-python-binary-parse-build/" rel="bookmark">Construct：二进制数据解析器和构建器</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+        <div class="popular-posts-date">2018-06-10</div>
+      
+      
+      <div class="popular-posts-title"><a href="/2018/06/10/my-python-packages-and-libraries/" rel="bookmark">我的 Python 第三方库</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+        <div class="popular-posts-date">2016-05-17</div>
+      
+      
+      <div class="popular-posts-title"><a href="/2016/05/17/osc-tweet-publish/" rel="bookmark">自动发送动弹到开源中国</a></div>
+      
+    </li>
+  
+  </ul>
+
+        
+      
+        <div id="reward-container">
+  <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+  <button id="reward-button" disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/wechat_reward.png" alt="程序员Barnes 微信支付">
+        <p>微信支付</p>
+      </div>
+
+  </div>
+</div>
+
+      
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>程序员Barnes</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://kinegratii.github.io/2017/04/02/the-design-of-packet-identify-engine/" title="NMS协议包识别引擎">http://kinegratii.github.io/2017/04/02/the-design-of-packet-identify-engine/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+</div>
+
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/Python/" rel="tag"><i class="fa fa-tag"></i> Python</a>
+            
+              <a href="/tags/设计模式/" rel="tag"><i class="fa fa-tag"></i> 设计模式</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2017/03/29/start-machine-learning/" rel="next" title="机器学习（一） —— 准备工作">
+                  <i class="fa fa-chevron-left"></i> 机器学习（一） —— 准备工作
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2017/04/07/construct-python-binary-parse-build/" rel="prev" title="Construct：二进制数据解析器和构建器">
+                  Construct：二进制数据解析器和构建器 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="comments"></div>
+  
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-问题描述"><span class="nav-text">1 问题描述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-基本识别过程"><span class="nav-text">2 基本识别过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-查询表-lookup"><span class="nav-text">3 查询表(lookup)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-构建基本查询表"><span class="nav-text">3.1 构建基本查询表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-基于应用协议扩展识别规则查询表"><span class="nav-text">3.2 基于应用协议扩展识别规则查询表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-使用方法和测试案例"><span class="nav-text">3.3 使用方法和测试案例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-识别匹配"><span class="nav-text">4 识别匹配</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.jpg"
+      alt="程序员Barnes">
+  <p class="site-author-name" itemprop="name">程序员Barnes</p>
+  <div class="site-description" itemprop="description">逍遥于天地之间，而心意自得。</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">46</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/kinegratii" title="GitHub &rarr; https://github.com/kinegratii" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://my.oschina.net/kinegratii" title="oschina &rarr; https://my.oschina.net/kinegratii" rel="noopener" target="_blank"><i class="fa fa-fw fa-link"></i>oschina</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://kinegratii.github.io/borax/" title="Borax &rarr; https://kinegratii.github.io/borax/"><i class="fa fa-fw fa-link"></i>Borax</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2015 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">程序员Barnes</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  <script src="/lib/pjax/pjax.min.js?v=0.2.8"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[pjax], script#page-configurations, #pjax script').forEach(element => {
+    var id = element.id || '';
+    var src = element.src || '';
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (id !=='') {
+      script.id = element.id;
+    }
+    if (src !== '') {
+      script.src = src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+  var GUEST = ['nick', 'mail', 'link'];
+  var guest = 'nick,mail,link';
+  guest = guest.split(',').filter(item => {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#comments',
+    verify: false,
+    notify: false,
+    appId: 'YlSXBoomxn9Ws7GEb7bfJiaz-gzGzoHsz',
+    appKey: 'usgVEKYx48ugyhewgxrnLjFk',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: guest,
+    pageSize: '10' || 10,
+    visitor: true,
+    lang: '' || 'zh-cn',
+    path: location.pathname
+  });
+}, window.Valine);
+</script>
+
+    </div>
+</body>
+</html>

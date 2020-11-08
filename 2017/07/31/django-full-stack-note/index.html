@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/logo/apple_touch_icon.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/logo/logo_16.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-corner-indicator.min.css?v=1.0.2">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="概述BWS项目是自己一年来在开发的项目。本文就项目中一些技术选型、功能实现、项目流程做一些简单的总结。">
+<meta name="keywords" content="项目,Django">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Django项目全栈笔记">
+<meta property="og:url" content="http://kinegratii.github.io/2017/07/31/django-full-stack-note/index.html">
+<meta property="og:site_name" content="程序员Barnes的博客">
+<meta property="og:description" content="概述BWS项目是自己一年来在开发的项目。本文就项目中一些技术选型、功能实现、项目流程做一些简单的总结。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2020-11-08T06:32:52.269Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Django项目全栈笔记">
+<meta name="twitter:description" content="概述BWS项目是自己一年来在开发的项目。本文就项目中一些技术选型、功能实现、项目流程做一些简单的总结。">
+  <link rel="alternate" href="/atom.xml" title="程序员Barnes的博客" type="application/atom+xml">
+  <link rel="canonical" href="http://kinegratii.github.io/2017/07/31/django-full-stack-note/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Django项目全栈笔记 | 程序员Barnes的博客</title>
+  <meta name="generator" content="Hexo 3.9.0">
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">程序员Barnes的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">逍遥于天地之间，而心意自得。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档<span class="badge">46</span></a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-topics">
+      
+    
+      
+    
+
+    <a href="/topics/" rel="section"><i class="menu-item-icon fa fa-fw fa-file"></i> <br>专题</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-library">
+      
+    
+      
+    
+
+    <a href="/library/" rel="section"><i class="menu-item-icon fa fa-fw fa-book"></i> <br>图书馆</a>
+
+  </li>
+      
+      
+      
+        
+          
+          
+          
+            
+            
+    
+  
+  <li class="menu-item menu-item-about">
+      
+    
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+
+
+          
+        
+          
+          
+          
+        
+          
+          
+          
+        
+      
+      
+      
+      
+        
+        <li class="menu-item menu-item-borax">
+      
+    
+      
+    
+
+    <a href="/borax-project/" rel="section"><i class="menu-item-icon fa fa-fw fa-tasks"></i> <br>Borax</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/kinegratii" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://kinegratii.github.io/2017/07/31/django-full-stack-note/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="程序员Barnes">
+      <meta itemprop="description" content="逍遥于天地之间，而心意自得。">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="程序员Barnes的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">Django项目全栈笔记
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2017-07-31 10:55:06" itemprop="dateCreated datePublished" datetime="2017-07-31T10:55:06+08:00">2017-07-31</time>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/编程/" itemprop="url" rel="index"><span itemprop="name">编程</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            <span id="/2017/07/31/django-full-stack-note/" class="post-meta-item leancloud_visitors" data-flag-title="Django项目全栈笔记" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+        
+      
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2017/07/31/django-full-stack-note/#comments" itemprop="discussionUrl"><span class="post-comments-count valine-comment-count" data-xid="/2017/07/31/django-full-stack-note/" itemprop="commentCount"></span></a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>BWS项目是自己一年来在开发的项目。本文就项目中一些技术选型、功能实现、项目流程做一些简单的总结。</p>
+<a id="more"></a>
+
+<h2 id="python3"><a href="#python3" class="headerlink" title="python3"></a>python3</h2><p>虽然Python3发布已经10年之久，但是2和3之争直到今天依旧存在，对于如何学习，每个人都有自己的理解和学习策略。我个人看法：</p>
+<ul>
+<li>果断学习面向未来的3；</li>
+<li>3和2的差别对于学习过程没有太多的影响，学好了3自然也能够很快上手2了；</li>
+<li>常见的第三方库大多数（80%以上）是支持Python3的；</li>
+<li>不过在系统安装的时候总是23共存的，可以自由切换；</li>
+</ul>
+<p>今年4月份重新开发的时候做了一个比较激进的做法：<strong>完全抛弃对Python2的支持</strong>。当时的考量，把这个项目作为Django持续学习的一个示范项目，毕竟 Django的下一个大版本2.0（预计2017年12月发布），也已经要求最低版本为3.5了。</p>
+<p>其实在项目中使用几个Python2不支持的语法和没有的标准库，就可以达到以上目的，具体来说，在代码中使用了以下几个语法：</p>
+<ul>
+<li>字典合并创建语法（<a href="https://www.python.org/dev/peps/pep-0448/" target="_blank" rel="noopener">PEP448</a>）</li>
+<li>强制关键字传参（<a href="https://www.python.org/dev/peps/pep-3102/" target="_blank" rel="noopener">PEP3102</a>）</li>
+</ul>
+<p>根据 PEP448，在Python3.5中可以使用更加简洁明了的代码实现合并多个字典。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 3.5+</span></span><br><span class="line">combination = &#123;**first_dictionary, <span class="string">"x"</span>: <span class="number">1</span>, <span class="string">"y"</span>: <span class="number">2</span>&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 3.5以下</span></span><br><span class="line">combination = first_dictionary.copy()</span><br><span class="line">combination.update(&#123;<span class="string">"x"</span>: <span class="number">1</span>, <span class="string">"y"</span>: <span class="number">2</span>&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>另外Python3在文本和二进制方面作了比较大的改变，这对文件导入导出功能开发提供了便利，不用再纠结2的编码问题，可以集中解决业务层面的问题。</p>
+<h2 id="Django"><a href="#Django" class="headerlink" title="Django"></a>Django</h2><p>我也算是Django的忠实用户了，从1.4到1.11都有用到，不断看到Django的成长和壮大。1.4/1.8/1.11是LTS版本，项目使用的是1.10。这些年来Django比较大的变更有：</p>
+<ul>
+<li>自定义用户类型：这个是1.5就有的功能了，之前只能使用内置的用户类，连使用邮箱作为用户名也不能直接支持；</li>
+<li>数据库迁移：1.7借鉴 <a href="https://bitbucket.org/andrewgodwin/south/" target="_blank" rel="noopener">South</a> 实现的，这个是开发的利器，修改用户模型时候可以使用命令一键将修改同步到数据库，而忽略具体的数据库类型；</li>
+<li>自定义过滤查询：1.7，这个主要用于封装一些业务数据库查询。</li>
+<li>多模板支持：1.8引入的，Django自己的模板引擎效率历来为人们所诟病，现在可以在Django中使用Jinja2这样的模板了。</li>
+<li>表单控件支持模板渲染：Django表单其实是着重于后端验证，前端相对薄弱，导致定制起来没有那么顺手。最新的1.11引入的可以通过模板文件定制控件样式等等。</li>
+</ul>
+<h3 id="CBV"><a href="#CBV" class="headerlink" title="CBV"></a>CBV</h3><p><strong>强烈建议使用 Class-Based-View 组织视图处理函数。</strong></p>
+<p>Class-Based-View 是相对于Function-Based-View而言，主要支持封装，减少重复的代码编写工作，逻辑流程清晰，经过测试过的。在具体编写代码还是一定要查看源代码，才能理解其中的功能实现。</p>
+<p>CBV的核心是Mixin模式。</p>
+<blockquote>
+<p>Mixin是一种将多个类中的功能单元的进行组合的利用的方式，这听起来就像是有类的继承机制就可以实现，然而这与传统的类继承有所不同。通常mixin并不作为任何类的基类，也不关心与什么类一起使用，而是在运行时动态的同其他零散的类一起组合使用。</p>
+</blockquote>
+<blockquote>
+<p>使用mixin机制有如下好处：可以在不修改任何源代码的情况下，对已有类进行扩展；可以保证组件的划分；可以根据需要，使用已有的功能进行组合，来实现“新”类；很好的避免了类继承的局限性，因为新的业务需要可能就需要创建新的子类。</p>
+</blockquote>
+<p>现在也基本上不写视图函数了，项目上能见到的也就是 <code>django.contrib.auth.login</code> 等几个函数了，不过现在也要改成视图类形式了。</p>
+<h3 id="是否启用admin"><a href="#是否启用admin" class="headerlink" title="是否启用admin"></a>是否启用admin</h3><p>虽然admin是Django的主要优势所在，但是它的使用场景有限，主要由于整合许多功能，比如分页、过滤、搜索、增删改查和批量操作等等，相互之间具有非常高的耦合度。在没有提供公开的API下去实现一些定制往往是“牵一发而动全身”，最后基本上也改的是不成样子。</p>
+<p>由于项目中没有使用内置的admin组件，增删改查的页面就需要多花一点时间自己去适配。</p>
+<p>日志模型也要自己去设计，项目中我自己添加了ip这个字段，这个是原来所没有的。</p>
+<h2 id="后端数据API-DRF"><a href="#后端数据API-DRF" class="headerlink" title="后端数据API - DRF"></a>后端数据API - DRF</h2><p>后端数据采用的是 <a href="http://www.django-rest-framework.org/" target="_blank" rel="noopener">Django Rest Framework</a> 这个框架，覆盖了大多数需求，包括：</p>
+<ul>
+<li>搜索/分页</li>
+<li>访问权限</li>
+<li>请求限制（频率、IP）</li>
+<li>表单验证</li>
+</ul>
+<h2 id="前端-Amaze-UI"><a href="#前端-Amaze-UI" class="headerlink" title="前端 Amaze UI"></a>前端 Amaze UI</h2><p>前端UI用的是 <a href="http://amazeui.org/" target="_blank" rel="noopener">Amaze UI</a>这个框架。不过从后来的发展形势来看，这是最为错误的决定了，主要原因在于无法和后端比较平稳地整合。</p>
+<p>Django表单中有一个比较大的问题，如何需要定制控件样式，需要在Python代码中修改，而且需要应用的每一处都需要更改，灵活度不够。目前主要有两种解决方式：</p>
+<ul>
+<li>使用Django1.11版本的<a href="https://docs.djangoproject.com/en/1.11/ref/forms/renderers/#" target="_blank" rel="noopener">模板功能</a>，这个功能刚刚推出，文档也只有一页的内容，不太建议使用。</li>
+<li>使用 <a href="https://github.com/django-crispy-forms/django-crispy-forms" target="_blank" rel="noopener">django-crispy-forms</a> 第三方库，这个库的思路也是使用模板html文件渲染控件，已经有一定的使用规模，但是支持 Bootstrap这样常见的UI框架，不支持 Amaze UI。</li>
+</ul>
+<h2 id="导入导出"><a href="#导入导出" class="headerlink" title="导入导出"></a>导入导出</h2><p>实现导入导出功能主要使用的是 <a href="https://github.com/kennethreitz/tablib" target="_blank" rel="noopener">tablib</a> 和 <a href="https://github.com/django-import-export/django-import-export" target="_blank" rel="noopener">django-import-export</a> 这两个库，其中后者依赖前者。</p>
+<h3 id="导出"><a href="#导出" class="headerlink" title="导出"></a>导出</h3><p>编写 <code>Resource</code>， 几点值得注意的地方：</p>
+<ul>
+<li>需要设置表头，不仅需要指定字段<code>Meta.fields</code>，同时也要显示指定 <code>Meta.export_order</code> 的值，通常和 <code>Meta.fields</code>一样即可。</li>
+<li><code>Meta.fields</code> 里的元素必须是模型的数据库字段，不能是自定义的 property，这一点和 <code>ModelAdmin.list_display</code> 不一样。</li>
+<li>可以使用 <code>dehydrate_FOO</code> 函数重写导出内容</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BillResource</span><span class="params">(resources.ModelResource)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_export_headers</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> [<span class="string">'流水号'</span>,<span class="string">'月份'</span>, <span class="string">'类型'</span>,<span class="string">'单价'</span>,<span class="string">'用量'</span>, <span class="string">'金额'</span>]</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">dehydrate_price</span><span class="params">(self, obj)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> obj.get_price_display</span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">        model = models.Bill</span><br><span class="line">        fields = (<span class="string">'id'</span>, <span class="string">'month'</span>, <span class="string">'resource_type'</span>,<span class="string">'price'</span>, <span class="string">'amout'</span>, <span class="string">'total'</span>)</span><br><span class="line">        export_order = fields</span><br></pre></td></tr></table></figure>
+
+<h3 id="导入"><a href="#导入" class="headerlink" title="导入"></a>导入</h3><p>django-import-export也提供了几个Mixin，但问题这些和admin组件耦合很高，不利于一些自定义操作，所以直接使用tablib库比较好。根据官方文档，可以使用以下代码实现文件导入</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">imported_data = Dataset().load(open(<span class="string">'data.csv'</span>).read())</span><br></pre></td></tr></table></figure>
+
+<p>但其实load还有几个比较重要的参数：</p>
+<ul>
+<li>format：文件格式，如果不写，使用自动识别，但有出错的机率，之前试验过一个xlsx文件在不同环境下识别为json文件的，因此建议这个参数也留给用户输入</li>
+<li>headers：表示第一行是否是表头，这个参数在文档中没有表明，需要自行查看源代码获取相关信息。</li>
+</ul>
+<p>所以最后就写成下面这个样子</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BillUploadForm</span><span class="params">(form.Form)</span>:</span></span><br><span class="line">    import_file = forms.FileField()</span><br><span class="line">    format = forms.ChoiceField(choices=((<span class="string">'xlsx'</span>, <span class="string">'xlsx'</span>), (<span class="string">'xls'</span>, <span class="string">'xls'</span>)))</span><br><span class="line"></span><br><span class="line"><span class="comment"># 导入</span></span><br><span class="line"></span><br><span class="line">tablib.Dataset().load(form.cleaned_data[<span class="string">'import_file'</span>].read(), format=form.cleaned_data[<span class="string">'format'</span>], headers=<span class="literal">False</span>)</span><br></pre></td></tr></table></figure>
+
+<h2 id="数据库查询优化"><a href="#数据库查询优化" class="headerlink" title="数据库查询优化"></a>数据库查询优化</h2><h3 id="select-related函数"><a href="#select-related函数" class="headerlink" title="select_related函数"></a>select_related函数</h3><p>select_related是 <code>django.db.models.QuerySet</code> 类的一个方法，它解决了 ORM中常见的N+1查询效率问题，关于这一部分可以参考我之前写过的一篇文章<a href="/2017/07/11/django-select-related-performance/">《select_related函数性能基本测试》</a>。</p>
+<h3 id="更新记录"><a href="#更新记录" class="headerlink" title="更新记录"></a>更新记录</h3><p>在更新记录时可以使用 update_fields 参数指定只需更新的字段列表。这个参数在只更新一两个字段的时候特别有用。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">product.name = <span class="string">'Name changed again'</span></span><br><span class="line">product.save(update_fields=[<span class="string">'name'</span>])</span><br></pre></td></tr></table></figure>
+
+<p>如果不指定参数的值，将更新所有字段。</p>
+<h2 id="测试和部署"><a href="#测试和部署" class="headerlink" title="测试和部署"></a>测试和部署</h2><h3 id="分离配置文件"><a href="#分离配置文件" class="headerlink" title="分离配置文件"></a>分离配置文件</h3><p>Django使用 <code>settings</code> 模块配置相关参数，这使得其很好的区分开发/测试/生产。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">- BillWorkingSystem</span><br><span class="line">    - BillWorkingSystem</span><br><span class="line">        - __init__.py</span><br><span class="line">        - settings.py</span><br><span class="line">        - test_settings.py</span><br><span class="line">        - urls.py</span><br><span class="line">        - wsgi.py</span><br></pre></td></tr></table></figure>
+
+<p>一个简单的test_settings.py如下，可以配置一些仅用于测试的项目，如数据目录 FIXTURE_DIRS 。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> BillWorkingSystem.settings <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DisableMigrations</span><span class="params">(object)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__contains__</span><span class="params">(self, item)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> <span class="literal">True</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__getitem__</span><span class="params">(self, item)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> <span class="string">"notmigrations"</span></span><br><span class="line"></span><br><span class="line">MIGRATION_MODULES = DisableMigrations()</span><br><span class="line"></span><br><span class="line">FIXTURE_DIRS = (</span><br><span class="line">    os.path.join(BASE_DIR, <span class="string">'fixtures'</span>).replace(<span class="string">'\\'</span>, <span class="string">'/'</span>),</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">UPLOAD_TEST_DATA_DIR = os.path.join(BASE_DIR, <span class="string">'fixtures'</span>, <span class="string">'test_data'</span>).replace(<span class="string">'\\'</span>, <span class="string">'/'</span>)</span><br></pre></td></tr></table></figure>
+
+<p><code>MIGRATION_MODULES</code> 设置表示是否运行数据迁移脚本。上述例子设置为空，表示测试无需运行这些迁移脚本。</p>
+<h3 id="单元测试"><a href="#单元测试" class="headerlink" title="单元测试"></a>单元测试</h3><p>单元测试主要测试那些返回为实际数据（如json/yaml）的视图。</p>
+<p>测试采用标准的 <code>django.test.TestCase</code>，按照文档所描述的步骤，一步一步的编写。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BillCreateTestCase</span><span class="params">(TestCaseBase)</span>:</span></span><br><span class="line">    url = <span class="string">'/api/bill/create/'</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">test_success</span><span class="params">(self)</span>:</span></span><br><span class="line">        data = &#123;</span><br><span class="line">            <span class="string">'enterprise'</span>: <span class="number">1</span>,</span><br><span class="line">            <span class="string">'year'</span>: <span class="number">2017</span>,</span><br><span class="line">            <span class="string">'month'</span>: <span class="number">1</span>,</span><br><span class="line">            <span class="string">'amount'</span>: <span class="number">4000</span>,</span><br><span class="line">            <span class="string">'create_name'</span>: <span class="string">'Test'</span></span><br><span class="line">        &#125;</span><br><span class="line">        rsp = self.client.post(self.url, data)</span><br><span class="line">        self.assertEqual(<span class="number">201</span>, rsp.status_code)</span><br><span class="line">        <span class="comment"># 其他assert语句</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">test_with_error_enterprise</span><span class="params">(self)</span>:</span></span><br><span class="line">        data = &#123; &#125; <span class="comment"># 参数</span></span><br><span class="line">        rsp = self.client.post(self.url, data)</span><br><span class="line">        self.assertEqual(<span class="number">400</span>, rsp.status_code)</span><br><span class="line">        <span class="comment"># 其他assert语句</span></span><br></pre></td></tr></table></figure>
+
+<p>一个基本模式，</p>
+<ul>
+<li>一个TestCase表示一个主要功能，如一个POST请求</li>
+<li>每个 <code>test_FOO</code> 函数表示一种情况，包括正确和无效参数</li>
+<li>依次对响应对象的状态码和内容、数据变更进行断言(Assert)测试</li>
+</ul>
+<h3 id="docker部署"><a href="#docker部署" class="headerlink" title="docker部署"></a>docker部署</h3><p>之前采用的是daocloud这个平台的工具。具体可参考<a href="https://kinegratii.github.io/2016/07/23/daocloud-django-deploy/">《使用DaoCloud部署Django项目》</a>这篇文章。由于对docker这方面没有一个完整的学习，加上daocloud.io更新到3版本，作了一些比较大的改变，后来就决定搬迁到阿里云服务器上，这样相对比较容易把握。</p>
+<h2 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h2><h3 id="轮子"><a href="#轮子" class="headerlink" title="轮子"></a>轮子</h3><p>什么是轮子 wheel，写多了代码就会发现一些代码具有共同之处，将其抽象并提取，慢慢地就形成了一个库，可以和别人分享。本质上来说，Django也是一个轮子。</p>
+<h3 id="持续开发"><a href="#持续开发" class="headerlink" title="持续开发"></a>持续开发</h3><p>由于是个人项目，因此一些版本升级方面就比较随意，基本上新版本出来就完全废弃旧有版本。</p>
+<h3 id="第三方库"><a href="#第三方库" class="headerlink" title="第三方库"></a>第三方库</h3><p>稳定才是真，不要为追求标新立异而盲目升级。</p>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      
+        <div class="popular-posts-date">2017-08-09</div>
+      
+      
+      <div class="popular-posts-title"><a href="/2017/08/09/amap-position-picker/" rel="bookmark">【项目】高德地图位置选择器</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+        <div class="popular-posts-date">2020-08-05</div>
+      
+      
+      <div class="popular-posts-title"><a href="/2020/08/05/argon-robot-v300-plan/" rel="bookmark">ArgonRobot-V3.0.0 发布计划</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+        <div class="popular-posts-date">2020-11-08</div>
+      
+      
+      <div class="popular-posts-title"><a href="/2020/11/08/borax-release-note-340/" rel="bookmark">Borax-3.4.0发布日志</a></div>
+      
+    </li>
+  
+  </ul>
+
+        
+      
+        <div id="reward-container">
+  <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+  <button id="reward-button" disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/wechat_reward.png" alt="程序员Barnes 微信支付">
+        <p>微信支付</p>
+      </div>
+
+  </div>
+</div>
+
+      
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>程序员Barnes</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://kinegratii.github.io/2017/07/31/django-full-stack-note/" title="Django项目全栈笔记">http://kinegratii.github.io/2017/07/31/django-full-stack-note/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+</div>
+
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/项目/" rel="tag"><i class="fa fa-tag"></i> 项目</a>
+            
+              <a href="/tags/Django/" rel="tag"><i class="fa fa-tag"></i> Django</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2017/07/28/driver-exam/" rel="next" title="驾考点滴">
+                  <i class="fa fa-chevron-left"></i> 驾考点滴
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2017/08/09/amap-position-picker/" rel="prev" title="【项目】高德地图位置选择器">
+                  【项目】高德地图位置选择器 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="comments"></div>
+  
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#概述"><span class="nav-text">概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#python3"><span class="nav-text">python3</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Django"><span class="nav-text">Django</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#CBV"><span class="nav-text">CBV</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#是否启用admin"><span class="nav-text">是否启用admin</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后端数据API-DRF"><span class="nav-text">后端数据API - DRF</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#前端-Amaze-UI"><span class="nav-text">前端 Amaze UI</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#导入导出"><span class="nav-text">导入导出</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#导出"><span class="nav-text">导出</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#导入"><span class="nav-text">导入</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据库查询优化"><span class="nav-text">数据库查询优化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#select-related函数"><span class="nav-text">select_related函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#更新记录"><span class="nav-text">更新记录</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#测试和部署"><span class="nav-text">测试和部署</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#分离配置文件"><span class="nav-text">分离配置文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#单元测试"><span class="nav-text">单元测试</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#docker部署"><span class="nav-text">docker部署</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后记"><span class="nav-text">后记</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#轮子"><span class="nav-text">轮子</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#持续开发"><span class="nav-text">持续开发</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第三方库"><span class="nav-text">第三方库</span></a></li></ol></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.jpg"
+      alt="程序员Barnes">
+  <p class="site-author-name" itemprop="name">程序员Barnes</p>
+  <div class="site-description" itemprop="description">逍遥于天地之间，而心意自得。</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">46</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/kinegratii" title="GitHub &rarr; https://github.com/kinegratii" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://my.oschina.net/kinegratii" title="oschina &rarr; https://my.oschina.net/kinegratii" rel="noopener" target="_blank"><i class="fa fa-fw fa-link"></i>oschina</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://kinegratii.github.io/borax/" title="Borax &rarr; https://kinegratii.github.io/borax/"><i class="fa fa-fw fa-link"></i>Borax</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2015 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">程序员Barnes</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  <script src="/lib/pjax/pjax.min.js?v=0.2.8"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[pjax], script#page-configurations, #pjax script').forEach(element => {
+    var id = element.id || '';
+    var src = element.src || '';
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (id !=='') {
+      script.id = element.id;
+    }
+    if (src !== '') {
+      script.src = src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+  var GUEST = ['nick', 'mail', 'link'];
+  var guest = 'nick,mail,link';
+  guest = guest.split(',').filter(item => {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#comments',
+    verify: false,
+    notify: false,
+    appId: 'YlSXBoomxn9Ws7GEb7bfJiaz-gzGzoHsz',
+    appKey: 'usgVEKYx48ugyhewgxrnLjFk',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: guest,
+    pageSize: '10' || 10,
+    visitor: true,
+    lang: '' || 'zh-cn',
+    path: location.pathname
+  });
+}, window.Valine);
+</script>
+
+    </div>
+</body>
+</html>

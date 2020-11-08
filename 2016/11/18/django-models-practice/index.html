@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/logo/apple_touch_icon.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/logo/logo_16.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-corner-indicator.min.css?v=1.0.2">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="1 概述本文总结了一些Django数据库查询的实践经验。  基本的增删改查 分类统计：aggregate和annotate的使用 实现按年/月/日统计 Manager和QuerySet的混合使用 编写迁移文件  根据Django官方文档，本人整理出与数据库相关的话题列表，  基本的增删改查 外键访问 (Accessing related objects) 管理器和查询集 (Manger &amp;amp;">
+<meta name="keywords" content="Django">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Django实践：数据库查询">
+<meta property="og:url" content="http://kinegratii.github.io/2016/11/18/django-models-practice/index.html">
+<meta property="og:site_name" content="程序员Barnes的博客">
+<meta property="og:description" content="1 概述本文总结了一些Django数据库查询的实践经验。  基本的增删改查 分类统计：aggregate和annotate的使用 实现按年/月/日统计 Manager和QuerySet的混合使用 编写迁移文件  根据Django官方文档，本人整理出与数据库相关的话题列表，  基本的增删改查 外键访问 (Accessing related objects) 管理器和查询集 (Manger &amp;amp;">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2020-11-08T06:32:52.269Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Django实践：数据库查询">
+<meta name="twitter:description" content="1 概述本文总结了一些Django数据库查询的实践经验。  基本的增删改查 分类统计：aggregate和annotate的使用 实现按年/月/日统计 Manager和QuerySet的混合使用 编写迁移文件  根据Django官方文档，本人整理出与数据库相关的话题列表，  基本的增删改查 外键访问 (Accessing related objects) 管理器和查询集 (Manger &amp;amp;">
+  <link rel="alternate" href="/atom.xml" title="程序员Barnes的博客" type="application/atom+xml">
+  <link rel="canonical" href="http://kinegratii.github.io/2016/11/18/django-models-practice/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Django实践：数据库查询 | 程序员Barnes的博客</title>
+  <meta name="generator" content="Hexo 3.9.0">
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">程序员Barnes的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">逍遥于天地之间，而心意自得。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档<span class="badge">46</span></a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-topics">
+      
+    
+      
+    
+
+    <a href="/topics/" rel="section"><i class="menu-item-icon fa fa-fw fa-file"></i> <br>专题</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-library">
+      
+    
+      
+    
+
+    <a href="/library/" rel="section"><i class="menu-item-icon fa fa-fw fa-book"></i> <br>图书馆</a>
+
+  </li>
+      
+      
+      
+        
+          
+          
+          
+            
+            
+    
+  
+  <li class="menu-item menu-item-about">
+      
+    
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+
+
+          
+        
+          
+          
+          
+        
+          
+          
+          
+        
+      
+      
+      
+      
+        
+        <li class="menu-item menu-item-borax">
+      
+    
+      
+    
+
+    <a href="/borax-project/" rel="section"><i class="menu-item-icon fa fa-fw fa-tasks"></i> <br>Borax</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/kinegratii" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://kinegratii.github.io/2016/11/18/django-models-practice/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="程序员Barnes">
+      <meta itemprop="description" content="逍遥于天地之间，而心意自得。">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="程序员Barnes的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">Django实践：数据库查询
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2016-11-18 20:43:57" itemprop="dateCreated datePublished" datetime="2016-11-18T20:43:57+08:00">2016-11-18</time>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/编程/" itemprop="url" rel="index"><span itemprop="name">编程</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            <span id="/2016/11/18/django-models-practice/" class="post-meta-item leancloud_visitors" data-flag-title="Django实践：数据库查询" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+        
+      
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2016/11/18/django-models-practice/#comments" itemprop="discussionUrl"><span class="post-comments-count valine-comment-count" data-xid="/2016/11/18/django-models-practice/" itemprop="commentCount"></span></a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="1-概述"><a href="#1-概述" class="headerlink" title="1 概述"></a>1 概述</h2><p>本文总结了一些Django数据库查询的实践经验。</p>
+<ul>
+<li>基本的增删改查</li>
+<li>分类统计：<code>aggregate</code>和<code>annotate</code>的使用</li>
+<li>实现按年/月/日统计</li>
+<li>Manager和QuerySet的混合使用</li>
+<li>编写迁移文件</li>
+</ul>
+<p>根据<a href="https://docs.djangoproject.com/en/1.10/" target="_blank" rel="noopener">Django官方文档</a>，本人整理出与数据库相关的话题列表，</p>
+<ul>
+<li>基本的增删改查</li>
+<li>外键访问 (Accessing related objects)</li>
+<li>管理器和查询集 (Manger &amp; QuerySet)</li>
+<li>原生SQL (raw SQL)</li>
+<li>事务 (Transactions)</li>
+<li>统计、聚合和分组 (Aggregation)</li>
+<li>搜索 (Search)</li>
+<li>自定义字段 (Custom fields)</li>
+<li>多数据库 (Multiple databases )</li>
+<li>查询表达式和自定义查询表达式(Lookup expressions &amp; Custom lookups)</li>
+<li>条件表达式 (Conditional Expressions)</li>
+<li>数据库函数 (Database Functions)</li>
+<li>数据库优化 (Optimize database access)</li>
+<li>数据库迁移 (Migrations)</li>
+</ul>
+<p>其中一部分是在数据库有对应的内容，另外一部分则是Django框架自有的特性。涉及的代码主要包括以下三个包：</p>
+<ul>
+<li><code>django.db.connections</code>: 底层数据库连接对象操作</li>
+<li><code>django.db.migrations</code>:  迁移相关</li>
+<li><code>django.db.models</code>: 模型定义、数据库查询</li>
+</ul>
+<a id="more"></a>
+
+<h2 id="2-查询API"><a href="#2-查询API" class="headerlink" title="2 查询API"></a>2 查询API</h2><h3 id="2-1-模型描述"><a href="#2-1-模型描述" class="headerlink" title="2.1 模型描述"></a>2.1 模型描述</h3><p>以一个设备管理系统的简易系统为例，该项目包含了设备描述和报警记录。</p>
+<ul>
+<li>设备以序列号唯一确定该设备，可默认为“主键”。</li>
+<li><code>longitude</code>  <code>latitude</code>和<code>address</code>表示设备的地理位置，创建后可认为不可更改。</li>
+<li>设备含有使用和报警两个状态标识变量。</li>
+<li><code>Alarm.catalog</code>表示警报类型，定义在choices上。</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Device</span><span class="params">(models.Model)</span>:</span></span><br><span class="line">    serial = models.CharField(verbose_name=<span class="string">'序列号'</span>, max_length=<span class="number">100</span>, unique=<span class="literal">True</span>)</span><br><span class="line">    name = models.CharField(verbose_name=<span class="string">'名称'</span>, max_length=<span class="number">100</span>, null=<span class="literal">True</span>, blank=<span class="literal">True</span>)</span><br><span class="line">    longitude = models.FloatField(verbose_name=<span class="string">'经度'</span>, null=<span class="literal">True</span>,</span><br><span class="line">                                  validators=[validators.MaxValueValidator(<span class="number">180</span>), validators.MinValueValidator(<span class="number">-180</span>)])</span><br><span class="line">    latitude = models.FloatField(verbose_name=<span class="string">'纬度'</span>, null=<span class="literal">True</span>,</span><br><span class="line">                                 validators=[validators.MaxValueValidator(<span class="number">90</span>), validators.MinValueValidator(<span class="number">-90</span>)])</span><br><span class="line">    address = models.CharField(verbose_name=<span class="string">'地址'</span>, max_length=<span class="number">100</span>, null=<span class="literal">True</span>)</span><br><span class="line">    is_active = models.BooleanField(verbose_name=<span class="string">'使用标识'</span>, default=<span class="literal">True</span>)</span><br><span class="line">    is_alarm = models.BooleanField(verbose_name=<span class="string">'报警标识'</span>, default=<span class="literal">False</span>)</span><br><span class="line">    latest_alarm_time = models.DateTimeField(verbose_name=<span class="string">'最新报警时间'</span>, null=<span class="literal">True</span>, blank=<span class="literal">True</span>)</span><br><span class="line">    latest_alarm_remark = models.CharField(verbose_name=<span class="string">'最新报警内容'</span>, max_length=<span class="number">200</span>, null=<span class="literal">True</span>, blank=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__str__</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> self.serial</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Alarm</span><span class="params">(models.Model)</span>:</span></span><br><span class="line">    ALARM_CATALOG_CHOICES = (</span><br><span class="line">          (<span class="string">'low_battery'</span>, <span class="string">'低电量'</span>),</span><br><span class="line">          (<span class="string">'fail_connection'</span>, <span class="string">'通信故障'</span>),</span><br><span class="line">          (<span class="string">'location_moved'</span>, <span class="string">'位置移动'</span>)</span><br><span class="line">      )</span><br><span class="line">    device = models.ForeignKey(Device, verbose_name=<span class="string">'设备'</span>)</span><br><span class="line">    create_time = models.DateTimeField(verbose_name=<span class="string">'创建时间'</span>, default=timezone.now)</span><br><span class="line">    catalog = models.CharField(max_length=<span class="number">30</span>, null=<span class="literal">True</span>, choices=ALARM_CATALOG_CHOICES)</span><br><span class="line">    content = models.CharField(verbose_name=<span class="string">'内容'</span>, max_length=<span class="number">30</span>, null=<span class="literal">True</span>, blank=<span class="literal">True</span>)</span><br><span class="line">    read = models.BooleanField(verbose_name=<span class="string">'已读'</span>, default=<span class="literal">False</span>)</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-2-查询一览表"><a href="#2-2-查询一览表" class="headerlink" title="2.2 查询一览表"></a>2.2 查询一览表</h3><h4 id="2-2-1-检索、过滤、外键查询、分页"><a href="#2-2-1-检索、过滤、外键查询、分页" class="headerlink" title="2.2.1 检索、过滤、外键查询、分页"></a>2.2.1 检索、过滤、外键查询、分页</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查询mac地址为'0FFFFFFF561C4030'的设备</span></span><br><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    device = models.Device.objects.get(serial=<span class="string">'0FFFFFFF561C4030'</span>)</span><br><span class="line"><span class="keyword">except</span> models.Device.DoesNotExist:</span><br><span class="line">    device = <span class="literal">None</span></span><br><span class="line"></span><br><span class="line">&lt;Device:<span class="number">0</span>FFFFFFF561C4030&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查询地址包含“小区”的设备。</span></span><br><span class="line"><span class="meta">&gt;&gt;&gt; </span>device_list = models.Device.objects.filter(address__icontains=<span class="string">'小区'</span>)</span><br><span class="line">&lt;QuerySet [&lt;Device: <span class="number">0</span>FFFFFFF5BC91F87&gt;, &lt;Device: <span class="number">0</span>FFFFFFF561C4030&gt;, ...]&gt;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查询设备'0FFFFFFF5BC91F87'的所有报警记录</span></span><br><span class="line">models.Alarm.objects.filter(device__serial=<span class="string">'0FFFFFFF5BC91F87'</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 假设设备列表每页20项，查询第3页的数据。</span></span><br><span class="line">device_list = models.Device.objects.all()[<span class="number">20</span>:<span class="number">30</span>]</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-2-2-更新"><a href="#2-2-2-更新" class="headerlink" title="2.2.2 更新"></a>2.2.2 更新</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 单记录更新</span></span><br><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    device = models.Device.objects.get(serial=<span class="string">'0FFFFFFF561C4030'</span>)</span><br><span class="line">    device.is_active = <span class="literal">False</span></span><br><span class="line">    device.save()</span><br><span class="line"><span class="keyword">except</span> models.Device.DoesNotExist:</span><br><span class="line">    <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 多记录更新</span></span><br><span class="line">models.Device.objects.filter(serial__in=[<span class="string">'0FFFFFFF561C4030'</span>, <span class="string">'0FFFFFFF56174CA0'</span>]).update(is_active=<span class="literal">False</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 去掉所有设备地址中“福建省”的前缀，比如“福建省厦门市Xxxx”改为"厦门市Xxxx"。</span></span><br><span class="line">models.Device.objects.filter(address__isnull=<span class="literal">False</span>).update(address=F(<span class="string">'address'</span>).strip(<span class="string">'福建省'</span>))</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-2-3-删除"><a href="#2-2-3-删除" class="headerlink" title="2.2.3 删除"></a>2.2.3 删除</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 删除单条记录</span></span><br><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    device = models.Device.objects.get(serial=<span class="string">'0FFFFFFF561C4030'</span>)</span><br><span class="line">    device.delete()</span><br><span class="line"><span class="keyword">except</span> models.Device.DoesNotExist:</span><br><span class="line">    <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 批量删除</span></span><br><span class="line">models.Alarm.objects.filter(serial=<span class="string">'0FFFFFFF561C4030'</span>).delete()</span><br><span class="line"><span class="comment"># 由于delete只是QuerySet的方法，并没有向Manager公开，需要先调用all方法</span></span><br><span class="line">models.Alarm.objects.all().delete() <span class="comment"># OK</span></span><br><span class="line">models.Alarm.objects.delete() <span class="comment"># Fail</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="2-2-4-基础统计：数据、最值和平均值"><a href="#2-2-4-基础统计：数据、最值和平均值" class="headerlink" title="2.2.4 基础统计：数据、最值和平均值"></a>2.2.4 基础统计：数据、最值和平均值</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"># 计算设备0FFFFFFF561C4030所有的报警数目。</span><br><span class="line">models.Alarm.objects.filter(device__serial=&apos;0FFFFFFF561C4030&apos;).count()</span><br><span class="line"># 165</span><br><span class="line"></span><br><span class="line"># 计算每个设备的报警数目。</span><br><span class="line">&gt;&gt;&gt; device_list = models.Device.objects.annotate(num_alarms=Count(&apos;alarm&apos;))</span><br><span class="line">&gt;&gt;&gt; device_list</span><br><span class="line">&lt;QuerySet [&lt;Device: 0FFFFFFF561C4021&gt;, &lt;Device: 0FFFFFFF561C4030&gt;, ...]&gt;</span><br><span class="line">&gt;&gt;&gt; device_list [0].num_alarms</span><br><span class="line">34</span><br><span class="line"></span><br><span class="line"># 查询2016年报警次数最多的前5个设备</span><br><span class="line"></span><br><span class="line">models.Alarm.objects.filter(create_time__year=2016).values(&apos;serial&apos;).annotate(num_alarms=models.Count(&apos;serial&apos;)).order_by(&apos;-num_alarms&apos;)[:5]</span><br><span class="line"></span><br><span class="line">[</span><br><span class="line">    &#123;&apos;serial&apos;:&apos;0FFFFFFF9FFC15F9&apos;, &apos;num_alarms&apos;:38&#125;,</span><br><span class="line">    &#123;&apos;serial&apos;:&apos;0FFFFFFF71281152&apos;, &apos;num_alarms&apos;:32&#125;,</span><br><span class="line">    &#123;&apos;serial&apos;:&apos;0FFFFFFF5992B723&apos;, &apos;num_alarms&apos;:27&#125;,</span><br><span class="line">    &#123;&apos;serial&apos;:&apos;0FFFFFFF05E20356&apos;, &apos;num_alarms&apos;:21&#125;,</span><br><span class="line">    &#123;&apos;serial&apos;:&apos;0FFFFFFF66DDF14D&apos;, &apos;num_alarms&apos;:12&#125;,</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-2-5-分类统计"><a href="#2-2-5-分类统计" class="headerlink" title="2.2.5 分类统计"></a>2.2.5 分类统计</h4><p>分类统计有以下两种方法。</p>
+<ul>
+<li><code>aggregate</code> + 条件表达式Case，返回一个字典形式的结果，未出现的分类值默认为None，需要使用<code>Coalesce</code>函数设置默认值</li>
+<li><code>annotate</code> + 分组GROUP BY，返回一个列表形式的结果，未出现的分类值不会出现在最后的结果中</li>
+</ul>
+<p>下面是两种方式查询最近30天中每个报警类型的报警数目为例。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">latest_week_qs = models.Alarm.objects.filter(create_time__gt=timezone.now()-timedelta(days=<span class="number">30</span>).</span><br><span class="line"></span><br><span class="line"><span class="comment"># aggregate方式</span></span><br><span class="line">latest_week_qs.aggregate(</span><br><span class="line">    fail_connection=Coalesce(Sum(</span><br><span class="line">        Case(When(catalog=<span class="string">'fail_connection'</span>, then=<span class="number">1</span>), output_field=models.IntegerField()),</span><br><span class="line">    ), <span class="number">0</span>),</span><br><span class="line">    low_battery=Coalesce(Sum(</span><br><span class="line">        Case(When(catalog=<span class="string">'low_battery'</span>, then=<span class="number">1</span>), output_field=models.IntegerField()),</span><br><span class="line">    ), <span class="number">0</span>),</span><br><span class="line">    location_moved=Coalesce(Sum(</span><br><span class="line">        Case(When(catalog=<span class="string">'location_moved'</span>, then=<span class="number">1</span>), output_field=models.IntegerField()),</span><br><span class="line">    ), <span class="number">0</span>)</span><br><span class="line">)</span><br><span class="line"><span class="comment"># 结果</span></span><br><span class="line">&#123;‘fail_connection’：<span class="number">12</span>， <span class="string">'low_battery'</span>：<span class="number">34</span>, <span class="string">'location_moved'</span>: <span class="number">0</span>&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"># annotate方式</span></span><br><span class="line">latest_week_qs.values(<span class="string">'catalog'</span>).annotate(count=Count(<span class="string">'catalog'</span>))</span><br><span class="line"><span class="comment"># 结果</span></span><br><span class="line">[&#123;<span class="string">'catalog'</span>:<span class="string">'low_battery'</span>, <span class="string">'count'</span>:<span class="number">34</span>&#125;,&#123;<span class="string">'catalog'</span>:<span class="string">'fail_connection'</span>， <span class="string">'count'</span>: <span class="number">12</span>&#125;]</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-2-6-日期统计"><a href="#2-2-6-日期统计" class="headerlink" title="2.2.6 日期统计"></a>2.2.6 日期统计</h4><p>实现按年、月、日统计通常有两种方法：</p>
+<ul>
+<li>数据库函数 <code>django.db.connection.ops.date_trunc_sql</code></li>
+<li>对第一种的封装类DateExtra，仅Django 1.10+可用</li>
+</ul>
+<p>以上两种结果中日期类型不一样，第一种返回时datetime对象，第二种只返回其中的分类字段，为整数类型。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查询mac地址为`0FFFFFFF561C4030`的设备最近一周每天报警次数。</span></span><br><span class="line">models.Alarm.objects.filter(serial=<span class="string">'0FFFFFFF561C4030'</span>, create_time__gt=timezone.now()-timedelta(days=<span class="number">7</span>)).extra(</span><br><span class="line">    select=&#123;<span class="string">'dt'</span>: connection.ops.date_trunc_sql(<span class="string">'day'</span>, <span class="string">'create_time'</span>)&#125;</span><br><span class="line">).values(<span class="string">'dt'</span>).annotate(count=models.Count(<span class="string">'create_time'</span>)).order_by(<span class="string">'dt'</span>)</span><br><span class="line"></span><br><span class="line">[</span><br><span class="line">    &#123;<span class="string">'count'</span>:<span class="number">4</span>, <span class="string">'dt'</span>:datetime.datetime(<span class="number">2016</span>, <span class="number">11</span>, <span class="number">08</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>,<span class="number">0</span>)&#125;,</span><br><span class="line">    &#123;<span class="string">'count'</span>:<span class="number">2</span>, <span class="string">'dt'</span>:datetime.datetime(<span class="number">2016</span>, <span class="number">11</span>, <span class="number">11</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>,<span class="number">0</span>)&#125;,</span><br><span class="line">    &#123;<span class="string">'count'</span>:<span class="number">1</span>, <span class="string">'dt'</span>:datetime.datetime(<span class="number">2016</span>, <span class="number">11</span>, <span class="number">12</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>,<span class="number">0</span>)&#125;</span><br><span class="line">]</span><br><span class="line"><span class="comment"># 在Django 1.10+ 还可以使用`DateExtra`相关类</span></span><br><span class="line">models.Alarm.objects.filter(serial=<span class="string">'0FFFFFFF561C4030'</span>, create_time__gt=timezone.now()-timedelta(days=<span class="number">7</span>))</span><br><span class="line">    annotate(day=ExtractDay(<span class="string">'create_time'</span>))</span><br><span class="line"><span class="comment"># 结果</span></span><br><span class="line">&#123;</span><br><span class="line">  <span class="string">'count'</span>:<span class="number">4</span>, <span class="string">'day'</span>: <span class="number">8</span>,</span><br><span class="line">  <span class="string">'count'</span>:<span class="number">2</span>, <span class="string">'day'</span>: <span class="number">11</span>,</span><br><span class="line">  <span class="string">'count'</span>:<span class="number">1</span>, <span class="string">'day'</span>: <span class="number">12</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-3-数据库函数"><a href="#2-3-数据库函数" class="headerlink" title="2.3 数据库函数"></a>2.3 数据库函数</h3><ul>
+<li><code>django.db.models.Q</code>: 与、或、非条件组合查询</li>
+<li><code>django.db.models.F</code>: <code>F()</code>表示数据库中相应字段的值，用于计数器更新等。</li>
+<li><code>django.db.models.Functions.Coalesce</code>:接收一组参数，返回第一个不为None的数据，</li>
+</ul>
+<p>更多函数可参考<a href="https://docs.djangoproject.com/en/1.10/ref/models/database-functions/" target="_blank" rel="noopener">Database Functions</a>。</p>
+<h2 id="3-管理器和查询集"><a href="#3-管理器和查询集" class="headerlink" title="3 管理器和查询集"></a>3 管理器和查询集</h2><h3 id="3-1-管理器与模型的关系"><a href="#3-1-管理器与模型的关系" class="headerlink" title="3.1 管理器与模型的关系"></a>3.1 管理器与模型的关系</h3><p>管理器是Django数据库查询的接口。查询语法 <code>models.XxModels.objects.filter(*kwargs)</code> 。</p>
+<ul>
+<li>一个模型可以拥有一个或多个管理器。</li>
+<li>默认情况下，每个模型都有名为objects的管理器，默认返回数据表中所有记录。</li>
+<li>管理器来源于默认管理器、外键管理器和自定义管理器。</li>
+</ul>
+<h3 id="3-2-自定义管理器"><a href="#3-2-自定义管理器" class="headerlink" title="3.2 自定义管理器"></a>3.2 自定义管理器</h3><p>当一些查询逻辑复杂而且经常使用时，往往是在管理器上添加自定义函数封装相关查询逻辑，一方面减少重复代码，另一方面对view层透明，有利于MVC职责分工。</p>
+<p>自定义管理器有三种方法</p>
+<h4 id="3-2-1-继承-models-Manager"><a href="#3-2-1-继承-models-Manager" class="headerlink" title="3.2.1 继承 models.Manager"></a>3.2.1 继承 models.Manager</h4><p>这是默认出现的方式，以下 <code>period_date</code>函数封装了日期时间段查询函数</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AlarmManager</span><span class="params">(models.Manager)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">period_date</span><span class="params">(self, field, start_date=None, end_date=None, fmt=<span class="string">'%Y-%m-%d'</span>)</span>:</span></span><br><span class="line">        <span class="string">"""封装日期开始结束时间段查询"""</span></span><br><span class="line">        <span class="function"><span class="keyword">def</span> <span class="title">to_datetime</span><span class="params">(val)</span>:</span></span><br><span class="line">            <span class="keyword">if</span> isinstance(val, (datetime, date)):</span><br><span class="line">                <span class="keyword">return</span> val</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                <span class="keyword">try</span>:</span><br><span class="line">                    <span class="keyword">return</span> datetime.strptime(val, fmt)</span><br><span class="line">                <span class="keyword">except</span> (TypeError, ValueError):</span><br><span class="line">                    <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line">        kvs = &#123;&#125;</span><br><span class="line">        start_date = to_datetime(start_date)</span><br><span class="line">        end_date = to_datetime(end_date)</span><br><span class="line">        <span class="keyword">if</span> start_date:</span><br><span class="line">            kvs[field + <span class="string">'__gte'</span>] = start_date</span><br><span class="line">        <span class="keyword">if</span> end_date:</span><br><span class="line">            kvs[field + <span class="string">'__lte'</span>] = end_date + timedelta(days=<span class="number">1</span>)  <span class="comment"># 包含当前</span></span><br><span class="line">        <span class="keyword">return</span> self.filter(**kvs)    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">has_location</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> self.filter(longitude__isnull=<span class="literal">False</span>, latitude__isnull=<span class="literal">False</span>)</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">unread</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> self.filter(read=<span class="literal">False</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># views.py</span></span><br><span class="line"><span class="comment"># 返回未读的报警记录</span></span><br><span class="line">alarm_list = models.Alarm.objects.unread()</span><br><span class="line"><span class="comment"># 返回2016年9月12日到21日的报警记录</span></span><br><span class="line">alarm_list = models.Alarm.objects.period_date(field=<span class="string">'create_time'</span>, start_time=<span class="string">'2016-09-12'</span>, end_time=<span class="string">'2016-09-21'</span>)</span><br><span class="line"><span class="comment"># 返回2016年9月26日以前的报警记录</span></span><br><span class="line">alarm_list = models.Alarm.objects.period_date(field=<span class="string">'create_time'</span>, end_time=<span class="string">'2016-09-26'</span>)</span><br><span class="line"><span class="comment">#返回2016年9月26日以前的未读报警记录</span></span><br><span class="line">alarm_list  = models.Device.objects.period_date(field=<span class="string">'create_time'</span>, end_time=<span class="string">'2016-09-26'</span>).unread()</span><br><span class="line">AttributeError: <span class="string">'_QuerySet'</span> object has no attribute <span class="string">'unread'</span></span><br></pre></td></tr></table></figure>
+
+<p>在最后一个查询中出现异常，因为这两个方法定义在<code>models.Manager</code>上，返回的却是<code>models.QuerySet</code>实例。这时非常希望自定义的方法能够级联调用，下面的几种方法可以解决这个问题。</p>
+<h4 id="3-2-2-使用QuerySet的方法"><a href="#3-2-2-使用QuerySet的方法" class="headerlink" title="3.2.2 使用QuerySet的方法"></a>3.2.2 使用QuerySet的方法</h4><p>使用查询集上的 <code>as_manager()</code>函数创建新的管理器</p>
+<p>将自定义的方法定义从<code>models.Manager</code>移到<code>models.QuerySet</code></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AlarmQuerySet</span><span class="params">(models.QuerySet)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">period_date</span><span class="params">(self, field, start_date=None, end_date=None, fmt=<span class="string">'%Y-%m-%d'</span>)</span>:</span></span><br><span class="line">        <span class="comment"># 省略具体代码</span></span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">has_location</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> self.filter(longitude__isnull=<span class="literal">False</span>, latitude__isnull=<span class="literal">False</span>)</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">unread</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> self.filter(read=<span class="literal">False</span>)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Alarm</span><span class="params">(models.Model)</span>:</span></span><br><span class="line">    ...</span><br><span class="line">   objects = AlarmQuerySet.as_manager()</span><br></pre></td></tr></table></figure>
+
+<p>这时代码<code>alarm_list  = models.Device.objects.period_date(field=&#39;create_time&#39;, end_time=&#39;2016-09-26&#39;).unread()</code>就能够返回正确的结果。</p>
+<h4 id="3-2-3-继承Manager和QuerySet"><a href="#3-2-3-继承Manager和QuerySet" class="headerlink" title="3.2.3 继承Manager和QuerySet"></a>3.2.3 继承Manager和QuerySet</h4><p>使用管理器上的<code>from_queryset(queryset_class)</code>函数创建新的管理器<br>在使用django认证用户上一方面需要继承 <code>django.contrib.auth.models.BaseUserManager</code>，另一方面又希望能够自定义函数，这时可以使用这种方式。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UserQuerySet</span><span class="params">(models.QuerySet)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">no_login_in_days</span><span class="params">(self, days)</span>:</span></span><br><span class="line">        start_time = timezone.now() - timedelta(days=days)</span><br><span class="line">        <span class="keyword">return</span> self.filter(last_login_time__ge=start_time)</span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">no_activity_in_days</span><span class="params">(self, days)</span>:</span></span><br><span class="line">        start_time = timezone.now() - timedelta(days=days)</span><br><span class="line">        <span class="keyword">return</span> self.filter(last_activity_time__ge=start_time)</span><br><span class="line"></span><br><span class="line">MyUserManager = BaseUserManager.from_queryset(UserQuerySet)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyUser</span><span class="params">(AbstractBaseUser)</span>:</span></span><br><span class="line">    objects = MyUserManager()</span><br></pre></td></tr></table></figure>
+
+<p> 当直接调用<code>django.db.models.Manager.from_queryset</code>方法，其等效于第二种方法，即以下两行等效。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># 使用as_manager函数</span><br><span class="line">objects = AlarmQuerySet.as_manager()</span><br><span class="line"># 使用from_queryset函数</span><br><span class="line">objects = models.Manager.from_queryset(AlarmQuerySet)</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-3-managers模块实践"><a href="#3-3-managers模块实践" class="headerlink" title="3.3 managers模块实践"></a>3.3 managers模块实践</h3><p>随着业务逻辑越来越复杂，需要编写更多的自定义管理器，通常的做法是单独创建一个名称为<code>managers</code>的模块，封装所有数据操作。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.db <span class="keyword">import</span> models</span><br><span class="line"><span class="keyword">from</span> django.contrib.auth.models <span class="keyword">import</span> BaseUserManager</span><br><span class="line"></span><br><span class="line">__all__ = [<span class="string">'AxxManager'</span>, <span class="string">'BxxManager'</span>, <span class="string">'UserManager'</span>] <span class="comment"># 外部模块只能引用XxxManager类</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BaseQuerySet</span><span class="params">(models.QuerySet)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">common_method_for_all_models</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AxxQuerySet</span><span class="params">(BaseQuerySet)</span>:</span></span><br><span class="line">    <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line">AxxManager = models.Manager().from_queryset(AxxQuerySet)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BxxQuerySet</span><span class="params">(BaseQuerySet)</span>:</span></span><br><span class="line">    <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line">BxxManager = models.Manager().from_queryset(BxxQuerySet)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UserQuerySet</span><span class="params">(BaseQuerySet)</span>:</span></span><br><span class="line">    <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UserManager</span><span class="params">(BaseUserManager.from_queryset<span class="params">(UserQuerySet)</span>)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">create_user</span><span class="params">(self, username, password=None, **kwargs)</span>:</span></span><br><span class="line">        <span class="keyword">pass</span></span><br></pre></td></tr></table></figure>
+
+<p>为避免模块循环导入的问题</p>
+<ul>
+<li>需要使用<code>django.apps.apps.get_model</code>函数获取模型类对象，不能直接使用 <code>from models import Xxxx</code></li>
+<li><code>managers</code>模块一般只能被<code>models</code>模块引用，其他模块应当不能引用</li>
+</ul>
+<h3 id="3-4-其他"><a href="#3-4-其他" class="headerlink" title="3.4 其他"></a>3.4 其他</h3><p><strong>覆盖get函数异常</strong></p>
+<p>在获取对象函数会抛出<code>ObjectDoesNotExist</code>异常，在这种情况下我们需要使用<code>try-catch</code>捕捉异常，会出现大量重复的代码。这时我们可以用下的代码实现封装。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BaseManager</span><span class="params">(models.Manager)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_object</span><span class="params">(self, **kwargs)</span>:</span></span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            <span class="keyword">return</span> self.get(**kwargs)</span><br><span class="line">        <span class="keyword">except</span> models.ObjectDoesNotExist:</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">None</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 以下方式访问</span></span><br><span class="line">device = models.objects.get_object(serial=<span class="string">'0FFFFFFF66DDF13F'</span>)</span><br></pre></td></tr></table></figure>
+
+<p><strong>访问request变量</strong></p>
+<p>按照MVC分离的实践，不应该直接访问request，只能通过参数传递方式。</p>
+<h2 id="4-迁移"><a href="#4-迁移" class="headerlink" title="4 迁移"></a>4 迁移</h2><h3 id="4-1-开发流程"><a href="#4-1-开发流程" class="headerlink" title="4.1 开发流程"></a>4.1 开发流程</h3><p>迁移是将模型代码的变化应用到数据库，可以认为是一个数据库模式的版本管理系统。</p>
+<blockquote>
+<p>在Django1.7之前的版本第三方库<a href="http://south.aeracode.org/" target="_blank" rel="noopener">South</a>提供了类似的功能。</p>
+</blockquote>
+<p>迁移通常可以按照下列步骤循环进行。</p>
+<ul>
+<li>1 编写 <code>models</code> 模块代码</li>
+<li>2 模型迁移：执行 <code>python manage.py makemigrations</code>，在<code>APP.migrations</code>包生成迁移模块文件。</li>
+<li>3 数据迁移：如果需要数据迁移，按照一定的格式编写迁移文件。</li>
+<li>3 应用迁移：执行 <code>python manage.py migrate</code>，将2、3步迁移文件所实现的数据库变化应用到数据库。</li>
+</ul>
+<p>Django Migration分为模式迁移（Schema migration）和数据迁移（Data Migration）。</p>
+<ul>
+<li>模式迁移：包括表结构修改，对应于 SQL的 <code>CREATE TABLE</code> <code>ALTER TABLE</code>和 <code>DROP TABLE</code>，可以由Django自动生成。</li>
+<li>数据迁移：包括数据记录修改，对应于SQL的 <code>INSERT TO</code> <code>DELETE</code>和 <code>UPDATE</code>等语句,需要开发者自己编写。</li>
+</ul>
+<p>无论是模式迁移还是数据迁移，迁移模块都具有几个特点：</p>
+<ul>
+<li>每个迁移文件是一个Python模块，位于应用目录migrations包下，代表了一次迁移</li>
+<li>每个迁移包含一个名为Migration的迁移类，该类继承自 <code>django.db.migrations.Migration</code></li>
+<li><code>dependencies</code> 属性表示需要依赖的迁移模块名称</li>
+<li><code>operations</code> 属性表示一系列依次进行的迁移操作，这些都定义在 <code>django.db.migrations.operations</code>模块中。</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.db <span class="keyword">import</span> migrations</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Migration</span><span class="params">(migrations.Migration)</span>:</span></span><br><span class="line">    dependencies = []</span><br><span class="line">    operations = []</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-2-数据迁移"><a href="#4-2-数据迁移" class="headerlink" title="4.2 数据迁移"></a>4.2 数据迁移</h3><p>下面的例子实现了将设备的<code>longitude</code> <code>latitude</code>和<code>address</code>三个字段复制到报警记录表中，以便查询位置时无需外接操作。</p>
+<p>所有的操作被操作 <code>migrations.RunPython</code> 类中，要注意的是需要 <code>django.apps.get_model</code> 函数引用模型类。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> __future__ <span class="keyword">import</span> unicode_literals</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> django.db <span class="keyword">import</span> migrations, models</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">create_address_for_alarm</span><span class="params">(apps, scheme_editor)</span>:</span></span><br><span class="line">    AlarmClass = apps.get_model(<span class="string">'hdc'</span>, <span class="string">'Alarm'</span>)</span><br><span class="line">    <span class="keyword">for</span> alarm <span class="keyword">in</span> AlarmClass.objects.all():</span><br><span class="line">        alarm.longitude = alarm.device.longitude</span><br><span class="line">        alarm.latitude = alarm.device.latitude</span><br><span class="line">        alarm.address = alarm.device.address</span><br><span class="line">        alarm.save()</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Migration</span><span class="params">(migrations.Migration)</span>:</span></span><br><span class="line">    dependencies = [</span><br><span class="line">        (<span class="string">'hdc'</span>, <span class="string">'0002_alarm_address'</span>),</span><br><span class="line">    ]</span><br><span class="line"></span><br><span class="line">    operations = [</span><br><span class="line">         migrations.RunPython(create_address_for_alarm),</span><br><span class="line">    ]</span><br></pre></td></tr></table></figure>
+
+<h2 id="5-参考资料"><a href="#5-参考资料" class="headerlink" title="5 参考资料"></a>5 参考资料</h2><ul>
+<li><a href="https://docs.djangoproject.com/en/1.10/ref/models/querysets/" target="_blank" rel="noopener">QuerySet API reference | Django documentation | Django</a></li>
+<li><a href="http://chase-seibert.github.io/blog/2012/02/24/django-aggregation-group-by-day.html" target="_blank" rel="noopener">Django aggregation, group by day</a></li>
+<li><a href="http://timmyomahony.com/blog/filtering-annotations-django/" target="_blank" rel="noopener">Filtering on annotations in Django</a></li>
+<li><a href="http://www.dabapps.com/blog/higher-level-query-api-django-orm/" target="_blank" rel="noopener">Building a higher-level query API: the right way to use Django’s ORM - DabApps, Brighton, UK</a></li>
+<li><a href="https://realpython.com/blog/python/django-migrations-a-primer/" target="_blank" rel="noopener">Django Migrations - A Primer - Real Python</a></li>
+<li><a href="http://hunterford.me/django-custom-model-manager-chaining/" target="_blank" rel="noopener">Django Custom Model Manager Chaining - Hunter Ford</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      
+        <div class="popular-posts-date">2016-07-23</div>
+      
+      
+      <div class="popular-posts-title"><a href="/2016/07/23/daocloud-django-deploy/" rel="bookmark">使用DaoCloud部署Django项目</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+        <div class="popular-posts-date">2018-06-27</div>
+      
+      
+      <div class="popular-posts-title"><a href="/2018/06/27/dealing-with-legacy-code/" rel="bookmark">处理和迁移遗留的代码</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+        <div class="popular-posts-date">2017-07-31</div>
+      
+      
+      <div class="popular-posts-title"><a href="/2017/07/31/django-full-stack-note/" rel="bookmark">Django项目全栈笔记</a></div>
+      
+    </li>
+  
+  </ul>
+
+        
+      
+        <div id="reward-container">
+  <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+  <button id="reward-button" disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/wechat_reward.png" alt="程序员Barnes 微信支付">
+        <p>微信支付</p>
+      </div>
+
+  </div>
+</div>
+
+      
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>程序员Barnes</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://kinegratii.github.io/2016/11/18/django-models-practice/" title="Django实践：数据库查询">http://kinegratii.github.io/2016/11/18/django-models-practice/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+</div>
+
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/Django/" rel="tag"><i class="fa fa-tag"></i> Django</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2016/10/29/ionic-build-android/" rel="next" title="ionic安卓构建">
+                  <i class="fa fa-chevron-left"></i> ionic安卓构建
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2016/12/02/learning-ionic2/" rel="prev" title="ionic2杂记">
+                  ionic2杂记 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="comments"></div>
+  
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-概述"><span class="nav-text">1 概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-查询API"><span class="nav-text">2 查询API</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-模型描述"><span class="nav-text">2.1 模型描述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-查询一览表"><span class="nav-text">2.2 查询一览表</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-1-检索、过滤、外键查询、分页"><span class="nav-text">2.2.1 检索、过滤、外键查询、分页</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-2-更新"><span class="nav-text">2.2.2 更新</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-3-删除"><span class="nav-text">2.2.3 删除</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-4-基础统计：数据、最值和平均值"><span class="nav-text">2.2.4 基础统计：数据、最值和平均值</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-5-分类统计"><span class="nav-text">2.2.5 分类统计</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-6-日期统计"><span class="nav-text">2.2.6 日期统计</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-数据库函数"><span class="nav-text">2.3 数据库函数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-管理器和查询集"><span class="nav-text">3 管理器和查询集</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-管理器与模型的关系"><span class="nav-text">3.1 管理器与模型的关系</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-自定义管理器"><span class="nav-text">3.2 自定义管理器</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-1-继承-models-Manager"><span class="nav-text">3.2.1 继承 models.Manager</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-2-使用QuerySet的方法"><span class="nav-text">3.2.2 使用QuerySet的方法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-3-继承Manager和QuerySet"><span class="nav-text">3.2.3 继承Manager和QuerySet</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-managers模块实践"><span class="nav-text">3.3 managers模块实践</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-4-其他"><span class="nav-text">3.4 其他</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-迁移"><span class="nav-text">4 迁移</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-开发流程"><span class="nav-text">4.1 开发流程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-数据迁移"><span class="nav-text">4.2 数据迁移</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-参考资料"><span class="nav-text">5 参考资料</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.jpg"
+      alt="程序员Barnes">
+  <p class="site-author-name" itemprop="name">程序员Barnes</p>
+  <div class="site-description" itemprop="description">逍遥于天地之间，而心意自得。</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">46</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/kinegratii" title="GitHub &rarr; https://github.com/kinegratii" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://my.oschina.net/kinegratii" title="oschina &rarr; https://my.oschina.net/kinegratii" rel="noopener" target="_blank"><i class="fa fa-fw fa-link"></i>oschina</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://kinegratii.github.io/borax/" title="Borax &rarr; https://kinegratii.github.io/borax/"><i class="fa fa-fw fa-link"></i>Borax</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2015 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">程序员Barnes</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  <script src="/lib/pjax/pjax.min.js?v=0.2.8"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[pjax], script#page-configurations, #pjax script').forEach(element => {
+    var id = element.id || '';
+    var src = element.src || '';
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (id !=='') {
+      script.id = element.id;
+    }
+    if (src !== '') {
+      script.src = src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+  var GUEST = ['nick', 'mail', 'link'];
+  var guest = 'nick,mail,link';
+  guest = guest.split(',').filter(item => {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#comments',
+    verify: false,
+    notify: false,
+    appId: 'YlSXBoomxn9Ws7GEb7bfJiaz-gzGzoHsz',
+    appKey: 'usgVEKYx48ugyhewgxrnLjFk',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: guest,
+    pageSize: '10' || 10,
+    visitor: true,
+    lang: '' || 'zh-cn',
+    path: location.pathname
+  });
+}, window.Valine);
+</script>
+
+    </div>
+</body>
+</html>

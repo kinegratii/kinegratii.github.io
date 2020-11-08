@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/logo/apple_touch_icon.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/logo/logo_16.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+  <link rel="stylesheet" href="/lib/pace/pace-theme-corner-indicator.min.css?v=1.0.2">
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":true,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: true,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="本文简要介绍了我国传统的农历历法知识，并叙述了 Borax-Lunar 工具库开发背后的一些算法原理和技术资料。">
+<meta name="keywords" content="项目,农历">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Borax.Lunardate:中国农历日期">
+<meta property="og:url" content="http://kinegratii.github.io/2019/01/05/lunardate-module/index.html">
+<meta property="og:site_name" content="程序员Barnes的博客">
+<meta property="og:description" content="本文简要介绍了我国传统的农历历法知识，并叙述了 Borax-Lunar 工具库开发背后的一些算法原理和技术资料。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2020-11-08T06:32:52.269Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Borax.Lunardate:中国农历日期">
+<meta name="twitter:description" content="本文简要介绍了我国传统的农历历法知识，并叙述了 Borax-Lunar 工具库开发背后的一些算法原理和技术资料。">
+  <link rel="alternate" href="/atom.xml" title="程序员Barnes的博客" type="application/atom+xml">
+  <link rel="canonical" href="http://kinegratii.github.io/2019/01/05/lunardate-module/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Borax.Lunardate:中国农历日期 | 程序员Barnes的博客</title>
+  <meta name="generator" content="Hexo 3.9.0">
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">程序员Barnes的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">逍遥于天地之间，而心意自得。</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档<span class="badge">46</span></a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-topics">
+      
+    
+      
+    
+
+    <a href="/topics/" rel="section"><i class="menu-item-icon fa fa-fw fa-file"></i> <br>专题</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-library">
+      
+    
+      
+    
+
+    <a href="/library/" rel="section"><i class="menu-item-icon fa fa-fw fa-book"></i> <br>图书馆</a>
+
+  </li>
+      
+      
+      
+        
+          
+          
+          
+            
+            
+    
+  
+  <li class="menu-item menu-item-about">
+      
+    
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+
+
+          
+        
+          
+          
+          
+        
+          
+          
+          
+        
+      
+      
+      
+      
+        
+        <li class="menu-item menu-item-borax">
+      
+    
+      
+    
+
+    <a href="/borax-project/" rel="section"><i class="menu-item-icon fa fa-fw fa-tasks"></i> <br>Borax</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+  <a href="https://github.com/kinegratii" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://kinegratii.github.io/2019/01/05/lunardate-module/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="程序员Barnes">
+      <meta itemprop="description" content="逍遥于天地之间，而心意自得。">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="程序员Barnes的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">Borax.Lunardate:中国农历日期
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2019-01-05 14:34:29" itemprop="dateCreated datePublished" datetime="2019-01-05T14:34:29+08:00">2019-01-05</time>
+            </span>
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/技术研究/" itemprop="url" rel="index"><span itemprop="name">技术研究</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            <span id="/2019/01/05/lunardate-module/" class="post-meta-item leancloud_visitors" data-flag-title="Borax.Lunardate:中国农历日期" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="leancloud-visitors-count"></span>
+            </span>
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="fa fa-comment-o"></i>
+      </span>
+        
+      
+      <span class="post-meta-item-text">Valine：</span>
+    
+    <a title="valine" href="/2019/01/05/lunardate-module/#comments" itemprop="discussionUrl"><span class="post-comments-count valine-comment-count" data-xid="/2019/01/05/lunardate-module/" itemprop="commentCount"></span></a>
+  </span>
+  
+  
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>本文简要介绍了我国传统的农历历法知识，并叙述了 Borax-Lunar 工具库开发背后的一些算法原理和技术资料。</p>
+<a id="more"></a>
+
+<h1 id="1-农历概述"><a href="#1-农历概述" class="headerlink" title="1 农历概述"></a>1 农历概述</h1><p>农历是我国的传统历法，依据太阳和月球位置的精确预报以及约定的日期编排规则编排日期，并以传统命名方法表述日期。</p>
+<p>2017年，我国已经颁布了国家推荐性标准《GB/T 33661-2017 农历的编算和颁行》。</p>
+<h2 id="1-1-编排规则"><a href="#1-1-编排规则" class="headerlink" title="1.1 编排规则"></a>1.1 编排规则</h2><p>农历属于一种阴阳合历，基本规则如下：其年份分为平年和闰年。平年为十二个月；闰年为十三个月。月份分为大月和小月，大月三十天，小月二十九天。一年中哪个月大，哪个月小，可由“置闰规则”计算决定。</p>
+<blockquote>
+<p>若从某个农历十一月开始到下一个农历十一月（不含）之间有13个农历月，则需要置闰。置闰规则为：去其中最先出现的一个不包含中气的农历月为农历闰月。</p>
+</blockquote>
+<p>除此之外，还有生肖纪年、干支纪年、二十四节气等。</p>
+<h2 id="1-2-表示方法"><a href="#1-2-表示方法" class="headerlink" title="1.2 表示方法"></a>1.2 表示方法</h2><p>农历日期通常有以下几种表示方法：</p>
+<ul>
+<li>农历乙未年正月初一</li>
+<li>农历牛年闰五月十一</li>
+<li>农历甲午年七月庚戌日</li>
+<li>公元2016年农历丙申年十一月廿九</li>
+</ul>
+<h2 id="1-3-二十四节气"><a href="#1-3-二十四节气" class="headerlink" title="1.3 二十四节气"></a>1.3 二十四节气</h2><p>一个回归年内24个太阳地心视黄经等于15度的整数倍的时刻的总称，每个时刻成为一个节气。太阳每年运行360度，共经历二十四个节气，分别为立春（315度）、雨水（330度）、惊蛰（345度）、春分（0度、360度）、清明（15度）、谷雨（30度）、立夏（45度）、小满（60度）、芒种（75度）、夏至（90度）、小暑（105度）、大暑（120度）、立秋（135度）、处暑（150度）、白露（165度）、秋分（180度）、寒露（195度）、霜降（210度）、立冬（225度）、小雪（240度）、大雪（255度）、冬至（270度）、小寒（285度）、大寒（300度）。可以通过下面的儿歌记忆这些节气。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">春雨惊春清谷天，</span><br><span class="line">夏满芒夏暑相连，</span><br><span class="line">秋处露秋寒霜降，</span><br><span class="line">冬雪雪冬小大寒，</span><br><span class="line">每月两节不变更，</span><br><span class="line">最多相差一两天</span><br></pre></td></tr></table></figure>
+
+<p>2016年11月30日，中国“二十四节气”被正式列入联合国教科文组织人类非物质文化遗产代表作名录。</p>
+<h1 id="2-数据结构"><a href="#2-数据结构" class="headerlink" title="2 数据结构"></a>2 数据结构</h1><p>农历月份大小、农历闰/平年、二十四节气的日期没有什么特定的规律，只能使用原始的“查表法”存储和查询这些信息。</p>
+<h2 id="2-1-大小月和闰月"><a href="#2-1-大小月和闰月" class="headerlink" title="2.1 大小月和闰月"></a>2.1 大小月和闰月</h2><p>从香港天文台网站可以获取1900 - 2100年的农历信息，每一天包含公历日期、农历日期、星期、节气四项基本信息。日期范围的基本信息如下表：</p>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>起始日</th>
+<th>…</th>
+<th>2100年</th>
+<th>2101年</th>
+<th>…</th>
+<th>截止日</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>公历</td>
+<td>1990年1月31日</td>
+<td>…</td>
+<td>2100年12月31日</td>
+<td>2101年1月1日</td>
+<td>…</td>
+<td>2101年1月28日</td>
+</tr>
+<tr>
+<td>农历</td>
+<td>1900年正月初一</td>
+<td>…</td>
+<td>2100年十二月初一</td>
+<td>2100年十二月初二</td>
+<td>…</td>
+<td>2100年十二月二十九</td>
+</tr>
+<tr>
+<td>offset</td>
+<td>0</td>
+<td>…</td>
+<td>73383</td>
+<td>73384</td>
+<td>…</td>
+<td>73411</td>
+</tr>
+<tr>
+<td>干支</td>
+<td>庚午年丙子月壬辰日</td>
+<td>…</td>
+<td>庚申年戊子月丁未日</td>
+<td>-</td>
+<td>…</td>
+<td>-</td>
+</tr>
+</tbody></table>
+<p>具体到一个农历年中，从中可以看出以下几点信息：</p>
+<ul>
+<li>每个月有多少天；哪些是大月（30天），哪些是小月（29天）</li>
+<li>本年是否有闰月；如果有，是哪个月份</li>
+</ul>
+<p>如何使用精炼的数据结构表述这些信息，是一个重要的前提，主要要求算法简单、内存占用少。网上有许多种方式，一种比较通行的做法是使用5字节的数据，高3位总是“000”，实际使用的低17位二进制。</p>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>闰月大小标志</th>
+<th>月份大小标志</th>
+<th>闰月月份</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>大小</td>
+<td>4b</td>
+<td>12b</td>
+<td>4b</td>
+</tr>
+<tr>
+<td>2017年示例</td>
+<td>0001</td>
+<td>0101 0001 0111</td>
+<td>0110</td>
+</tr>
+<tr>
+<td>描述</td>
+<td>本年有闰月</td>
+<td>2,4,8,10,11,12为大月</td>
+<td>六月是闰月</td>
+</tr>
+<tr>
+<td>2019年示例</td>
+<td>0000</td>
+<td>1010 1001 0011</td>
+<td>0000</td>
+</tr>
+<tr>
+<td>描述</td>
+<td>无闰月</td>
+<td>1,3,5,8,11,12为大月</td>
+<td>无闰月</td>
+</tr>
+</tbody></table>
+<p>综上所述，2017年信息可以使用 0x15176 表示；2019年信息可使用 0x0a930 表示。</p>
+<h2 id="2-2-节气的数据结构"><a href="#2-2-节气的数据结构" class="headerlink" title="2.2 节气的数据结构"></a>2.2 节气的数据结构</h2><p><strong>36位字符串</strong></p>
+<p>二十四节气开始的日期，与通用的公历几乎一致，最多相差一两天，因为是按照地球一年绕太阳公转一周作为依据。比如小寒通常落在在1月5-7日，立春落在2月3-5日，冬至落在12月21-23日。即每个月都会有2个节气，1月只能有小寒、大寒这两个节气。</p>
+<p>构建两个含有24元素的数组，</p>
+<p>第一个数组以小寒为第1个节气重新排列这24个节气。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">小寒, 大寒, 立春, 雨水, 惊蛰, 春分, 清明, 谷雨, 立夏, 小满, 芒种, 夏至,</span><br><span class="line">小暑, 大暑, 立秋, 处暑, 白露, 秋分, 寒露, 霜降, 立冬, 小雪, 大雪, 冬至</span><br></pre></td></tr></table></figure>
+
+<p>第二个数组表示对应节气对应的日期数字。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">6 20 4 19 6 21 5 20 6 21 6 22 7 23 8 23 8 23 9 24 8 23 7 22</span><br></pre></td></tr></table></figure>
+
+<p>结合这两个数组，可记录在一个公历年中，二十四个节气分别是在哪一天。比如上述的24个数字可解释为：1月6日是小寒、1月20日是大寒…12月7日是大雪、12月22日是冬至。</p>
+<p>在 Python 语言层面，可以使用字符串（基本数据类型）代替上述数组（复合数据类型），即<code>&quot;620419621520621622723823823924823722&quot;</code> ，需要36位字符存储。</p>
+<p>解析表中数据的 Python 代码实现如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">parse_term</span><span class="params">(year_info)</span>:</span></span><br><span class="line">    result = []</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">0</span>, <span class="number">36</span>, <span class="number">3</span>):</span><br><span class="line">        s = year_info[i:i + <span class="number">3</span>]</span><br><span class="line">        result.extend([int(s[<span class="number">0</span>]), int(s[<span class="number">1</span>:<span class="number">3</span>])])</span><br><span class="line">    <span class="keyword">return</span> result</span><br></pre></td></tr></table></figure>
+
+<p><strong>30位字符串</strong></p>
+<p><a href="https://github.com/jjonline/calendar.js" target="_blank" rel="noopener">jjonline/calendar.js</a> 提供了一种用更为简单的表示方法：利用十六进制压缩数字的位数，进一步简化为30位的字符串。具体计算过程如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">9778397bd097c36b0b6fc9274c91aa  # 按长度5分割，共6组</span><br><span class="line"></span><br><span class="line">97783 97bd0 97c36 b0b6f c9274 c91aa  # 转化为十进制</span><br><span class="line"></span><br><span class="line">620419 621520 621622 723823 823924 823722  # 按长度1,2,1,2细分</span><br><span class="line"></span><br><span class="line">6 20 4 19 6 21 5 20 6 21 6 22 7 23 8 23 8 23 9 24 8 23 7 22</span><br></pre></td></tr></table></figure>
+
+<p>使用 Python代码实现上述算法如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">parse_term</span><span class="params">(term_info)</span>:</span></span><br><span class="line">    values = [str(int(term_info[i:i + <span class="number">5</span>], <span class="number">16</span>)) <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">0</span>, <span class="number">30</span>, <span class="number">5</span>)]</span><br><span class="line">    term_day_list = []</span><br><span class="line">    <span class="keyword">for</span> v <span class="keyword">in</span> values:</span><br><span class="line">        term_day_list.extend([</span><br><span class="line">            int(v[<span class="number">0</span>]), int(v[<span class="number">1</span>:<span class="number">3</span>]), int(v[<span class="number">3</span>]), int(v[<span class="number">4</span>:<span class="number">6</span>])</span><br><span class="line">        ])</span><br><span class="line">    <span class="keyword">return</span> term_day_list</span><br></pre></td></tr></table></figure>
+
+<p><strong>24位字符串</strong></p>
+<blockquote>
+<p>从 Borax v1.2.0 开始使用算法。</p>
+</blockquote>
+<p>统计1900-2100年之前节气日期统计可知，中气的日期都是在18-24日之间，这些均为两位数，可以通过线性变化转为一位数的数字，结合月份特点，可以通过减去一个固定偏移量15就是比较好的选择。</p>
+<p>同样的按照上述处理，具体过程如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">654466556667788888998877 # 按长度1分割</span><br><span class="line"></span><br><span class="line">6 5 4 4 6 6 5 5 6 6 6 7 7 8 8 8 8 8 9 9 8 8 7 7 # 增加偏移量，奇位置为0，偶位置为15</span><br><span class="line"></span><br><span class="line">6 20 4 19 6 21 5 20 6 21 6 22 7 23 8 23 8 23 9 24 8 23 7 22</span><br></pre></td></tr></table></figure>
+
+<p>同样的使用Python 代码如下，和30位表示法相比，更为简单直接。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">parse_term_days</span><span class="params">(term_info)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> [int(c) + [<span class="number">0</span>, <span class="number">15</span>][i % <span class="number">2</span>] <span class="keyword">for</span> i, c <span class="keyword">in</span> enumerate(term_info)]</span><br></pre></td></tr></table></figure>
+
+<h1 id="3-Borax-Lunardate概述"><a href="#3-Borax-Lunardate概述" class="headerlink" title="3 Borax-Lunardate概述"></a>3 Borax-Lunardate概述</h1><p>到2019年1月为止，关于农历的主题，github/PyPI 上已经有非常多的代码项目，语言有C、Java、Python等，具体的思路也不一样。综合来看，这些库有的功能单一，只覆盖某几个方面；有的已经很久没有更新了，主要是农历信息已在多年之前就采集完成，但是对于一些最新的数据修正未能及时涵盖；也有的在代码层面没有很好的适用最新的 Python 语言特性。</p>
+<p>基于此，本人利用收集整理的一些技术资料开发出了 Borax-Lunar 这个库，主要的目标和特点有：</p>
+<ul>
+<li><strong>完整的农历信息</strong></li>
+</ul>
+<p>在开发过程中我收集网络上的几个重要农历数据，包含了干支、生肖、节气等事项，并同时将它们作为数据验证的参考标准。</p>
+<p>另外，一些术语命名（比如天干、地支等）采用 《GB/T 33661-2017 农历的编算和颁行》 所规定的文字。</p>
+<ul>
+<li><strong>功能完备</strong></li>
+</ul>
+<p>Borax-Lunardate 库分为三个部分：1) 基于 <code>LunarDate</code> 的农历日期表示；2）类似于 <code>datetime.strftime</code> 的字符串格式系统；3） 一些常用的农历工具接口。</p>
+<p>其中第2,3部分是网络上的农历库比较少涉及的，Borax-Lunardate 在这一方面非常有优势的。</p>
+<ul>
+<li><strong>对标datetime</strong></li>
+</ul>
+<p>在模块/类层面的组织和分类上，Borax-Lunardate 对标标准库的 <code>datetime</code>  和 <code>calendar</code> 模块，实现了这两个模块中与农历日期相联系的方法，<code>LunarDate</code> 和 <code>date</code> 类有许多相同的特性，包括不可变类、可比较性、时间加减等。 甚至有些命名也是一样的，比如 <code>strftime</code> 方法。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">lunardate.LunarDate    &lt;------&gt;   datetime.date</span><br><span class="line"></span><br><span class="line">lunardate.LCalendars   &lt;------&gt;   calendar.Calendar</span><br></pre></td></tr></table></figure>
+
+<h1 id="4-模块设计"><a href="#4-模块设计" class="headerlink" title="4 模块设计"></a>4 模块设计</h1><h2 id="4-1-LunarDate日期类"><a href="#4-1-LunarDate日期类" class="headerlink" title="4.1 LunarDate日期类"></a>4.1 LunarDate日期类</h2><h3 id="4-1-1-初始化日期对象"><a href="#4-1-1-初始化日期对象" class="headerlink" title="4.1.1 初始化日期对象"></a>4.1.1 初始化日期对象</h3><p><code>LunarDate</code> 是一个重要的类，每一个对象表示一个农历日期，一个特定的农历日期可以由农历年、月、日、闰月标志4个字段唯一确定，可以使用这些字段初始化对象。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt;from borax.calendars.lunardate import LunarDate</span><br><span class="line">&gt;&gt;&gt;LunarDate(2018, 7, 1)</span><br><span class="line">LunarDate(2018, 7, 1, 0)</span><br></pre></td></tr></table></figure>
+
+<p>对于一些特定的日期，也可以通过类方法创建这些日期对象。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span>&gt;&gt;LunarDate.today()</span><br><span class="line">LunarDate(2018, 7, 1, 0)</span><br><span class="line"><span class="meta">&gt;</span>&gt;&gt;LunarDate.yesterday()</span><br><span class="line">LunarDate(2018, 6, 29, 0)</span><br><span class="line"><span class="meta">&gt;</span>&gt;&gt;LunarDate.tomorrow()</span><br><span class="line">LunarDate(2018, 7, 2, 0)</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-1-2-基准日期"><a href="#4-1-2-基准日期" class="headerlink" title="4.1.2 基准日期"></a>4.1.2 基准日期</h3><p><code>LunarDate</code> 类使用可表示范围的下限作为基准日期（即<code>LunarDate(1990, 1, 1, False)</code>）。对象的 offset 属性表示与基准日期相差的天数，这也是一种可以唯一确定日期的方法。</p>
+<h2 id="4-2-格式化显示"><a href="#4-2-格式化显示" class="headerlink" title="4.2 格式化显示"></a>4.2 格式化显示</h2><p>该功能由 Borax-Lunardate 特有的功能，提供了与 <code>datetime.date.strftime</code> 相似的功能。</p>
+<h3 id="4-2-1-使用方法"><a href="#4-2-1-使用方法" class="headerlink" title="4.2.1 使用方法"></a>4.2.1 使用方法</h3><p><code>LunarDate</code> 提供了 <code>strftime</code> 方法，可以将一个农历日期按照给定的格式转化为字符串。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">LunarDate</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">strftime</span><span class="params">(fmt:str)</span> -&gt; str:</span> <span class="keyword">pass</span></span><br></pre></td></tr></table></figure>
+
+<p>格式字符串使用 ‘%’ 加一个字母的描述符(Directive)表示日期对象的一个字段，常用的描述符见下表：</p>
+<table>
+<thead>
+<tr>
+<th>属性</th>
+<th>类型</th>
+<th>描述</th>
+<th>示例值</th>
+<th>格式描述符</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>year</td>
+<td><code>int</code></td>
+<td>农历年</td>
+<td>2018</td>
+<td>%y</td>
+<td></td>
+</tr>
+<tr>
+<td>month</td>
+<td><code>int</code></td>
+<td>农历月</td>
+<td>6</td>
+<td>%m</td>
+<td></td>
+</tr>
+<tr>
+<td>day</td>
+<td><code>int</code></td>
+<td>农历日</td>
+<td>26</td>
+<td>%d</td>
+<td></td>
+</tr>
+<tr>
+<td>leap</td>
+<td><code>bool</code></td>
+<td>是否闰月</td>
+<td>False</td>
+<td>%l</td>
+<td>(1)</td>
+</tr>
+<tr>
+<td>offset</td>
+<td><code>int</code></td>
+<td>距下限的偏移量</td>
+<td>43287</td>
+<td>-</td>
+<td></td>
+</tr>
+<tr>
+<td>term</td>
+<td><code>str</code> 或 <code>None</code></td>
+<td>节气名称</td>
+<td>立秋</td>
+<td>%t</td>
+<td></td>
+</tr>
+<tr>
+<td>cn_year</td>
+<td><code>str</code></td>
+<td>中文年</td>
+<td>二〇一八年</td>
+<td>%Y</td>
+<td>(2)</td>
+</tr>
+<tr>
+<td>cn_month</td>
+<td><code>str</code></td>
+<td>中文月</td>
+<td>六月</td>
+<td>%M</td>
+<td>(2)</td>
+</tr>
+<tr>
+<td>cn_day</td>
+<td><code>str</code></td>
+<td>中文日</td>
+<td>廿六</td>
+<td>%D</td>
+<td>(2)</td>
+</tr>
+<tr>
+<td>gz_year</td>
+<td><code>str</code></td>
+<td>干支年份</td>
+<td>戊戌</td>
+<td>%o</td>
+<td></td>
+</tr>
+<tr>
+<td>gz_month</td>
+<td><code>str</code></td>
+<td>干支月份</td>
+<td>庚申</td>
+<td>%p</td>
+<td></td>
+</tr>
+<tr>
+<td>gz_day</td>
+<td><code>str</code></td>
+<td>干支日</td>
+<td>辛未</td>
+<td>%q</td>
+<td></td>
+</tr>
+<tr>
+<td>animal</td>
+<td><code>str</code></td>
+<td>年生肖</td>
+<td>狗</td>
+<td>%a</td>
+<td></td>
+</tr>
+<tr>
+<td>-</td>
+<td><code>str</code></td>
+<td>两位数字的月份</td>
+<td>06</td>
+<td>%A</td>
+<td></td>
+</tr>
+<tr>
+<td>-</td>
+<td><code>str</code></td>
+<td>两位数字的日期</td>
+<td>26</td>
+<td>%B</td>
+<td></td>
+</tr>
+</tbody></table>
+<p>备注：</p>
+<ul>
+<li>(1) ‘%l’ 将闰月标志格式化为数字，如“0”、“1”</li>
+<li>(2) ‘%Y’、’%M’、’%D’ 三个中文名称不包含“年”、“月”、“日”后缀汉字</li>
+</ul>
+<p>下面是几个使用 <code>strftime</code> 的例子：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&gt;&gt;&gt;today = LunarDate.today()</span><br><span class="line">&gt;&gt;&gt;today.strftime（&apos;%Y-%M-%D&apos;)</span><br><span class="line">&apos;二〇一八-六-廿六&apos;</span><br><span class="line">&gt;&gt;&gt;today.strftime(&apos;今天的干支表示法为：%G&apos;)</span><br><span class="line">&apos;今天的干支表示法为：戊戌年庚申月辛未日&apos;</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-2-2-源码解析"><a href="#4-2-2-源码解析" class="headerlink" title="4.2.2 源码解析"></a>4.2.2 源码解析</h3><p><code>strftime</code> 的具体实现定义在 <code>lunardate.Formatter</code> 类。该类接受一个 %形式的格式字符串，转化为命名字段形式的格式字符串，并格式化给定的日期对象，如下图：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&apos;%Y-%M-%D&apos;  ==&gt;  &apos;&#123;cn_year&#125;-&#123;cn_month&#125;-&#123;cn_day&#125;&apos;  ==&gt; &apos;二〇一八-六-廿六&apos;</span><br></pre></td></tr></table></figure>
+
+<p>某个字段 field 的具体值，根据下列先后顺序确定具体的值。</p>
+<ul>
+<li><code>Formatter.get_&lt;field&gt;</code></li>
+<li><code>obj.&lt;field&gt;()</code></li>
+<li><code>obj.&lt;field&gt;</code></li>
+</ul>
+<p>核心代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Formatter</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">resolve</span><span class="params">(self, obj, field)</span>:</span></span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            func = getattr(self, <span class="string">'get_'</span> + field)</span><br><span class="line">            <span class="keyword">return</span> func(obj)</span><br><span class="line">        <span class="keyword">except</span> AttributeError:</span><br><span class="line">            attr = getattr(obj, field)</span><br><span class="line">            <span class="keyword">if</span> callable(attr):</span><br><span class="line">                <span class="keyword">return</span> attr()</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                <span class="keyword">return</span> attr</span><br></pre></td></tr></table></figure>
+
+<h2 id="4-3-类型标注"><a href="#4-3-类型标注" class="headerlink" title="4.3 类型标注"></a>4.3 类型标注</h2><h3 id="4-3-1-概述"><a href="#4-3-1-概述" class="headerlink" title="4.3.1 概述"></a>4.3.1 概述</h3><p><a href="https://www.python.org/dev/peps/pep-0484" target="_blank" rel="noopener">PEP 484</a> 和 <a href="https://www.python.org/dev/peps/pep-0526" target="_blank" rel="noopener">PEP526</a> 提供了一种针对 Python 语言的类型标注方法。在 Python3.5+ 以上，可以使用 <code>typing</code> 标准模块实现这一目的，需要说明的是：</p>
+<ul>
+<li><p>方便使用者了解所调用函数的参数类型和返回值类型</p>
+</li>
+<li><p>类型标注不会影响运行，不会抛出异常，只是警告</p>
+</li>
+<li><p>配合IDE的语法语义检查功能，增强智能提示功能</p>
+<p>下面是一个参数和返回值都是字符串的函数标注：</p>
+</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">greeting</span><span class="params">(name: str)</span> -&gt; str:</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">'Hello '</span> + name</span><br></pre></td></tr></table></figure>
+
+<p>除了一些基本类型，常用的符合数据类型还有 <code>Any</code>、<code>Union</code>、<code>Tuple</code>、<code>List</code>、<code>Callable</code>、<code>TyVar</code>、<code>Generic</code> 等。</p>
+<p>需要注意的是，Python 的语言特性也可能给类型标准的使用带来了一些麻烦，比如变量在使用过程中其类型有所变化。基于目标用户是API使用者，大概可以整理出几条实用的原则：</p>
+<ul>
+<li>只应用在公共接口（类、函数、方法、变量）加上类型标注。</li>
+<li>全局常量不使用类型标注</li>
+<li>魔术方法不使用类型标注</li>
+<li>私有方法可以不使用类型标注</li>
+</ul>
+<h3 id="4-3-2-常用的使用示例"><a href="#4-3-2-常用的使用示例" class="headerlink" title="4.3.2 常用的使用示例"></a>4.3.2 常用的使用示例</h3><p>类型标注学习起来也不困难，掌握几种常见的情形即可。</p>
+<p>使用 <code>:</code>表示参数类型，使用 <code>-&gt;</code> 表示返回值类型，如上述的 <code>greeting</code> 函数 。</p>
+<p>默认参数</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">foo</span><span class="params">(arg: int = <span class="number">0</span>)</span> -&gt; <span class="keyword">None</span>:</span> <span class="keyword">pass</span></span><br></pre></td></tr></table></figure>
+
+<p>可选参数，需要使用 <code>Optional</code>，通常和上面的默认参数相互配合。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">ndays</span><span class="params">(year: int, month: Optional[int] = None, leap: bool = False)</span> -&gt; int:</span></span><br><span class="line">    <span class="keyword">pass</span></span><br></pre></td></tr></table></figure>
+
+<p>自定义类型、混合类型，闰月标记可以使用布尔值或者整数。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Leap = Union[bool, int]</span><br></pre></td></tr></table></figure>
+
+<p>后向引用，如果使用的类还没有定义，可以使用包含类名的字符串，以便后续实例化。一般用于创建对象的方法或者树形结构的定义。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">LunarDate</span>:</span></span><br><span class="line"><span class="meta">    @classmethod</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">from_solar_date</span><span class="params">(cls, year: int, month: int, day: int)</span> -&gt; 'LunarDate':</span></span><br><span class="line">        <span class="keyword">pass</span></span><br></pre></td></tr></table></figure>
+
+<p>类型绑定。在后向引用的例子中，通常需要在多个地方使用字符串方式，为避免拼写错误，可以使用 <code>TypeVar</code> 的  bound 参数提前预定义。</p>
+<blockquote>
+<p><code>T = TypeVar(&#39;T&#39;, bound=BaseClass)</code> 使用父类创建类型变量以便所有子类均可匹配，这和 Java/C++ 语言中的 <em>多态</em> 相类似。</p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> typing <span class="keyword">import</span> TypeVar</span><br><span class="line"></span><br><span class="line">T = TypeVar(<span class="string">'T'</span>, bound=<span class="string">'LunarDate'</span>)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">LunarDate</span>:</span></span><br><span class="line"><span class="meta">    @classmethod</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">from_solar_date</span><span class="params">(cls, year: int, month: int, day: int)</span> -&gt; T:</span></span><br><span class="line">        <span class="keyword">pass</span></span><br></pre></td></tr></table></figure>
+
+<p>迭代器，使用 <code>Iterator</code>。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">hello</span><span class="params">(n:int)</span> -&gt; Iterator[int]:</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(n):</span><br><span class="line">        <span class="keyword">yield</span> i</span><br></pre></td></tr></table></figure>
+
+<h1 id="5-参考资料"><a href="#5-参考资料" class="headerlink" title="5 参考资料"></a>5 参考资料</h1><ul>
+<li><a href="http://www.hko.gov.hk/gts/time/conversion.htm" target="_blank" rel="noopener">香港天文台农历信息</a></li>
+<li><a href="https://en.wikipedia.org/wiki/Chinese_calendar" target="_blank" rel="noopener">“农历”维基词条</a></li>
+<li><a href="https://github.com/jjonline/calendar.js" target="_blank" rel="noopener">jjonline/calendar.js</a></li>
+<li><a href="https://github.com/lidaobing/python-lunardate" target="_blank" rel="noopener">lidaobing/python-lunardate</a></li>
+<li><a href="https://stackoverflow.com/questions/33533148/how-do-i-specify-that-the-return-type-of-a-method-is-the-same-as-the-class-itsel" target="_blank" rel="noopener">Forward references - Stackflow</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+      
+  <div class="popular-posts-header">相关文章</div>
+  <ul class="popular-posts">
+    <li class="popular-posts-item">
+      
+        <div class="popular-posts-date">2017-08-09</div>
+      
+      
+      <div class="popular-posts-title"><a href="/2017/08/09/amap-position-picker/" rel="bookmark">【项目】高德地图位置选择器</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+        <div class="popular-posts-date">2020-08-05</div>
+      
+      
+      <div class="popular-posts-title"><a href="/2020/08/05/argon-robot-v300-plan/" rel="bookmark">ArgonRobot-V3.0.0 发布计划</a></div>
+      
+    </li>
+  
+    <li class="popular-posts-item">
+      
+        <div class="popular-posts-date">2020-11-08</div>
+      
+      
+      <div class="popular-posts-title"><a href="/2020/11/08/borax-release-note-340/" rel="bookmark">Borax-3.4.0发布日志</a></div>
+      
+    </li>
+  
+  </ul>
+
+        
+      
+        <div id="reward-container">
+  <div>坚持原创技术分享，您的支持将鼓励我继续创作！</div>
+  <button id="reward-button" disable="enable" onclick="var qr = document.getElementById(&quot;qr&quot;); qr.style.display = (qr.style.display === 'none') ? 'block' : 'none';">
+    打赏
+  </button>
+  <div id="qr" style="display: none;">
+        
+      
+      <div style="display: inline-block">
+        <img src="/images/wechat_reward.png" alt="程序员Barnes 微信支付">
+        <p>微信支付</p>
+      </div>
+
+  </div>
+</div>
+
+      
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>程序员Barnes</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://kinegratii.github.io/2019/01/05/lunardate-module/" title="Borax.Lunardate:中国农历日期">http://kinegratii.github.io/2019/01/05/lunardate-module/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！</li>
+</ul>
+</div>
+
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/项目/" rel="tag"><i class="fa fa-tag"></i> 项目</a>
+            
+              <a href="/tags/农历/" rel="tag"><i class="fa fa-tag"></i> 农历</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2018/10/29/word-scapes-helper-tool/" rel="next" title="WordScapes(纵横填字母)游戏工具">
+                  <i class="fa fa-chevron-left"></i> WordScapes(纵横填字母)游戏工具
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2019/01/15/english-big-numbers/" rel="prev" title="英语的那些大数字">
+                  英语的那些大数字 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+    
+    <div class="comments" id="comments"></div>
+  
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-农历概述"><span class="nav-text">1 农历概述</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-编排规则"><span class="nav-text">1.1 编排规则</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2-表示方法"><span class="nav-text">1.2 表示方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-3-二十四节气"><span class="nav-text">1.3 二十四节气</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-数据结构"><span class="nav-text">2 数据结构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-大小月和闰月"><span class="nav-text">2.1 大小月和闰月</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-节气的数据结构"><span class="nav-text">2.2 节气的数据结构</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-Borax-Lunardate概述"><span class="nav-text">3 Borax-Lunardate概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-模块设计"><span class="nav-text">4 模块设计</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#4-1-LunarDate日期类"><span class="nav-text">4.1 LunarDate日期类</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-1-初始化日期对象"><span class="nav-text">4.1.1 初始化日期对象</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-2-基准日期"><span class="nav-text">4.1.2 基准日期</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-2-格式化显示"><span class="nav-text">4.2 格式化显示</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-1-使用方法"><span class="nav-text">4.2.1 使用方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-2-源码解析"><span class="nav-text">4.2.2 源码解析</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-3-类型标注"><span class="nav-text">4.3 类型标注</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-1-概述"><span class="nav-text">4.3.1 概述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-2-常用的使用示例"><span class="nav-text">4.3.2 常用的使用示例</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5-参考资料"><span class="nav-text">5 参考资料</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/avatar.jpg"
+      alt="程序员Barnes">
+  <p class="site-author-name" itemprop="name">程序员Barnes</p>
+  <div class="site-description" itemprop="description">逍遥于天地之间，而心意自得。</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">46</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+          
+        
+        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/kinegratii" title="GitHub &rarr; https://github.com/kinegratii" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://my.oschina.net/kinegratii" title="oschina &rarr; https://my.oschina.net/kinegratii" rel="noopener" target="_blank"><i class="fa fa-fw fa-link"></i>oschina</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://kinegratii.github.io/borax/" title="Borax &rarr; https://kinegratii.github.io/borax/"><i class="fa fa-fw fa-link"></i>Borax</a>
+      </span>
+    
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    
+  
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2015 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">程序员Barnes</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  <script src="/lib/pjax/pjax.min.js?v=0.2.8"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+  <script>
+var pjax = new Pjax({
+  selectors: [
+    'head title',
+    '#page-configurations',
+    '.content-wrap',
+    '.post-toc-wrap',
+    '#pjax'
+  ],
+  switches: {
+    '.post-toc-wrap': Pjax.switches.innerHTML
+  },
+  analytics: false,
+  cacheBust: false,
+  scrollTo : !CONFIG.bookmark.enable
+});
+
+window.addEventListener('pjax:success', () => {
+  document.querySelectorAll('script[pjax], script#page-configurations, #pjax script').forEach(element => {
+    var id = element.id || '';
+    var src = element.src || '';
+    var code = element.text || element.textContent || element.innerHTML || '';
+    var parent = element.parentNode;
+    parent.removeChild(element);
+    var script = document.createElement('script');
+    if (id !=='') {
+      script.id = element.id;
+    }
+    if (src !== '') {
+      script.src = src;
+      // Force synchronous loading of peripheral JS.
+      script.async = false;
+    }
+    if (code !== '') {
+      script.appendChild(document.createTextNode(code));
+    }
+    parent.appendChild(script);
+  });
+  NexT.boot.refresh();
+  // Define Motion Sequence & Bootstrap Motion.
+  if (CONFIG.motion.enable) {
+    NexT.motion.integrator
+      .init()
+      .add(NexT.motion.middleWares.postList)
+      .bootstrap();
+  }
+  NexT.utils.updateSidebarPosition();
+});
+</script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <div id="pjax">
+
+  
+
+  
+
+  
+
+
+<script>
+NexT.utils.getScript('//unpkg.com/valine/dist/Valine.min.js', () => {
+  var GUEST = ['nick', 'mail', 'link'];
+  var guest = 'nick,mail,link';
+  guest = guest.split(',').filter(item => {
+    return GUEST.indexOf(item) > -1;
+  });
+  new Valine({
+    el: '#comments',
+    verify: false,
+    notify: false,
+    appId: 'YlSXBoomxn9Ws7GEb7bfJiaz-gzGzoHsz',
+    appKey: 'usgVEKYx48ugyhewgxrnLjFk',
+    placeholder: 'Just go go',
+    avatar: 'mm',
+    meta: guest,
+    pageSize: '10' || 10,
+    visitor: true,
+    lang: '' || 'zh-cn',
+    path: location.pathname
+  });
+}, window.Valine);
+</script>
+
+    </div>
+</body>
+</html>
